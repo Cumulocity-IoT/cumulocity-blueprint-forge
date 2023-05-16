@@ -14,9 +14,7 @@
     "prebuild-dev": " gulp clean",
     "postbuild-dev": " gulp bundle"
   },
-  "keywords": [
-    "Blueprint"
-  ],
+  "keywords": ["Blueprint"],
   "author": "Software AG, Global Presales",
   "license": "Apache-2.0",
   "dependencies": {
