@@ -1,0 +1,35 @@
+<form #stepForm="ngForm" name="form" class="d-contents">
+    <div class="container-fluid flex-no-shrink fit-w">
+      <div class="row separator-bottom">
+        <div class="col-md-8 col-md-offset-2 col-lg-6 col-lg-offset-3 p-t-24 p-l-16 p-r-16">
+          <h3 translate class="text-medium l-h-base">App Template</h3>
+          <p class="lead text-normal" translate>
+            Get Started Quickly with Our Pre-Built Templates, or Choose Custom and Upload/Create Your Own to Build Your Perfect Application.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="templates" class="inner-scroll flex-grow">
+      <div class="container-fluid fit-w">
+        <div class="card-group interact-grid card-group-align">
+          <div *ngFor="let template of templates" class="col-xs-12 col-sm-3 col-md-3">
+            <div class="card pointer">
+              <img src="./../../../assets/custom-template.png" alt="#" class="img-responsive thumbnail"/>
+              <div class="card-header">
+                <h4 class="card-title">{{template?.title}}</h4>
+              </div>
+              <div class="card-block">
+                <p>{{template?.description}}</p>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+    </div>
+    <!-- <c8y-template-setup-stepper-buttons
+      [index]="stepper.selectedIndex"
+      (onBack)="back()"
+    > 
+    </c8y-template-setup-stepper-buttons> -->
+  </form>
+  

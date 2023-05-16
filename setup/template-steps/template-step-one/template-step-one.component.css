@@ -1,0 +1,8 @@
+.card-group-align {
+    text-align:center;
+    padding-top: 10px;
+}
+.thumbnail {
+    max-height: 150px;
+    width: 100%;
+}

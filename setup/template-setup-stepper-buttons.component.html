@@ -1,0 +1,14 @@
+<div class="card-footer separator d-flex j-c-center">
+  <button
+    class="btn btn-default"
+    type="button"
+    (click)="onBack.emit()"
+    *ngIf="index !== 0"
+    translate
+  >
+    Previous
+  </button>
+  <button class="btn btn-primary" type="submit" (click)="onNext.emit()" translate>
+    Continue
+  </button>
+</div>
