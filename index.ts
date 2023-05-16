@@ -1,4 +1,5 @@
 import './polyfills';
+import './ng1';
 import './i18n';
 
 import { enableProdMode } from '@angular/core';
