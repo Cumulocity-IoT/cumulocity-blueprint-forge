@@ -1,0 +1,47 @@
+<form #stepForm="ngForm" name="form" class="d-contents">
+    <div class="container-fluid flex-no-shrink fit-w">
+      <div class="row separator-bottom">
+        <div class="col-md-8 col-md-offset-2 col-lg-6 col-lg-offset-3  p-t-24 p-l-16 p-r-16">
+          <h3 translate class="text-medium l-h-base">Boon Logic</h3>
+          <p class="lead text-normal" translate>
+            IOT for Smart Equipment Manufecturer
+            </p>
+        </div>
+      </div>
+    </div>
+    <div class="inner-scroll flex-grow">
+      <div class="container-fluid fit-w">
+        <div class="card-group interact-grid" style="text-align:center;padding-top: 10px;">
+          <div class="col-xs-12 col-sm-6 col-md-6 ">
+            <div class="card">
+              <div class="card-block">
+                <img src="./../../../assets/wilsen_preview.png" alt="#" class="img-responsive" style=""/>
+              </div>
+              <div class="card-block">
+                <video width="100%" height="100%" controls controls="controls">
+                  <source type="video/mp4" src="https://labcase.softwareag.com/storage/d/b6b40d9e5a3d5a2ce69f17201c3b0996" />
+                 </video>
+              </div>
+          </div>
+          </div>
+          <div class="col-xs-12 col-sm-6 col-md-6 ">
+            <div class="card">
+              
+              <div class="card-block">
+            Smart Equipment Management is designed to demonstrate that the Cumulocity IoT is an open, ready-to-go IoT platform available as a SaaS, PaaS (managed by Software AG or self-operated), on-premises and at edge which is fully re-brandable. and helps to understand the current status of equipment located at a customer or difficult to access location and being able to communicate bi-directional with the piece of equipment.
+  
+            The Internet of Things (IoT) is the key enabler for this new connected world and the first step is understanding service asset conditions using IoT sensors.As companies shift towards a new paradigm—Everything-as-a-Service, understand the current status of piece of equipment located at your customer and be able to communicate bi-directional with the piece of equipment. IoT sensors will provide you with the needed data to support this initiative.The expectations of customers, and business partners alike, are rising rapidly as the world becomes increasingly digitized.
+          </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+    <c8y-template-setup-stepper-buttons
+      [index]="stepper.selectedIndex"
+      (onNext)="next()"
+      (onBack)="back()"
+    >
+    </c8y-template-setup-stepper-buttons>
+  </form>
+  
