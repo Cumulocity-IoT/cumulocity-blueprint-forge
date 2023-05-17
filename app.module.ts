@@ -42,6 +42,7 @@ import { TemplateCatalogService } from './setup/template-catalog.service';
 @NgModule({
   declarations: [
     TemplateStepOneComponent, 
+    TemplateStepTwoDetailsComponent,
     TemplateSetupStepperButtonsComponent
   ],
   imports: [
