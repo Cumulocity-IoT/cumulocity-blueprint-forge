@@ -297,14 +297,29 @@ body {
     --navigator-text-color: ${this.colorToHex(app.applicationBuilder.branding.colors.textOnPrimary)};
     --navigator-title-color: ${this.colorToHex(app.applicationBuilder.branding.colors.textOnPrimary)};
     --navigator-active-color: ${this.colorToHex(app.applicationBuilder.branding.colors.textOnActive)};
+    --navigator-color-active:${this.colorToHex(app.applicationBuilder.branding.colors.textOnActive)};
     --navigator-hover-color: ${this.colorToHex(app.applicationBuilder.branding.colors.hover)};
+    --navigator-bg-color:  ${this.colorToHex(app.applicationBuilder.branding.colors.primary)};
+    --navigator-header-bg: ${this.colorToHex(app.applicationBuilder.branding.colors.primary)};
+
+    --c8y-action-bar-background-default: ${this.colorToHex(app.applicationBuilder.branding.colors.toolBar)};
+    --c8y-action-bar-color-default: ${this.colorToHex(app.applicationBuilder.branding.colors.text)};
+    --c8y-action-bar-color-actions: ${this.colorToHex(app.applicationBuilder.branding.colors.text)};
+    --c8y-action-bar-icon-color:${this.colorToHex(app.applicationBuilder.branding.colors.text)};
     
+    --c8y-nav-tabs-background-default: ${app.applicationBuilder.branding.colors.tabBar ? this.colorToHex(app.applicationBuilder.branding.colors.tabBar) : '#ffffff'};
+    --c8y-nav-tabs-color-default: ${this.colorToHex(app.applicationBuilder.branding.colors.text)};
+    --c8y-nav-tabs-icon-color-active: ${this.colorToHex(app.applicationBuilder.branding.colors.text)};
+    --c8y-nav-tabs-color-default: ${this.colorToHex(app.applicationBuilder.branding.colors.text)};
+
+
 
     /* All the other text: */
     --brand-dark: ${this.colorToHex(app.applicationBuilder.branding.colors.text)};
     /* --input-focus-color: ${this.colorToHex(app.applicationBuilder.branding.colors.text)}; */
     --header-hover-color: ${app.applicationBuilder.branding.colors.hover ? this.colorToHex(app.applicationBuilder.branding.colors.hover) : '#14629f'};
     --header-color: ${app.applicationBuilder.branding.colors.headerBar ? this.colorToHex(app.applicationBuilder.branding.colors.headerBar) : '#ffffff'};
+    --header-text-color: ${app.applicationBuilder.branding.colors.textOnPrimary ? this.colorToHex(app.applicationBuilder.branding.colors.textOnPrimary) : '#ffffff'};
     --dropdown-background: ${app.applicationBuilder.branding.colors.headerBar ? this.colorToHex(app.applicationBuilder.branding.colors.headerBar) : '#ffffff'};
     --toolbar-background:${app.applicationBuilder.branding.colors.toolBar ? this.colorToHex(app.applicationBuilder.branding.colors.toolBar) : '#ffffff'};
     --toolbar-color: ${this.colorToHex(app.applicationBuilder.branding.colors.text)};

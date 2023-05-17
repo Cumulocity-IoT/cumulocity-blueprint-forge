@@ -63,14 +63,14 @@ export class AppBuilderConfigNavigationRegistrationService {
 export class AppBuilderConfigNavigationService implements NavigatorNodeFactory {
     nodes = new BehaviorSubject<NavigatorNode[]>([]);
     constructor(appIdService: AppIdService, private configNavService: AppBuilderConfigNavigationRegistrationService, appStateService: AppStateService, userService: UserService) {
-        configNavService.registerNewConfigListener((appId, configNode) => {
+        /* configNavService.registerNewConfigListener((appId, configNode) => {
             configNode.add( new NavigatorNode({
                 label: 'Styling',
                 icon: 'paint-brush',
                 path: `/application/${appId}/branding`,
                 priority: 2
             }));
-        });
+        }); */
         configNavService.registerNewConfigListener((appId, configNode) => {
             configNode.add(new NavigatorNode({
                 label: 'Simulator',
