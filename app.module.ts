@@ -37,7 +37,7 @@ import { TemplateStepOneComponent } from './setup/template-steps/template-step-o
 import { TemplateSetupStepperButtonsComponent } from './setup/template-setup-stepper-buttons.component';
 import { TemplateStepTwoDetailsComponent } from './setup/template-steps/template-step-two-details/template-step-two-details.component';
 import { TemplateStepThreeConfigComponent } from './setup/template-steps/template-step-three-config/template-step-three-config.component';
-import { TemplateCatalogService } from './setup/template-catalog.service';
+import { TemplateCatalogService } from './setup/template-catalog-setup.service';
 
 @NgModule({
   declarations: [

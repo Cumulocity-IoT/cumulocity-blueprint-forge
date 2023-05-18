@@ -4,12 +4,8 @@ import { Observable } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { has, get } from "lodash-es";
 import { IManagedObject, IManagedObjectBinary } from '@c8y/client';
-import { TemplateCatalogEntry, TemplateDetails } from "./template-catalog.model";
+import { AppTemplateDetails, TemplateCatalogEntry, TemplateDetails } from "./template-catalog-setup.model";
 import { ApplicationService, InventoryBinaryService, InventoryService } from "@c8y/ngx-components/api";
-// import { AppBuilderNavigationService } from "../navigation/app-builder-navigation.service";
-// import { Alert, AlertService } from "@c8y/ngx-components";
-// import { AppBuilderExternalAssetsService } from 'app-builder-external-assets';
-// import { DashboardConfig } from "builder/application-config/dashboard-config.component";
 
 const packageJson = require('./../package.json');
 @Injectable()
@@ -20,6 +16,7 @@ export class TemplateCatalogService {
     private GATEWAY_URL_GitHubAsset_FallBack = '';
     private GATEWAY_URL_GitHubAPI_FallBack = '';
     private bluePrintTemplatePath = '/blueprintForge/template.json';
+    private bluePrintTemplateDetailsPath = '/blueprintForge/boonLogic/config.json';
     private devBranchPath = "?ref=blueprint-forge";
     private preprodBranchPath = "?ref=blueprint-forge";
     pkgVersion: any;
@@ -49,6 +46,16 @@ export class TemplateCatalogService {
         return this.getDataForTemplateCatalog(url);
     }
 
+    getTemplateDetailsCatalog(): Observable<AppTemplateDetails> {
+        let url = `${this.GATEWAY_URL_GitHubAPI}${this.bluePrintTemplateDetailsPath}`;
+        if(this.pkgVersion.includes('dev')) {
+            url = url + this.devBranchPath;
+        } else if (this.pkgVersion.includes('rc')) {
+            url = url + this.preprodBranchPath;
+        }
+        return this.getDataForTemplateDetailsCatalog(url);
+    }
+
     getTemplateCatalogFallBack(): Observable<TemplateCatalogEntry[]> {
         let url = `${this.GATEWAY_URL_GitHubAPI_FallBack}${this.bluePrintTemplatePath}`;
         this.isFallBackActive = true;
@@ -59,6 +66,19 @@ export class TemplateCatalogService {
         }
         return this.getDataForTemplateCatalog(url);
     }
+
+    getTemplateDetailsCatalogFallBack(): Observable<AppTemplateDetails> {
+        let url = `${this.GATEWAY_URL_GitHubAPI_FallBack}${this.bluePrintTemplateDetailsPath}`;
+        this.isFallBackActive = true;
+        if(this.pkgVersion.includes('dev')) {
+            url = url + this.devBranchPath;
+        } else if (this.pkgVersion.includes('rc')) {
+            url = url + this.preprodBranchPath;
+        }
+        return this.getDataForTemplateDetailsCatalog(url);
+    }
+
+    
 
     private getDataForTemplateCatalog(url: string): Observable<TemplateCatalogEntry[]> {
         return this.http.get(`${url}`).pipe(map(response => {
@@ -82,6 +102,27 @@ export class TemplateCatalogService {
             
         }));
        
+    }
+
+
+    private getDataForTemplateDetailsCatalog(url: string): Observable<AppTemplateDetails> {
+        return this.http.get(`${url}`).pipe(map(response => {
+            if (!has(response, 'details')) {
+                console.error('Failed to load catalog');
+                return undefined;
+            }
+
+            let catalog = response['details'] as Array<object>;
+            return {
+                title: get(catalog, 'title'),
+                tagLine: get(catalog, 'tagLine'),
+                image: get(catalog, 'image'),
+                video: get(catalog, 'video'),
+                description: get(catalog, 'description')
+            } as AppTemplateDetails;
+            
+            
+        }));
     }
 
     getTemplateDetails(dashboardId: string): Observable<TemplateDetails> {
