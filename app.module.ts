@@ -38,7 +38,9 @@ import { TemplateSetupStepperButtonsComponent } from './setup/template-setup-ste
 import { TemplateStepTwoDetailsComponent } from './setup/template-steps/template-step-two-details/template-step-two-details.component';
 import { TemplateStepThreeConfigComponent } from './setup/template-steps/template-step-three-config/template-step-three-config.component';
 import { TemplateCatalogService } from './setup/template-catalog-setup.service';
-
+import { NgImageSliderModule } from 'ng-image-slider';
+import { GalleryModule } from 'ng-gallery';
+import { LightboxModule } from  'ng-gallery/lightbox';
 @NgModule({
   declarations: [
     TemplateStepOneComponent, 
@@ -57,7 +59,12 @@ import { TemplateCatalogService } from './setup/template-catalog-setup.service';
     BuilderModule,
     SimulationStrategiesModule,
     WidgetsModule,
-    CustomWidgetsModule
+    CustomWidgetsModule,
+    NgImageSliderModule,
+    GalleryModule.withConfig({
+        thumb: false
+      }),
+    LightboxModule
   ],
   providers: [
     TemplateCatalogService,

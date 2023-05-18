@@ -16,7 +16,7 @@ export class TemplateCatalogService {
     private GATEWAY_URL_GitHubAsset_FallBack = '';
     private GATEWAY_URL_GitHubAPI_FallBack = '';
     private bluePrintTemplatePath = '/blueprintForge/template.json';
-    private bluePrintTemplateDetailsPath = '/blueprintForge/boonLogic/config.json';
+    private bluePrintTemplateDetailsPath = '/blueprintForge/nitrobox/config.json';
     private devBranchPath = "?ref=blueprint-forge";
     private preprodBranchPath = "?ref=blueprint-forge";
     pkgVersion: any;
@@ -107,17 +107,16 @@ export class TemplateCatalogService {
 
     private getDataForTemplateDetailsCatalog(url: string): Observable<AppTemplateDetails> {
         return this.http.get(`${url}`).pipe(map(response => {
-            if (!has(response, 'details')) {
+            /* if (!has(response, 'details')) {
                 console.error('Failed to load catalog');
                 return undefined;
-            }
+            } */
 
-            let catalog = response['details'] as Array<object>;
+            let catalog = response as Array<object>;
             return {
                 title: get(catalog, 'title'),
                 tagLine: get(catalog, 'tagLine'),
-                image: get(catalog, 'image'),
-                video: get(catalog, 'video'),
+                media: get(catalog, 'media'),
                 description: get(catalog, 'description')
             } as AppTemplateDetails;
             

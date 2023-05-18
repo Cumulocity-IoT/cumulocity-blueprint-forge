@@ -15,13 +15,21 @@
           <div class="col-xs-12 col-sm-6 col-md-6 ">
             <div class="card">
               <div class="card-block">
-                <img [src]="templateDetails?.image && templateDetails?.image != '' ? templateDetails?.image : ''" alt="#" class="img-responsive" style=""/>
-              </div>
-              <div class="card-block">
+               <!--  <ng-image-slider #nav [images]="templateDetails?.media"
+                [infinite]="false" 
+              [autoSlide]="1"
+              [imageSize]="{width: '100%', height: '400'}"
+              slideImage="1"
+               ></ng-image-slider> -->  
+               <gallery [items]="images" class="galleryDiv" [counter]="false"></gallery>
+
+             <!--    <img [src]="templateDetails?.image && templateDetails?.image != '' ? templateDetails?.image : ''" alt="#" class="img-responsive" style=""/>
+             -->  </div>
+              <!-- <div class="card-block">
                 <video width="100%" height="100%" controls controls="controls">
                   <source type="video/mp4" [src]="templateDetails?.video && templateDetails?.video != '' ? templateDetails?.video : ''" />
                  </video>
-              </div>
+              </div> -->
           </div>
           </div>
           <div class="col-xs-12 col-sm-6 col-md-6 ">
