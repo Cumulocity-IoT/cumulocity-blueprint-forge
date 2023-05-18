@@ -26,18 +26,18 @@ import {IconSelectorModule} from "../icon-selector/icon-selector.module";
 import {TooltipModule} from "ngx-bootstrap/tooltip";
 import {SortableModule} from "ngx-bootstrap/sortable";
 import {WizardModule} from "../wizard/wizard.module";
-import {BrandingModule} from "./branding/branding.module";
+//import {BrandingModule} from "./branding/branding.module";
 import {AppBuilderNavigationService} from "./navigation/app-builder-navigation.service";
 import {
     AppBuilderConfigNavigationRegistrationService,
     AppBuilderConfigNavigationService
 } from "./navigation/app-builder-config-navigation.service";
-import { BrandingComponent } from "./branding/branding.component";
+//import { BrandingComponent } from "./branding/branding.component";
 import { SimulatorConfigModule } from "./simulator-config/simulator-config.module";
 import { AppIdService } from "./app-id.service";
 import { SimulatorConfigComponent } from "./simulator-config/simulator-config.component";
 import { MarkdownModule } from "ngx-markdown";
-import { BrandingDirtyGuardService } from "./branding/branding-dirty-guard.service";
+//import { BrandingDirtyGuardService } from "./branding/branding-dirty-guard.service";
 import { fromEvent, Observable } from "rxjs";
 import { distinctUntilChanged, filter, withLatestFrom } from "rxjs/operators";
 import { TemplateCatalogModule } from "./template-catalog/template-catalog.module";
@@ -73,11 +73,12 @@ import { SettingsService } from "./settings/settings.service";
             }, {
                 path: 'application/:applicationId/config',
                 component: DashboardConfigComponent
-            }, {
+            },
+            /*  {
                 path: 'application/:applicationId/branding',
                 component: BrandingComponent,
                 canDeactivate: [BrandingDirtyGuardService]
-            }, {
+            }, */ {
                 path: 'application/:applicationId/simulator-config',
                 component: SimulatorConfigComponent
             }
@@ -91,7 +92,7 @@ import { SettingsService } from "./settings/settings.service";
         WizardModule,
         TemplateCatalogModule,
         TooltipModule.forRoot(),
-        BrandingModule.forRoot(),
+  //      BrandingModule.forRoot(),
         SimulatorConfigModule,
         DeviceSelectorModule,
         MarkdownModule.forRoot(),

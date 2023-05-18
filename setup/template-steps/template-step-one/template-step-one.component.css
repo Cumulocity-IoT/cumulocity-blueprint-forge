@@ -6,3 +6,19 @@
     max-height: 150px;
     width: 100%;
 }
+.coming-soon-tag {
+    position        : absolute;
+    width           : 172px;
+    padding         : 5px;
+    background-color: #1776BF;
+    color           : white;
+    top             : 0px;
+    left            : 0px;
+    text-align      : center;
+    z-index         : 1001;
+    transform       : rotate(-45deg) translate(-53px, -8px);
+    box-shadow      : 5px 6px 3px #00000094
+  }
+.card-container {
+    overflow: hidden;
+}

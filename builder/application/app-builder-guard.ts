@@ -59,19 +59,6 @@ export class RedirectToApp implements CanActivate {
             const defaultAppBuilderData = {
                 applicationBuilder: {
                     version: packageJson.version,
-                    branding: {
-                        colors: {
-                            primary: '#1776BF',
-                            active: '#14629F',
-                            text: '#0b385b',
-                            textOnPrimary: 'white',
-                            textOnActive: 'white',
-                            hover: '#14629F',
-                            headerBar: 'white',
-                            toolBar: 'white',
-                            tabBar: 'white'
-                        }
-                    },
                     dashboards: [],
                     simulators: [],
                     icon: appIcon

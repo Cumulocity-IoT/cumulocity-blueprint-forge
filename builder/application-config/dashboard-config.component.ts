@@ -22,7 +22,7 @@ import { Observable, from, Subject, Subscription, BehaviorSubject, combineLatest
 import { debounceTime, first, map, switchMap, tap } from "rxjs/operators";
 import { AppBuilderNavigationService } from "../navigation/app-builder-navigation.service";
 import { AlertService, AppStateService } from "@c8y/ngx-components";
-import { BrandingService } from "../branding/branding.service";
+//import { BrandingService } from "../branding/branding.service";
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { NewDashboardModalComponent } from "./new-dashboard-modal.component";
 import { EditDashboardModalComponent } from "./edit-dashboard-modal.component";
@@ -108,7 +108,7 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
 
     constructor(
         private appIdService: AppIdService, private appService: ApplicationService, private appStateService: AppStateService,
-        private brandingService: BrandingService, private inventoryService: InventoryService, private navigation: AppBuilderNavigationService,
+        private inventoryService: InventoryService, private navigation: AppBuilderNavigationService,
         private modalService: BsModalService, private alertService: AlertService, private settingsService: SettingsService,
         private accessRightsService: AccessRightsService, private userService: UserService, private appDataService: AppDataService,
         @Inject(DOCUMENT) private document: Document, private renderer: Renderer2, private cd: ChangeDetectorRef, private clipboard: Clipboard
@@ -329,7 +329,7 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
         }
 
         // Refresh the application name/icon
-        this.brandingService.updateStyleForApp(app);
+    //    this.brandingService.updateStyleForApp(app);
         // Refresh the applications list
         this.appStateService.currentUser.next(this.appStateService.currentUser.value);
     }
