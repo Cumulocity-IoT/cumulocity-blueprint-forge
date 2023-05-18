@@ -51,4 +51,9 @@ export class TemplateStepOneComponent extends TemplateSetupStep {
                 this.alertService.danger("There is some technical error! Please try after sometime.");
             });
   }
+
+  selectedTemplate(dashboardURL: string) {
+    super.next();
+    
+  }
 }
