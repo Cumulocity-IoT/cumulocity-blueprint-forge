@@ -9,6 +9,14 @@ export interface TemplateCatalogEntry {
     comingSoon: boolean;
 }
 
+export interface AppTemplateDetails {
+    title: string;
+    tagLine: string;
+    image: string;
+    description: string;
+    video: string;
+}
+
 export interface TemplateDetails {
     input: {
         devices?: Array<DeviceDescription>;

@@ -2,9 +2,9 @@ import { CdkStep } from '@angular/cdk/stepper';
 import { Component } from '@angular/core';
 import { AlertService, AppStateService, C8yStepper, SetupComponent } from '@c8y/ngx-components';
 import { TemplateSetupStep } from './../../template-setup-step';
-import { TemplateCatalogService } from './../../template-catalog.service';
+import { TemplateCatalogService } from '../../template-catalog-setup.service';
 import { catchError } from "rxjs/operators";
-import { TemplateCatalogEntry } from './../../template-catalog.model';
+import { TemplateCatalogEntry } from '../../template-catalog-setup.model';
 
 @Component({
   selector: 'c8y-template-step-one',
