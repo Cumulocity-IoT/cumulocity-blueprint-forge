@@ -1,9 +1,10 @@
 import { CdkStep } from '@angular/cdk/stepper';
 import { AppStateService, AlertService, C8yStepper, SetupComponent } from '@c8y/ngx-components';
-import { TemplateConfig, DEFAULT_CONFIG } from './template-config.model';
+import { TemplateConfig, DEFAULT_CONFIG, TemplateDetails,  details_config} from './template-config.model';
 
 export abstract class TemplateSetupStep {
   config: TemplateConfig = DEFAULT_CONFIG;
+  detailsConfig: TemplateDetails = details_config; 
   pending = false;
 
   constructor(

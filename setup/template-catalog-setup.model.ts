@@ -12,9 +12,8 @@ export interface TemplateCatalogEntry {
 export interface AppTemplateDetails {
     title: string;
     tagLine: string;
-    image: string;
     description: string;
-    video: string;
+    media: any;
 }
 
 export interface TemplateDetails {

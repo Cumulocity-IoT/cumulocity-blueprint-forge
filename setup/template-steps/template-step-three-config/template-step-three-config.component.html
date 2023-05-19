@@ -1,0 +1,99 @@
+<form #stepForm="ngForm" name="form" class="d-contents">
+    <div class="container-fluid flex-no-shrink fit-w">
+      <div class="row separator-bottom">
+        <div class="col-md-8 col-md-offset-2 col-lg-6 col-lg-offset-3 p-t-24 p-l-16 p-r-16">
+          <h3 translate class="text-medium l-h-base">Configuration</h3>
+          <p class="lead text-normal" translate>
+            Let's Configure Your Application to Meet Your Specific Needs!
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="inner-scroll flex-grow">
+      <div class="container-fluid fit-w">
+        <div class="card-group interact-grid" style="text-align:center;padding-top: 10px;">
+          <div class="col-xs-12 col-sm-8 col-md-8">
+             <div class="card">
+              <div class="card-header">
+                <div class="col-xs-12 col-sm-6 col-md-6" style="text-align: left;">
+                  <h4 class="card-title"> Dashboards</h4>
+                </div>
+               
+                <div class="col-xs-12 col-sm-6 col-md-6" style="text-align: right;">
+                  <button type="button pull-right" class="btn btn-default">Dashboard Catalog</button>
+                </div>
+              </div>
+             </div>
+          </div>
+          <div class="col-xs-12 col-sm-4 col-md-4">
+            <div class="card">
+              <div class="card-header">
+                <h4 class="card-title"> Select Widgets</h4>
+              </div>
+              <div class="card-block">
+                <ul class="list-group" style="text-align: left;">
+                  <li class="list-group-item d-flex">
+                    <div class="list-item-checkbox">
+                      <label class="c8y-checkbox">
+                        <input type="checkbox" id="groupcheckbox3" />
+                        <span></span>
+                      </label>
+                    </div>
+                    <label for="groupcheckbox3">
+                      Boon Logic Configuration Widget
+                      <br /><small class="text-muted"
+                        >This widget help you to configure Boon Logic parameters for Machine Learning</small
+                      >
+                    </label>
+                  </li>
+                
+                  <li class="list-group-item d-flex">
+                    <div class="list-item-checkbox">
+                      <label class="c8y-checkbox">
+                        <input type="checkbox" id="groupcheckbox4" />
+                        <span></span>
+                      </label>
+                    </div>
+                    <label for="groupcheckbox4">
+                      Root Cause Analysis Widget
+                      <br /><small class="text-muted"
+                        >This is Root Cause Analysis widget</small
+                      >
+                    </label>
+                  </li>
+                </ul>
+              </div>
+            
+              <div class="card-header">
+                <h4 class="card-title"> Select Micro services</h4>
+              </div>
+              <div class="card-block">
+                <ul class="list-group" style="text-align: left;">
+                  <li class="list-group-item d-flex">
+                    <div class="list-item-checkbox">
+                      <label class="c8y-checkbox">
+                        <input type="checkbox" id="groupcheckbox3" />
+                        <span></span>
+                      </label>
+                    </div>
+                    <label for="groupcheckbox3">
+                      Amber Integration
+                      <br /><small class="text-muted"
+                        >Amber Integration</small
+                      >
+                    </label>
+                  </li>
+                </ul>
+              </div>
+            </div>
+         </div>
+        </div>
+      </div>
+    </div>
+    <c8y-template-setup-stepper-buttons
+      [index]="stepper.selectedIndex"
+      (onNext)="next()"
+      (onBack)="back()"
+    ></c8y-template-setup-stepper-buttons>
+  </form>
+  

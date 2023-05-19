@@ -1,10 +1,11 @@
 import { CdkStep } from '@angular/cdk/stepper';
-import { Component } from '@angular/core';
+import {  Component } from '@angular/core';
 import { AlertService, AppStateService, C8yStepper, SetupComponent } from '@c8y/ngx-components';
 import { TemplateSetupStep } from './../../template-setup-step';
 import { TemplateCatalogService } from '../../template-catalog-setup.service';
 import { catchError } from "rxjs/operators";
-import { TemplateCatalogEntry } from '../../template-catalog-setup.model';
+import { TemplateCatalogEntry, AppTemplateDetails } from '../../template-catalog-setup.model';
+import { TemplateStepTwoDetailsComponent } from '../template-step-two-details/template-step-two-details.component';
 
 @Component({
   selector: 'c8y-template-step-one',
@@ -12,11 +13,13 @@ import { TemplateCatalogEntry } from '../../template-catalog-setup.model';
   styleUrls: ['./template-step-one.component.css'],
   host: { class: 'd-contents' }
 })
-export class TemplateStepOneComponent extends TemplateSetupStep {
+export class TemplateStepOneComponent extends TemplateSetupStep   {
+
 
   public templates: Array<TemplateCatalogEntry> = [];
 
   public filterTemplates: Array<TemplateCatalogEntry> = [];
+  templateDetails: AppTemplateDetails;
   constructor(
     public stepper: C8yStepper,
     protected step: CdkStep,
@@ -31,6 +34,10 @@ export class TemplateStepOneComponent extends TemplateSetupStep {
 
   ngOnInit() {
     this.loadTemplateCatalog();
+  }
+
+  ngAfterViewInit() {
+    
   }
 
   loadTemplateCatalog() {
@@ -52,8 +59,11 @@ export class TemplateStepOneComponent extends TemplateSetupStep {
             });
   }
 
+
   selectedTemplate(dashboardURL: string) {
-    super.next();
-    
+    this.config.dashboard = dashboardURL;
+    super.next();    // Navigation to details page
   }
-}
+
+
+  }

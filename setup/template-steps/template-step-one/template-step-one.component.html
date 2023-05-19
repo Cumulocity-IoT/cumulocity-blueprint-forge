@@ -6,7 +6,6 @@
           <p class="lead text-normal" translate>
             Get Started Quickly with Our Pre-Built Templates, or Choose Custom and Upload/Create Your Own to Build Your Perfect Application.
           </p>
-          <!-- Templates -- {{templates | json}} -->
          
         </div>
       </div>
@@ -17,7 +16,8 @@
           <div class="col-md-10 col-lg-9 col-lg-offset-1">
             <div class="card-group interact-grid card-group-align">
               <div *ngFor="let template of templates" class="col-xs-12 col-sm-3 col-md-3">
-                <div class="card pointer card-container" (click)="selectedTemplate(template.dashboard)">
+                
+                <div class="card pointer card-container" (click)="selectedTemplate(template?.dashboard)">
                  
                   <img [src]="template?.thumbnail && template?.thumbnail != '' ? template?.thumbnail : ''" alt="#"
                     class="img-responsive thumbnail" />
@@ -35,10 +35,5 @@
       </div>
     </div>
     </div>
-    <!-- <c8y-template-setup-stepper-buttons
-      [index]="stepper.selectedIndex"
-      (onBack)="back()"
-    > 
-    </c8y-template-setup-stepper-buttons> -->
   </form>
   

@@ -3,7 +3,7 @@
   "version": "1017.0.156-1.0.0-dev-1",
   "description": "This is package blueprint to create application dynamically.",
   "scripts": {
-    "start": "c8ycli server",
+    "start": "c8ycli server -u https://appbuilder.eu-latest.cumulocity.com/",
     "build": "c8ycli build",
     "deploy": "c8ycli deploy",
     "locale-extract": "c8ycli locale-extract",
@@ -14,7 +14,9 @@
     "prebuild-dev": " gulp clean",
     "postbuild-dev": " gulp bundle"
   },
-  "keywords": ["Blueprint"],
+  "keywords": [
+    "Blueprint"
+  ],
   "author": "Software AG, Global Presales",
   "license": "Apache-2.0",
   "dependencies": {
@@ -43,6 +45,8 @@
     "fontawesome": "^4.7.2",
     "jszip": "^3.10.1",
     "lodash-es": "^4.0.0",
+    "ng-gallery": "^7.1.2",
+    "ng-image-slider": "^6.1.0",
     "ngx-bootstrap": "9.0.0",
     "ngx-markdown": "^14.0.1",
     "reflect-metadata": "^0.1.13",
@@ -76,6 +80,7 @@
       "brandingEntry": "./ui-assets/index.less",
       "tabsHorizontal": true,
       "upgrade": true,
+      "forceSetup": true,
       "rightDrawer": true,
       "contentSecurityPolicy": "base-uri 'none'; default-src 'self' 'unsafe-inline' http: https: ws: wss: blob:; connect-src 'self' *.webmethodscloud.com *.aptrinsic.com *.billwerk.com http: https: ws: wss: blob:;  script-src 'self' open.mapquestapi.com *.twitter.com *.twimg.com *.aptrinsic.com 'unsafe-inline' 'unsafe-eval' data:; style-src * 'unsafe-inline' blob:; img-src * data: blob:; font-src * data:; frame-src *; worker-src 'self' blob:;",
       "dynamicOptionsUrl": "/apps/public/public-options/options.json",
@@ -90,16 +95,21 @@
         "required": true,
         "functional": "These cookies are used to support you during your first steps in the product, to deliver content tailored to your needs, and to collect usage statistics."
       },
-      "copy": [{
-        "from": "./ui-assets/fonts",
-        "to": "./fonts/"
-      }, {
-        "from": "./ui-assets/img",
-        "to": "./img/"
-      }],
+      "copy": [
+        {
+          "from": "./ui-assets/fonts",
+          "to": "./fonts/"
+        },
+        {
+          "from": "./ui-assets/img",
+          "to": "./img/"
+        }
+      ],
       "version": "1017.0.156-1.0.0-dev-1"
     },
     "cli": {}
   },
-  "browserslist": ["last 2 major versions"]
+  "browserslist": [
+    "last 2 major versions"
+  ]
 }
