@@ -1,5 +1,5 @@
 import { CdkStep } from '@angular/cdk/stepper';
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { AlertService, AppStateService, C8yStepper, SetupComponent } from '@c8y/ngx-components';
 import { TemplateSetupStep } from './../../template-setup-step';
 import { TemplateCatalogService } from '../../template-catalog-setup.service';
@@ -11,6 +11,7 @@ import { GalleryItem, ImageItem } from 'ng-gallery';
   selector: 'c8y-template-step-two-details',
   templateUrl: './template-step-two-details.component.html',
   styleUrls: ["./template-step-two-details.component.css"],
+  encapsulation: ViewEncapsulation.None,
   host: { class: 'd-contents' }
 })
 export class TemplateStepTwoDetailsComponent extends TemplateSetupStep {

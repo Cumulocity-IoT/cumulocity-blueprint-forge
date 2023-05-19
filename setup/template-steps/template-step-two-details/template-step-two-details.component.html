@@ -21,7 +21,7 @@
               [imageSize]="{width: '100%', height: '400'}"
               slideImage="1"
                ></ng-image-slider> -->  
-               <gallery [items]="images" class="galleryDiv" [counter]="false"></gallery>
+               <gallery [items]="images"   [dots]=true  [autoPlay]="true" class="galleryDiv" [counter]="false"></gallery>
 
              <!--    <img [src]="templateDetails?.image && templateDetails?.image != '' ? templateDetails?.image : ''" alt="#" class="img-responsive" style=""/>
              -->  </div>
@@ -35,8 +35,8 @@
           <div class="col-xs-12 col-sm-6 col-md-6 ">
             <div class="card">
               
-              <div class="card-block">
-                {{templateDetails?.description}}
+              <div [innerHTML]="templateDetails?.description" class="card-block text-left">
+                
           </div>
           </div>
         </div>

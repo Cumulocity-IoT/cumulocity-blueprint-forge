@@ -64,7 +64,7 @@ import { LightboxModule } from  'ng-gallery/lightbox';
     GalleryModule.withConfig({
         thumb: false
       }),
-    LightboxModule
+    LightboxModule.withConfig({})
   ],
   providers: [
     TemplateCatalogService,
