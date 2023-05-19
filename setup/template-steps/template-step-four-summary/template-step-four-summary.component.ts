@@ -7,6 +7,8 @@ import { AppTemplateDetails } from '../../template-catalog-setup.model';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { DeviceSelectorModalComponent } from './../../../builder/utils/device-selector-modal/device-selector.component';
 import { IManagedObject } from '@c8y/client';
+import { ProgressIndicatorModalComponent } from './../../../builder/utils/progress-indicator-modal/progress-indicator-modal.component';
+import { ProgressIndicatorService } from './../../../builder/utils/progress-indicator-modal/progress-indicator.service';
 
 @Component({
   selector: 'c8y-template-step-four-summary',
@@ -14,6 +16,8 @@ import { IManagedObject } from '@c8y/client';
   host: { class: 'd-contents' }
 })
 export class TemplateStepFourSummaryComponent extends TemplateSetupStep {
+  templateDetails:any;
+  private progressModal: BsModalRef;
   constructor(
     public stepper: C8yStepper,
     protected step: CdkStep,
@@ -22,11 +26,12 @@ export class TemplateStepFourSummaryComponent extends TemplateSetupStep {
     protected alert: AlertService,
     private templateCatalogService: TemplateCatalogService,
     private modalService: BsModalService,
-    private deviceSelectorModalRef: BsModalRef
+    private deviceSelectorModalRef: BsModalRef,
+    private progressIndicatorService: ProgressIndicatorService
   ) {
     super(stepper, step, setup, appState, alert);
   }
-  templateDetails:any;
+
   ngOnInit() {
     this.loadTemplateDetailsCatalog();
   }
@@ -46,5 +51,59 @@ export class TemplateStepFourSummaryComponent extends TemplateSetupStep {
         }; */
         dashboard.devicesName = selectedDevice['name'];
     })
+ }
+
+ showProgressModalDialog(message: string): void {
+  this.progressModal = this.modalService.show(ProgressIndicatorModalComponent, { class: 'c8y-wizard', initialState: { message } });
+}
+
+async configureApp() {
+  let totalRemotes = this.templateDetails.plugins.length;
+  totalRemotes = totalRemotes + this.templateDetails.microservices.length;
+  totalRemotes = totalRemotes + this.templateDetails.dashboards.length;
+
+  const eachRemoteProgress: number = Math.floor((totalRemotes > 1 ? (90 / totalRemotes) : 0));
+  let overallProgress = 0;
+  this.showProgressModalDialog("Verifying plugins...")
+  if (totalRemotes > 1) { this.progressIndicatorService.setOverallProgress(overallProgress) }
+  
+  for (let plugin of this.templateDetails.plugins) {
+    this.progressIndicatorService.setMessage(`Installing ${plugin.title}`);
+    this.progressIndicatorService.setProgress(30);
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    this.progressIndicatorService.setProgress(60);
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    this.progressIndicatorService.setProgress(90);
+    overallProgress = overallProgress + eachRemoteProgress;
+    this.progressIndicatorService.setOverallProgress(overallProgress)
+  };
+  await new Promise(resolve => setTimeout(resolve, 3000));
+  for (let ms of this.templateDetails.microservices) {
+    this.progressIndicatorService.setMessage(`Installing ${ms.title}`);
+    this.progressIndicatorService.setProgress(30);
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    this.progressIndicatorService.setProgress(60);
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    this.progressIndicatorService.setProgress(90);
+    overallProgress = overallProgress + eachRemoteProgress;
+    this.progressIndicatorService.setOverallProgress(overallProgress)
+  };
+  await new Promise(resolve => setTimeout(resolve, 3000));
+  for (let db of this.templateDetails.dashboards) {
+    this.progressIndicatorService.setMessage(`Installing ${db.name}`);
+    this.progressIndicatorService.setProgress(30);
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    this.progressIndicatorService.setProgress(60);
+    await new Promise(resolve => setTimeout(resolve, 3000));
+    this.progressIndicatorService.setProgress(90);
+    overallProgress = overallProgress + eachRemoteProgress;
+    this.progressIndicatorService.setOverallProgress(overallProgress)
+  };
+  this.hideProgressModalDialog();
+  this.next();
+}
+
+hideProgressModalDialog() {
+  this.progressModal.hide();
 }
 }

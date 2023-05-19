@@ -15,9 +15,9 @@ export interface AppTemplateDetails {
     description: string;
     media: any;
     plugins: any;
-    microservice: any;
+    microservices: any;
     dashboards: any;
-    
+
 }
 
 export interface TemplateDetails {
