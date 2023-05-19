@@ -117,7 +117,10 @@ export class TemplateCatalogService {
                 title: get(catalog, 'title'),
                 tagLine: get(catalog, 'tagLine'),
                 media: get(catalog, 'media'),
-                description: get(catalog, 'description')
+                description: get(catalog, 'description'),
+                plugins: get(catalog, 'plugins'),
+                microservice: get(catalog, 'microservice'),
+                dashboards: get(catalog, 'dashboards')
             } as AppTemplateDetails;
             
             

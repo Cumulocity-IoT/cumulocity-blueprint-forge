@@ -6,7 +6,7 @@
 .g-dot-inner {
     background-color: #36469c !important;
 }
-lightbox {
+/* lightbox {
     width: 100% !important;
     height: 100% !important;
     max-height: 100vh !important;
@@ -31,4 +31,4 @@ lightbox gallery gallery-core .g-box gallery-counter .g-counter{
 }
 lightbox gallery .g-btn-close {
     top: 0.1em !important;
-}
+} */

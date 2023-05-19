@@ -14,6 +14,10 @@ export interface AppTemplateDetails {
     tagLine: string;
     description: string;
     media: any;
+    plugins: any;
+    microservice: any;
+    dashboards: any;
+    
 }
 
 export interface TemplateDetails {
