@@ -41,12 +41,14 @@ import { TemplateCatalogService } from './setup/template-catalog-setup.service';
 import { NgImageSliderModule } from 'ng-image-slider';
 import { GalleryModule } from 'ng-gallery';
 import { LightboxModule } from  'ng-gallery/lightbox';
+import { TemplateStepFourSummaryComponent } from './setup/template-steps/template-step-four-summary/template-step-four-summary.component';
 
 @NgModule({
   declarations: [
     TemplateStepOneComponent, 
     TemplateStepTwoDetailsComponent,
     TemplateStepThreeConfigComponent,
+    TemplateStepFourSummaryComponent,
     TemplateSetupStepperButtonsComponent
   ],
   imports: [
@@ -75,7 +77,7 @@ import { LightboxModule } from  'ng-gallery/lightbox';
       useValue: [
         {
           stepperId: Steppers.SETUP,
-          component: TemplateStepTwoDetailsComponent,
+          component: TemplateStepFourSummaryComponent,
           label: gettext('Connect'),
           setupId: 'cockpitTopLevelNodes',
           priority: 10

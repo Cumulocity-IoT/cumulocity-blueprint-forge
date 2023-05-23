@@ -10,6 +10,7 @@ import { TemplateCatalogService } from '../../template-catalog-setup.service';
   host: { class: 'd-contents' }
 })
 export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
+  configStepData: any;
   constructor(
     public stepper: C8yStepper,
     protected step: CdkStep,
@@ -22,6 +23,11 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
   }
 
   ngOnInit() {
-    this.templateCatalogService.templateData.subscribe(currentData => console.log('Stored template data', currentData));
+    this.templateCatalogService.templateData.subscribe(currentData => {
+      console.log('Stored template data', currentData);
+      if (currentData) {
+        this.configStepData = currentData;
+      }
+    });
   }
 }

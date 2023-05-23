@@ -51,6 +51,7 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep {
                 return this.templateCatalogService.getTemplateDetailsCatalogFallBack(dashboardURL)
             }))
             .subscribe((catalog: AppTemplateDetails) => {
+              
                 this.templateDetails = catalog;
               
                 if(this.templateDetails  && this.templateDetails.media) {

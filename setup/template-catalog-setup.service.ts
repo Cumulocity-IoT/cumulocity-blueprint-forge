@@ -4,7 +4,7 @@ import { BehaviorSubject, Observable } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { has, get } from "lodash-es";
 import { IManagedObject, IManagedObjectBinary } from '@c8y/client';
-import { AppTemplateDetails, TemplateCatalogEntry, TemplateDetails } from "./template-catalog-setup.model";
+import { AppTemplateDetails, TemplateCatalogEntry } from "./template-catalog-setup.model";
 import { ApplicationService, InventoryBinaryService, InventoryService } from "@c8y/ngx-components/api";
 import { TemplateSetupStep } from "./template-setup-step";
 
@@ -122,6 +122,9 @@ export class TemplateCatalogService{
                 title: get(catalog, 'title'),
                 tagLine: get(catalog, 'tagLine'),
                 media: get(catalog, 'media'),
+                plugins: get(catalog, 'plugins'),
+                microservices: get(catalog, 'microservices'),
+                dashboards: get(catalog, 'dashboards'),
                 description: get(catalog, 'description')
             } as AppTemplateDetails;
             
