@@ -34,11 +34,12 @@
                             <div class="form-group" style="width: 53%; padding:0px">
                                 <label class="sr-only" for="selected-device">Select Device/asset for dashboard</label>
                                 <input [readonly]="true" name="selected-device" class="form-control"
+                                [ngClass]="{'greyed-input': dashboard.isDevice}"
                                     style="width: 100%;" id="selected-device" placeholder="Select Device/Asset" type="text"
                                     [ngModel]="dashboard?.devicesName">
                             </div>
                             <button type="button" style="width: 47%;" class="btn btn-primary"
-                                (click)="openDeviceSelectorDialog(dashboard)">Select Device/Asset</button>
+                                (click)="openDeviceSelectorDialog(dashboard, i)">Select Device/Asset</button>
                         </form>
                       <!-- <div class="c8y-select-wrapper">
                         <select id="selectExample" class="form-control">
@@ -58,7 +59,7 @@
     </div>
     <c8y-template-setup-stepper-buttons
     [index]="stepper.selectedIndex"
-    (onNext)="configureApp()"
+    (onNext)="configureAppTest()"
     (onBack)="back()"
   >
   </c8y-template-setup-stepper-buttons>

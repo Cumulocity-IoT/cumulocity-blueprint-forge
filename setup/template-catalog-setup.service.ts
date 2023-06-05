@@ -4,9 +4,10 @@ import { BehaviorSubject, Observable } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { has, get } from "lodash-es";
 import { IManagedObject, IManagedObjectBinary } from '@c8y/client';
-import { AppTemplateDetails, TemplateCatalogEntry } from "./template-catalog-setup.model";
+import { AppTemplateDetails, DashboardDetails, DashboardWidgets, TemplateCatalogEntry } from "./template-catalog-setup.model";
 import { ApplicationService, InventoryBinaryService, InventoryService } from "@c8y/ngx-components/api";
 import { TemplateSetupStep } from "./template-setup-step";
+import { CumulocityDashboard } from "builder/template-catalog/template-catalog.model";
 
 const packageJson = require('./../package.json');
 @Injectable()
@@ -27,6 +28,9 @@ export class TemplateCatalogService{
 
     public templateData = new BehaviorSubject<AppTemplateDetails>(undefined);
     templateData$ = this.templateData.asObservable();
+
+    public widgetConfigDetails = new BehaviorSubject<DashboardWidgets>(undefined);
+    widgetConfigDetails$ = this.widgetConfigDetails.asObservable();
   
     constructor(private http: HttpClient, private inventoryService: InventoryService,
         private appService: ApplicationService, 
@@ -63,6 +67,16 @@ export class TemplateCatalogService{
         return this.getDataForTemplateDetailsCatalog(url);
     }
 
+    getDashboardDetails(dashboardURL): Observable<DashboardWidgets> {
+        let url = `${this.GATEWAY_URL_GitHubAPI}${dashboardURL}`;
+        if(this.pkgVersion.includes('dev')) {
+            url = url + this.devBranchPath;
+        } else if (this.pkgVersion.includes('rc')) {
+            url = url + this.preprodBranchPath;
+        }
+        return this.getDataForDashboardDetails(url);
+    }
+
     getTemplateDetailsCatalogFallBack(dashboardurl): Observable<AppTemplateDetails> {
         let url = `${this.GATEWAY_URL_GitHubAPI_FallBack}${dashboardurl}`;
         this.isFallBackActive = true;
@@ -74,6 +88,16 @@ export class TemplateCatalogService{
         return this.getDataForTemplateDetailsCatalog(url);
     }
 
+    getDashboardDetailsFallBack(dashboardurl): Observable<DashboardWidgets> {
+        let url = `${this.GATEWAY_URL_GitHubAPI_FallBack}${dashboardurl}`;
+        this.isFallBackActive = true;
+        if(this.pkgVersion.includes('dev')) {
+            url = url + this.devBranchPath;
+        } else if (this.pkgVersion.includes('rc')) {
+            url = url + this.preprodBranchPath;
+        }
+        return this.getDataForDashboardDetails(url);
+    }
  
     getTemplateCatalogFallBack(): Observable<TemplateCatalogEntry[]> {
         let url = `${this.GATEWAY_URL_GitHubAPI_FallBack}${this.bluePrintTemplatePath}`;
@@ -107,6 +131,21 @@ export class TemplateCatalogService{
             });
             
         }));
+    }
+
+    private getDataForDashboardDetails(url: string): Observable<DashboardWidgets> {
+        return this.http.get(`${url}`).pipe(map(response => {
+           
+
+            let catalog = response as Array<object>;
+            return {
+              
+                widgets: get(catalog, "widgets")
+            } as DashboardWidgets;
+            
+            
+        }));
+        
     }
 
     private getDataForTemplateDetailsCatalog(url: string): Observable<AppTemplateDetails> {
@@ -148,6 +187,7 @@ export class TemplateCatalogService{
         }));
     }
 
+    
     getGithubURL(relativePath: string){
         let url = `${this.GATEWAY_URL_GitHubAPI}`;
         if(this.isFallBackActive) {
@@ -160,6 +200,37 @@ export class TemplateCatalogService{
         }
         return  url + `${relativePath}`;
     }
+
+    getCumulocityDashboardRepresentation(dashboardConfiguration, widgets): CumulocityDashboard {
+        return {
+            children: this.getWidgetsAsChildren(widgets),
+            name: 'Blueprint-Forge-Dashboard',    //dashboardConfiguration.dashboardName
+            icon: '',         // dashboardConfiguration.dashboardIcon
+            global: true,
+            isFrozen: true,
+        };
+    }
+
+    private getWidgetsAsChildren(widgets): object {
+        let children = {};
+        console.log('Widgets value in get widgets as children', widgets);
+        widgets.forEach(widget => {
+            widget.id = this.generateId();
+            children[this.generateId()] = widget;
+        })
+    
+        return children;
+    }
+    
+    private generateId(): string {
+      let id = this.generateRandomInteger(10000, 100000000);
+      return id.toString();
+    }
+    
+    private generateRandomInteger(min, max): number {
+      return Math.floor(Math.random() * Math.floor(max) + min);
+    }
+    
 
 
 }

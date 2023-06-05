@@ -63,6 +63,14 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep {
                   this.templateDetails.media = [];
                 }
 
+                if (this.templateDetails && this.templateDetails.microservices === undefined ) {
+                  this.templateDetails.microservices = [];
+                }
+
+                if (this.templateDetails && this.templateDetails.devices === undefined) {
+                  this.templateDetails.devices = [];
+                }
+
                 if(this.templateDetails  && this.templateDetails.media) {
                 this.images = this.templateDetails.media.map(item => new ImageItem({ src: item.image }));
                 } else {
@@ -71,6 +79,8 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep {
                 
                 this.templateCatalogService.templateData.next(this.templateDetails);
                
+                
+                
             }, error => {
                 this.alertService.danger("There is some technical error! Please try after sometime.");
             });
