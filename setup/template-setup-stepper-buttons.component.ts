@@ -6,6 +6,8 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 })
 export class TemplateSetupStepperButtonsComponent {
   @Input() index;
+  @Input() isDashboardChecked
   @Output() onNext = new EventEmitter<void>();
   @Output() onBack = new EventEmitter<void>();
+  
 }

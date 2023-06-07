@@ -8,7 +8,7 @@
   >
     Previous
   </button>
-  <button class="btn btn-primary" type="submit" (click)="onNext.emit()" translate>
+  <button class="btn btn-primary" type="submit" (click)="onNext.emit()" [disabled]="isDashboardChecked === false" translate>
     Continue
   </button>
 </div>

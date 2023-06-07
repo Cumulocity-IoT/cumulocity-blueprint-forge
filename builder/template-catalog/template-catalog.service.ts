@@ -38,8 +38,10 @@ export class TemplateCatalogService {
     private GATEWAY_URL_GitHubAsset_FallBack = '';
     private GATEWAY_URL_GitHubAPI_FallBack = '';
     private dashboardCatalogPath = '/dashboardCatalog/catalog.json';
-    private devBranchPath = "?ref=development";
-    private preprodBranchPath = "?ref=preprod";
+    // private devBranchPath = "?ref=development";
+    // private preprodBranchPath = "?ref=preprod";
+    private devBranchPath = "?ref=blueprint-forge";
+    private preprodBranchPath = "?ref=blueprint-forge";
     pkgVersion: any;
     private isFallBackActive = false;
 
