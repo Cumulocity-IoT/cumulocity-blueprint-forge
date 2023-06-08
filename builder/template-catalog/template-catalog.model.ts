@@ -81,6 +81,7 @@ export interface DependencyDescription {
     isSupported?: boolean;
     visible?: boolean;
     contextPath?: string;
+    type?: string;
 }
 
 export interface CumulocityDashboard {

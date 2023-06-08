@@ -38,7 +38,7 @@ export class TemplateCatalogService {
     private GATEWAY_URL_GitHubAsset_FallBack = '';
     private GATEWAY_URL_GitHubAPI_FallBack = '';
     private dashboardCatalogPath = '/dashboardCatalog/catalog.json';
-    private devBranchPath = "?ref=development";
+    private devBranchPath = "?ref=blueprint-forge";
     private preprodBranchPath = "?ref=preprod";
     pkgVersion: any;
     private isFallBackActive = false;
@@ -126,6 +126,18 @@ export class TemplateCatalogService {
     }
 
     downloadBinary(binaryId: string): Observable<ArrayBuffer> {
+        return this.http.get(`${this.GATEWAY_URL_GitHubAsset}${binaryId}`, {
+            responseType: 'arraybuffer'
+        })
+        .pipe(catchError(err => {
+            console.log('Template Catalog: Download Binary: Error in primary endpoint! using fallback...');
+            return this.http.get(`${this.GATEWAY_URL_GitHubAsset_FallBack}${binaryId}`, {
+              responseType: 'arraybuffer'
+            })
+        }));
+    }
+
+    downloadLargeBinary(binaryId: string){
         return this.http.get(`${this.GATEWAY_URL_GitHubAsset}${binaryId}`, {
             responseType: 'arraybuffer'
         })

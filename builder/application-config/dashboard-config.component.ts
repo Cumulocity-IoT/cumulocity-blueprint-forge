@@ -144,7 +144,7 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
         let count = 0;
         this.appSubscription = this.app.pipe(first()).
             subscribe(app => {
-                if (app.applicationBuilder.branding.enabled && (app.applicationBuilder.selectedTheme && app.applicationBuilder.selectedTheme !== 'Default')) {
+                if (app.applicationBuilder.branding?.enabled && (app.applicationBuilder.selectedTheme && app.applicationBuilder.selectedTheme !== 'Default')) {
                     this.applyTheme = true;
                     this.renderer.addClass(this.document.body, 'dashboard-body-theme');
                 } else {

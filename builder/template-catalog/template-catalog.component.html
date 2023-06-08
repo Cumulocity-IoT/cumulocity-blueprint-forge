@@ -38,7 +38,7 @@
                 <div class="card-demo flip-card-inner">
                     <div class="flip-card-front">
                         <img class="card-image"
-                            [src]="template?.thumbnail && template?.thumbnail != '' ? template?.thumbnail : './images/placeholder.png'" />
+                            [src]="template?.thumbnail && template?.thumbnail != '' ? template?.thumbnail : './img/placeholder.png'" />
                         <div class="card-data">
                             <h3 [title]="template?.title">
                                 <b>{{ template?.title }} </b>
@@ -159,7 +159,8 @@
                     <li *ngIf="dependency.visible" class="list-group-item">
                             <span *ngIf="dependency.isInstalled" class="badge badge-success">INSTALLED</span>
                             <span *ngIf="!dependency.isInstalled" class="badge badge-danger">NOT INSTALLED</span>
-                            <a href="{{dependency.repository}}"style="color:#000;" target="_blank">{{dependency.title}}</a>
+                            <a href="{{dependency.repository}}"style="color:#000;" target="_blank">{{dependency.title}}
+                            <span *ngIf="dependency.type" class="badge badge-info">{{dependency.type}}</span></a>
                             <button *ngIf="!dependency.isInstalled && dependency.isSupported" type="button" style="margin-left: 10px"
                                 class="btn btn-primary btn-xs btn-icon" (click)="installDependency(dependency)">
                                 <i class="fa fa-cloud-download"></i>

@@ -17,13 +17,13 @@
  */
 
 import { Component, OnInit, ViewEncapsulation } from "@angular/core";
-import { ApplicationService, IManagedObject } from '@c8y/client';
+import { ApplicationService, IApplication, IManagedObject } from '@c8y/client';
 import { DeviceSelectorModalComponent } from "../utils/device-selector-modal/device-selector.component";
 import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
 import { DependencyDescription, TemplateCatalogEntry, TemplateDetails } from "./template-catalog.model";
 import { TemplateCatalogService } from "./template-catalog.service";
 import { AlertService, DynamicComponentDefinition, DynamicComponentService } from "@c8y/ngx-components";
-import { Observable, Subject } from "rxjs";
+import { Observable, Subject, Subscription, interval } from "rxjs";
 import { ProgressIndicatorModalComponent } from "../utils/progress-indicator-modal/progress-indicator-modal.component";
 
 //import './cumulocity.json';
@@ -31,6 +31,7 @@ import { WidgetCatalogService } from "../../builder/widget-catalog/widget-catalo
 import { catchError } from "rxjs/operators";
 import { AccessRightsService } from "../../builder/access-rights.service";
 import { ProgressIndicatorService } from "../../builder/utils/progress-indicator-modal/progress-indicator.service";
+import { ApplicationBinaryService } from "../../builder/application-binary.service";
 
 
 enum TemplateCatalogStep {
@@ -87,9 +88,13 @@ export class TemplateCatalogModalComponent implements OnInit {
 
     globalRoles: any;
 
+    private microserviceDownloadProgress = interval(3000);
+    private microserviceDownloadProgress$: Subscription;
+
     constructor(private modalService: BsModalService, private modalRef: BsModalRef, private appService: ApplicationService,
         private catalogService: TemplateCatalogService, private componentService: DynamicComponentService,
         private alertService: AlertService, private widgetCatalogService: WidgetCatalogService,
+        private applicationBinaryService: ApplicationBinaryService,
         private accessRightsService: AccessRightsService, private progressIndicatorService: ProgressIndicatorService) {
         this.onSave = new Subject();
     }
@@ -145,18 +150,25 @@ export class TemplateCatalogModalComponent implements OnInit {
             });
     }
 
-    updateDepedencies() {
+    async updateDepedencies() {
         if (!this.templateDetails || !this.templateDetails.input || !this.templateDetails.input.dependencies
             || this.templateDetails.input.dependencies.length === 0) {
             return;
         }
 
-        this.templateDetails.input.dependencies.forEach(dependency => {
-            this.verifyWidgetCompatibility(dependency);
-            this.componentService.getById(dependency.id).then(widget => {
-                dependency.isInstalled = (widget != undefined);
-            });
-        });
+        for (let dependency of this.templateDetails.input.dependencies) {
+            if (dependency.type && dependency.type == "microservice") {
+                dependency.isInstalled = (await this.applicationBinaryService.verifyExistingMicroservices(dependency.id)) as any;;
+                dependency.isSupported = true;
+                dependency.visible = true;
+            } else {
+                this.verifyWidgetCompatibility(dependency);
+                this.componentService.getById(dependency.id).then(widget => {
+                    dependency.isInstalled = (widget != undefined);
+                });
+            }
+
+        };
     }
 
     showDetailPage(): void {
@@ -244,48 +256,104 @@ export class TemplateCatalogModalComponent implements OnInit {
     async installDependency(dependency: DependencyDescription): Promise<void> {
         const currentHost = window.location.host.split(':')[0];
         if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
-            this.alertService.warning("Runtime widget installation isn't supported when running Application Builder on localhost.");
+            this.alertService.warning("Installation isn't supported when running Application Builder on localhost.");
             return;
         }
-        const widgetBinaryFound = this.appList.find(app => app.manifest?.isPackage && (app.name.toLowerCase() === dependency.title?.toLowerCase() ||
-            (app.contextPath && app.contextPath?.toLowerCase() === dependency?.contextPath?.toLowerCase())));
-        this.showProgressModalDialog(`Installing ${dependency.title}`);
-        if (widgetBinaryFound) {
+        if (dependency.type === "plugin") {
+            const widgetBinaryFound = this.appList.find(app => app.manifest?.isPackage && (app.name.toLowerCase() === dependency.title?.toLowerCase() ||
+                (app.contextPath && app.contextPath?.toLowerCase() === dependency?.contextPath?.toLowerCase())));
+            this.showProgressModalDialog(`Installing ${dependency.title}`);
+            this.progressIndicatorService.setProgress(10);
+            if (widgetBinaryFound) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                this.progressIndicatorService.setProgress(30);
+                this.widgetCatalogService.updateRemotesInCumulocityJson(widgetBinaryFound).then(async () => {
+                    dependency.isInstalled = true;
+                    this.isReloadRequired = true;
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    this.hideProgressModalDialog();
+                }, error => {
+                    this.alertService.danger("There is some technical error! Please try after sometime.");
+                    console.error(error);
+                });
+            } else {
+                this.progressIndicatorService.setProgress(10);
+                this.catalogService.downloadBinary(dependency.link)
+                    .subscribe(data => {
+                        this.progressIndicatorService.setProgress(20);
+                        const blob = new Blob([data], {
+                            type: 'application/zip'
+                        });
+                        const fileName = dependency.link.replace(/^.*[\\\/]/, '');
+                        const fileOfBlob = new File([blob], fileName);
+                        this.widgetCatalogService.installPackage(fileOfBlob).then(async () => {
+                            dependency.isInstalled = true;
+                            this.isReloadRequired = true;
+                            await new Promise(resolve => setTimeout(resolve, 5000));
+                            this.hideProgressModalDialog();
+                        }, error => {
+                            this.alertService.danger("There is some technical error! Please try after sometime.");
+                            console.error(error);
+                        });
+                    });
+            }
+        } else { // installing microservice
+            this.showProgressModalDialog(`Downloading ${dependency.title}`);
             this.progressIndicatorService.setProgress(10);
             await new Promise(resolve => setTimeout(resolve, 1000));
-            this.progressIndicatorService.setProgress(30);
-            this.widgetCatalogService.updateRemotesInCumulocityJson(widgetBinaryFound).then(async () => {
-                dependency.isInstalled = true;
-                this.isReloadRequired = true;
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                this.hideProgressModalDialog();
-            }, error => {
-                this.alertService.danger("There is some technical error! Please try after sometime.");
-                console.error(error);
+            let counter = 10;
+            this.microserviceDownloadProgress$ = this.microserviceDownloadProgress.subscribe(async val => {
+                counter++;
+                if (counter <= 40) {
+                    this.progressIndicatorService.setProgress(counter);
+                }
             });
-        } else {
-            this.progressIndicatorService.setProgress(10);
             this.catalogService.downloadBinary(dependency.link)
-                .subscribe(data => {
-                    this.progressIndicatorService.setProgress(20);
-                    const blob = new Blob([data], {
-                        type: 'application/zip'
-                    });
-                    const fileName = dependency.link.replace(/^.*[\\\/]/, '');
-                    const fileOfBlob = new File([blob], fileName);
-                    this.widgetCatalogService.installPackage(fileOfBlob).then(async () => {
-                        dependency.isInstalled = true;
-                        this.isReloadRequired = true;
+                .subscribe(async data => {
+                    let createdApp = null;
+                    this.microserviceDownloadProgress$.unsubscribe();
+                    try {
+                        this.progressIndicatorService.setProgress(40);
+                        this.progressIndicatorService.setMessage(`Installing ${dependency.title}`);
+                        const blob = new Blob([data], {
+                            type: 'application/zip'
+                        });
+                        const fileName = dependency.link.replace(/^.*[\\\/]/, '');
+                        const fileOfBlob = new File([blob], fileName);
+
+                        const createdApp = await this.applicationBinaryService.createAppForArchive(fileOfBlob);
+                        this.progressIndicatorService.setProgress(50);
+                        counter = 50;
+                        this.microserviceDownloadProgress$ = this.microserviceDownloadProgress.subscribe(async val => {
+                            counter++;
+                            if (counter <= 80) {
+                                this.progressIndicatorService.setProgress(counter);
+                            }
+                        });
+                        await this.applicationBinaryService.uploadMicroservice(fileOfBlob, createdApp);
+                        this.microserviceDownloadProgress$.unsubscribe();
+                        this.progressIndicatorService.setProgress(80);
                         await new Promise(resolve => setTimeout(resolve, 5000));
                         this.hideProgressModalDialog();
-                    }, error => {
+                        dependency.isInstalled = true;
+                        this.isReloadRequired = true;
+                    } catch (ex) {
+                        this.applicationBinaryService.cancelAppCreation(createdApp);
+                        createdApp = null;
                         this.alertService.danger("There is some technical error! Please try after sometime.");
-                        console.error(error);
-                    });
+                        console.error(ex.message);
+                        /* // prepare translation of static message if it exists
+                        const staticErrorMessage =
+                            ERROR_MESSAGES[ex.message] && this.translateService.instant(ERROR_MESSAGES[ex.message]);
+                        // if there is no static message, use dynamic one from the exception
+                        this.errorMessage = staticErrorMessage ?? ex.message;
+                        if (!this.errorMessage && !this.uploadCanceled) {
+                            this.alertService.addServerFailure(ex);
+                        } */
+                    }
                 });
         }
     }
-
     private isDevicesSelected(): boolean {
         if (!this.templateDetails.input.devices || this.templateDetails.input.devices.length === 0) {
             return true;
