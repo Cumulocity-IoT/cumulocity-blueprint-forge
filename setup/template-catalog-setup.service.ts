@@ -36,8 +36,6 @@ export class TemplateCatalogService{
         private appService: ApplicationService, 
         private binaryService: InventoryBinaryService,
         ) {
-
-           
         this.GATEWAY_URL_GitHubAPI = this.blueprintURL;
         this.GATEWAY_URL_GitHubAsset =  this.blueprintURL;
         this.GATEWAY_URL_GitHubAPI_FallBack = this.blueprintURL;

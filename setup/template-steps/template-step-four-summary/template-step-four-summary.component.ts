@@ -25,6 +25,7 @@ export class TemplateStepFourSummaryComponent extends TemplateSetupStep {
   widgetDetails: any;
   app: any;
   private appList = [];
+  isDashboardChecked= true;
 
   public dashboardConfiguration = {
     dashboardId: '12598412',
@@ -75,13 +76,26 @@ export class TemplateStepFourSummaryComponent extends TemplateSetupStep {
   openDeviceSelectorDialog(dashboard: any, index): void {
     console.log('Template details value in summary component', this.templateDetails);
     this.deviceSelectorModalRef = this.modalService.show(DeviceSelectorModalComponent, { class: 'c8y-wizard', initialState: {} });
+    
+    console.log('Devices value', this.templateDetails.devices);
+    if (this.templateDetails.devices && this.templateDetails.devices.length === 0) {
+      this.templateDetails.devices = [{
+        type: "",
+        placeholder: "",
+        representation: {
+        id: "",
+        name: ""
+      }
+      }];
+    }
     this.deviceSelectorModalRef.content.onDeviceSelected.subscribe((selectedDevice: IManagedObject) => {
-        //  this.templateDetails.devices[index].representation = {
-        //     id: selectedDevice.id,
-        //     name: selectedDevice['name']
-        // }; 
+         this.templateDetails.devices[index].representation = {
+            id: selectedDevice.id,
+            name: selectedDevice['name']
+        }; 
         dashboard.devicesName = selectedDevice['name'];
-    })
+    });
+    console.log('Devices value after assignment', this.templateDetails.devices);
  }
 
  showProgressModalDialog(message: string): void {
@@ -159,9 +173,9 @@ hideProgressModalDialog() {
         "c8y_Dashboard": this.templateCatalogService.getCumulocityDashboardRepresentation(dashboardConfiguration, this.widgetDetails.widgets)
     }).then(({ data }) => {
 
-
       
-       console.log('Data', data);
+      
+       console.log('Data in create dashboard', data);
        
        this.installDependency(dependency);
 

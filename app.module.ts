@@ -75,13 +75,13 @@ import { TemplateStepFourSummaryComponent } from './setup/template-steps/templat
     {
     provide: HOOK_STEPPER,
       useValue: [
-        {
-          stepperId: Steppers.SETUP,
-          component: TemplateStepFourSummaryComponent,
-          label: gettext('Connect'),
-          setupId: 'cockpitTopLevelNodes',
-          priority: 10
-        },
+        // {
+        //   stepperId: Steppers.SETUP,
+        //   component: TemplateStepFourSummaryComponent,
+        //   label: gettext('Connect'),
+        //   setupId: 'cockpitTopLevelNodes',
+        //   priority: 10
+        // },
         {
           stepperId: Steppers.SETUP,
           component: TemplateStepThreeConfigComponent,

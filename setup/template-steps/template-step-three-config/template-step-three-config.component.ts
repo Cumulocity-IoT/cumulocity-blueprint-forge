@@ -5,6 +5,13 @@ import { TemplateSetupStep } from './../../template-setup-step';
 import { TemplateCatalogService } from '../../template-catalog-setup.service';
 import { catchError } from "rxjs/operators";
 import { AppTemplateDetails, DashboardDetails, DashboardWidgets } from '../../template-catalog-setup.model';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { TemplateCatalogModalComponent } from '../../../builder/template-catalog/template-catalog.component';
+import { Observable, from, Subject, Subscription, BehaviorSubject, combineLatest } from 'rxjs';
+import { debounceTime, first, map, switchMap, tap } from "rxjs/operators";
+import { AppIdService } from '../../../builder/app-id.service';
+import { ApplicationService, IApplication } from '@c8y/client';
+import { AppDataService } from '../../../builder/app-data.service';
 
 @Component({
   selector: 'c8y-template-step-three-config',
@@ -15,6 +22,17 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
   configStepData: any;
   dashboardConfigDetails: DashboardDetails;
   dashboardWidgets: DashboardWidgets;
+  isDashboardChecked: boolean = false;
+  bsModalRef: BsModalRef;
+
+  newAppName: string;
+    newAppContextPath: string;
+    newAppIcon: string;
+    isChecked: boolean = true;
+
+    app: Observable<any>;
+    refreshApp = new BehaviorSubject<void>(undefined);
+  
   constructor(
     public stepper: C8yStepper,
     protected step: CdkStep,
@@ -23,8 +41,23 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
     protected alert: AlertService,
     private templateCatalogService: TemplateCatalogService,
     private alertService: AlertService,
+    private modalService: BsModalService,
+    private appIdService: AppIdService, private appService: ApplicationService, 
+    private appDataService: AppDataService,
   ) {
     super(stepper, step, setup, appState, alert);
+
+    this.app = combineLatest([appIdService.appIdDelayedUntilAfterLogin$, this.refreshApp]).pipe(
+      map(([appId]) => appId),
+      switchMap(appId => from(
+          this.appDataService.getAppDetails(appId)
+      )),
+      tap((app: IApplication & { applicationBuilder: any }) => { // TODO: do this a nicer way....
+          this.newAppName = app.name;
+          this.newAppContextPath = app.contextPath;
+          this.newAppIcon = app.applicationBuilder.icon;
+      })
+  );
   }
 
   ngOnInit() {
@@ -34,6 +67,20 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
         this.configStepData = currentData;
       }
     });
+  }
+
+
+  dashboardChecked (isDashboardChecked) {
+    let checkboxes = document.getElementsByTagName("input");
+    for (let ch = 0; ch < checkboxes.length; ch++) {
+      if (checkboxes[ch].type === 'checkbox' && checkboxes[ch].checked && checkboxes[ch].parentElement.id === 'dashboard'+ch) {
+        this.isDashboardChecked = true;
+        break;
+      } else {
+        this.isDashboardChecked = false;
+      }
+    }
+    return this.isDashboardChecked;
   }
 
   addCheckedDashboards () {
@@ -63,5 +110,17 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
             }, error => {
                 this.alertService.danger("There is some technical error! Please try after sometime.");
             });
+  }
+
+  showDashboardCatalogDialog(app) {
+    this.bsModalRef = this.modalService.show(TemplateCatalogModalComponent, { backdrop: 'static', class: 'modal-lg', initialState: { app } });
+    // this.bsModalRef.content.onSave.subscribe((isReloadRequired: boolean) => {
+    //     if (isReloadRequired) {
+    //         location.reload();
+    //         if (this.defaultListView === '1') {
+    //             this.prepareDashboardHierarchy(app);
+    //         }
+    //     }
+    // });
   }
 }
