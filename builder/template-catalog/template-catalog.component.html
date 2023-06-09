@@ -177,7 +177,7 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button *ngIf="isDetailPageDisplayed()" type="button" class="btn btn-default"
+    <button *ngIf="isDetailPageDisplayed() && !this.dashboard" type="button" class="btn btn-default"
         (click)="onBackButtonClicked()">Back</button>
     <button type="button" class="btn btn-default" (click)="onCancelButtonClicked()">Cancel</button>
     <button *ngIf="isDetailPageDisplayed()" type="button" class="btn btn-primary" (click)="onSaveButtonClicked()"

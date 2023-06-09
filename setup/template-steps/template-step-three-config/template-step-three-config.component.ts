@@ -112,15 +112,14 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
             });
   }
 
-  showDashboardCatalogDialog(app) {
-    this.bsModalRef = this.modalService.show(TemplateCatalogModalComponent, { backdrop: 'static', class: 'modal-lg', initialState: { app } });
-    // this.bsModalRef.content.onSave.subscribe((isReloadRequired: boolean) => {
-    //     if (isReloadRequired) {
-    //         location.reload();
-    //         if (this.defaultListView === '1') {
-    //             this.prepareDashboardHierarchy(app);
-    //         }
-    //     }
-    // });
+  showDashboardCatalogDialog(app: any, dashboard: DashboardDetails) {
+    this.bsModalRef = this.modalService.show(TemplateCatalogModalComponent, { backdrop: 'static', class: 'modal-lg', initialState: { app, dashboard} });
+    this.bsModalRef.content.onCancel.subscribe((flag: boolean) => {
+      dashboard.selected = false;
+    });
+    this.bsModalRef.content.onSave.subscribe((flag: boolean) => {
+      dashboard.selected = false;
+      dashboard.configured = true;
+    });
   }
 }

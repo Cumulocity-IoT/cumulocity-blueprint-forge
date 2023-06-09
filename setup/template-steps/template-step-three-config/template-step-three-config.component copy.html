@@ -11,10 +11,8 @@
   </div>
   <div class="inner-scroll flex-grow">
     <div class="container-fluid fit-w">
-      <div class="row">
-        <div class="col-md-10 col-lg-9 col-lg-offset-1">
       <div class="card-group interact-grid" style="text-align:center;padding-top: 10px;">
-        <div class="col-xs-12 col-sm-12 col-md-12">
+        <div class="col-xs-12 col-sm-8 col-md-8">
            <div class="card">
           <div class="card-header">
               <div class="col-xs-12 col-sm-6 col-md-6" style="text-align: left;">
@@ -22,13 +20,16 @@
               </div>
 
               
+              <div class="col-xs-12 col-sm-6 col-md-6" style="text-align: right;">
+                <button *ngIf="dashboardChecked(isDashboardChecked)" type="button pull-right" (click)="showDashboardCatalogDialog(app)" class="btn btn-primary" >Configure</button>
+            </div>
           </div>
-          <div class="card-block" id="dashboardDiv" *ngIf="app | async as app">
+          <div class="card-block" id="dashboardDiv">
               <div class="list-group">
-                  <div class="list-group-item d-flex " *ngFor="let dashboard of configStepData?.dashboards; let i = index">
+                  <div class="list-group-item d-flex" *ngFor="let dashboard of configStepData?.dashboards; let i = index">
                     <div class="list-item-checkbox">
                       <label id="dashboard{{i}}" title="Select" class="c8y-checkbox">
-                        <input type="checkbox" [checked]="dashboard.selected"  (click)="showDashboardCatalogDialog(app,dashboard)">
+                        <input type="checkbox" [checked]="isChecked">
                         <span></span>
                       </label>
                     </div>
@@ -43,11 +44,8 @@
                         <div class="col-sm-6 col-xs-12 text-muted">
                           <span translate>{{dashboard.description}}</span>
                         </div>
-                        <div class="col-sm-2 col-xs-12" *ngIf="dashboard.configured">
-                          <span class="badge badge-success text-right"> <i title="Dashboard" c8yIcon="check"></i>Configured</span>
-                        </div>
-                         </div>
                       </div>
+                    </div>
                   </div>
                 </div>
             </div>
@@ -63,8 +61,49 @@
           
           </div>
         </div>
-      </div>
-        </div>
+        <div class="col-xs-12 col-sm-4 col-md-4">
+          <div class="card">
+            <div class="card-header">
+              <h4 class="card-title"> Select Widgets</h4>
+            </div>
+            <div class="card-block">
+              <ul class="list-group" style="text-align: left;">
+                <li class="list-group-item d-flex" *ngFor="let plugin of configStepData?.plugins">
+                  <div class="list-item-checkbox">
+                    <label class="c8y-checkbox" >
+                      <input type="checkbox" [checked]="isChecked" />
+                      <span></span>
+                    </label>
+                  </div>
+                  <label>
+                    {{plugin.title}}
+                    <br /><small class="text-muted">{{plugin.description}}</small>
+                  </label>
+                </li>
+              </ul>
+            </div>
+          
+            <div class="card-header">
+              <h4 class="card-title"> Select Micro services</h4>
+            </div>
+            <div class="card-block">
+              <ul class="list-group" style="text-align: left;">
+                <li class="list-group-item d-flex" *ngFor="let microservice of configStepData?.microservices">
+                  <div class="list-item-checkbox">
+                    <label class="c8y-checkbox">
+                      <input type="checkbox" [checked]="isChecked" id="groupcheckbox3" />
+                      <span></span>
+                    </label>
+                  </div>
+                  <label for="groupcheckbox3">
+                    {{microservice.title}}
+                    <br /><small class="text-muted" >{{microservice.description}}</small>
+                  </label>
+                </li>
+              </ul>
+            </div>
+          </div>
+       </div>
       </div>
     </div>
   </div>

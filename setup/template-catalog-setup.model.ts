@@ -44,7 +44,10 @@ export interface DashboardDetails {
     name: string;
     icon: string;
     config: string;
+    dashboard: string;
     description: string;
+    selected?: boolean;
+    configured?: boolean;
     widgets: WidgetDetails[];
 }
 

@@ -47,6 +47,7 @@ enum TemplateCatalogStep {
 export class TemplateCatalogModalComponent implements OnInit {
 
     app: any;
+    dashboard: any;
 
     private currentStep: TemplateCatalogStep = TemplateCatalogStep.CATALOG;
 
@@ -81,6 +82,7 @@ export class TemplateCatalogModalComponent implements OnInit {
     public selectedDevice: IManagedObject;
 
     public onSave: Subject<boolean>;
+    public onCancel: Subject<boolean>;
 
     private isReloadRequired = false;
 
@@ -97,11 +99,21 @@ export class TemplateCatalogModalComponent implements OnInit {
         private applicationBinaryService: ApplicationBinaryService,
         private accessRightsService: AccessRightsService, private progressIndicatorService: ProgressIndicatorService) {
         this.onSave = new Subject();
+        this.onCancel = new Subject();
     }
 
     async ngOnInit() {
-        this.loadTemplateCatalog();
+        
         this.globalRoles = await this.accessRightsService.getAllGlobalRoles();
+        if(this.dashboard ) {
+            console.log("dashboard details", this.dashboard);
+            this.selectedTemplate = this.dashboard;
+            this.dashboardConfiguration.dashboardName = this.dashboard.name;
+            this.showDetailPage();
+            this.loadTemplateDetails(this.dashboard);
+        } else {
+            this.loadTemplateCatalog();
+        }
     }
 
     loadTemplateCatalog(): void {
@@ -206,6 +218,7 @@ export class TemplateCatalogModalComponent implements OnInit {
     }
 
     onCancelButtonClicked(): void {
+        this.onCancel.next(true);
         this.modalRef.hide();
     }
 
