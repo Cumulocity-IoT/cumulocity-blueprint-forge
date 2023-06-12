@@ -48,6 +48,7 @@ export interface DashboardDetails {
     description: string;
     selected?: boolean;
     configured?: boolean;
+    isChecked?: boolean;
     widgets: WidgetDetails[];
 }
 

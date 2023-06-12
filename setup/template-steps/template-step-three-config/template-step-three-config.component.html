@@ -26,7 +26,7 @@
                   <div class="list-group-item d-flex" *ngFor="let dashboard of configStepData?.dashboards; let i = index">
                     <div class="list-item-checkbox">
                       <label id="dashboard{{i}}" title="Select" class="c8y-checkbox">
-                        <input type="checkbox" [checked]="isChecked">
+                        <input type="checkbox" [checked]="dashboard.isChecked" (change)="syncDashboardFlag($event, i)">
                         <span></span>
                       </label>
                     </div>
@@ -93,8 +93,7 @@
   </div>
   <c8y-template-setup-stepper-buttons
     [index]="stepper.selectedIndex"
-    [isDashboardChecked]="isDashboardChecked"
-    (onNext)="addCheckedDashboards()"
+    (onNext)="saveandInstall()"
     (onBack)="back()"
   >
   </c8y-template-setup-stepper-buttons>

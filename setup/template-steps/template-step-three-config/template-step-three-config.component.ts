@@ -19,17 +19,14 @@ import { AppDataService } from '../../../builder/app-data.service';
   host: { class: 'd-contents' }
 })
 export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
-  configStepData: any;
-  dashboardConfigDetails: DashboardDetails;
+  configStepData: AppTemplateDetails;
   dashboardWidgets: DashboardWidgets;
-  isDashboardChecked: boolean = false;
   bsModalRef: BsModalRef;
 
   newAppName: string;
     newAppContextPath: string;
     newAppIcon: string;
     isChecked: boolean = true;
-
     app: Observable<any>;
     refreshApp = new BehaviorSubject<void>(undefined);
   
@@ -65,33 +62,22 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
       console.log('Stored template data', currentData);
       if (currentData) {
         this.configStepData = currentData;
+        this.configStepData.dashboards.map(item =>  item.isChecked = true);
       }
     });
   }
 
-  //TODO: Refector
-  /* dashboardChecked (isDashboardChecked) {
-    let checkboxes = document.getElementsByTagName("input");
-    for (let ch = 0; ch < checkboxes.length; ch++) {
-      if (checkboxes[ch].type === 'checkbox' && checkboxes[ch].checked && checkboxes[ch].parentElement.id === 'dashboard'+ch) {
-        this.isDashboardChecked = true;
-        break;
-      } else {
-        this.isDashboardChecked = false;
-      }
-    }
-    return this.isDashboardChecked;
+  syncDashboardFlag(event, index) {
+    this.configStepData.dashboards[index].isChecked = event.target.checked;
   }
- */
 
   //TODO: Refector // SaveInstall()
-  addCheckedDashboards () {
+  saveandInstall () {
+    console.log('Config step data value while saving', this.configStepData);
     if (this.configStepData && this.configStepData.dashboards) {
-
-      var checkboxes = document.getElementsByTagName("input");
       for (let i = 0; i < this.configStepData.dashboards.length; i++) {
-        if (checkboxes[i].type === 'checkbox' && checkboxes[i].checked) {
-        this.loadDashboardDetails(this.configStepData.dashboards[i].config);
+        if (this.configStepData.dashboards[i].isChecked) {
+          this.loadDashboardDetails(this.configStepData.dashboards[i].dashboard);
         }
       }
     }
@@ -115,14 +101,14 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
   }
 
  // TODO: Phase II
-  showDashboardCatalogDialog(app: any, dashboard: DashboardDetails) {
-    this.bsModalRef = this.modalService.show(TemplateCatalogModalComponent, { backdrop: 'static', class: 'modal-lg', initialState: { app, dashboard} });
-    this.bsModalRef.content.onCancel.subscribe((flag: boolean) => {
-      dashboard.selected = false;
-    });
-    this.bsModalRef.content.onSave.subscribe((flag: boolean) => {
-      dashboard.selected = false;
-      dashboard.configured = true;
-    });
-  }
+  // showDashboardCatalogDialog(app: any, dashboard: DashboardDetails) {
+  //   this.bsModalRef = this.modalService.show(TemplateCatalogModalComponent, { backdrop: 'static', class: 'modal-lg', initialState: { app, dashboard} });
+  //   this.bsModalRef.content.onCancel.subscribe((flag: boolean) => {
+  //     dashboard.selected = false;
+  //   });
+  //   this.bsModalRef.content.onSave.subscribe((flag: boolean) => {
+  //     dashboard.selected = false;
+  //     dashboard.configured = true;
+  //   });
+  // }
 }

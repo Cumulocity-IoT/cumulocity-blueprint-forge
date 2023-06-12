@@ -20,7 +20,6 @@ export class TemplateStepOneComponent extends TemplateSetupStep   {
 
   public filterTemplates: Array<TemplateCatalogEntry> = [];
   templateDetails: AppTemplateDetails;
-  isDashboardChecked= true;
   constructor(
     public stepper: C8yStepper,
     protected step: CdkStep,
