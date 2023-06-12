@@ -69,8 +69,8 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
     });
   }
 
-
-  dashboardChecked (isDashboardChecked) {
+  //TODO: Refector
+  /* dashboardChecked (isDashboardChecked) {
     let checkboxes = document.getElementsByTagName("input");
     for (let ch = 0; ch < checkboxes.length; ch++) {
       if (checkboxes[ch].type === 'checkbox' && checkboxes[ch].checked && checkboxes[ch].parentElement.id === 'dashboard'+ch) {
@@ -82,7 +82,9 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
     }
     return this.isDashboardChecked;
   }
+ */
 
+  //TODO: Refector // SaveInstall()
   addCheckedDashboards () {
     if (this.configStepData && this.configStepData.dashboards) {
 
@@ -112,6 +114,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
             });
   }
 
+ // TODO: Phase II
   showDashboardCatalogDialog(app: any, dashboard: DashboardDetails) {
     this.bsModalRef = this.modalService.show(TemplateCatalogModalComponent, { backdrop: 'static', class: 'modal-lg', initialState: { app, dashboard} });
     this.bsModalRef.content.onCancel.subscribe((flag: boolean) => {
