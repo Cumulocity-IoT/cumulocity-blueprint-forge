@@ -4,8 +4,7 @@ import { AlertService, AppStateService, C8yStepper, SetupComponent } from '@c8y/
 import { TemplateSetupStep } from './../../template-setup-step';
 import { TemplateCatalogService } from '../../template-catalog-setup.service';
 import { catchError } from "rxjs/operators";
-import { TemplateCatalogEntry, AppTemplateDetails } from '../../template-catalog-setup.model';
-import { TemplateStepTwoDetailsComponent } from '../template-step-two-details/template-step-two-details.component';
+import { TemplateBlueprintDetails, TemplateBlueprintEntry } from './../../template-setup.model';
 
 @Component({
   selector: 'c8y-template-step-one',
@@ -16,10 +15,10 @@ import { TemplateStepTwoDetailsComponent } from '../template-step-two-details/te
 export class TemplateStepOneComponent extends TemplateSetupStep   {
 
 
-  public templates: Array<TemplateCatalogEntry> = [];
+  public templates: Array<TemplateBlueprintEntry> = [];
 
-  public filterTemplates: Array<TemplateCatalogEntry> = [];
-  templateDetails: AppTemplateDetails;
+  public filterTemplates: Array<TemplateBlueprintEntry> = [];
+  templateDetails: TemplateBlueprintDetails;
   isDashboardChecked= true;
   constructor(
     public stepper: C8yStepper,
@@ -47,7 +46,7 @@ export class TemplateStepOneComponent extends TemplateSetupStep   {
                 console.log('Dashboard Catalog: Error in primary endpoint! using fallback...');
                 return this.templateCatalogService.getTemplateCatalogFallBack()
             }))
-            .subscribe((catalog: Array<TemplateCatalogEntry>) => {
+            .subscribe((catalog: Array<TemplateBlueprintEntry>) => {
                 this.templates = catalog;
                 this.filterTemplates = (this.templates ? this.templates : []);
                 this.filterTemplates.forEach(template => {
@@ -62,7 +61,7 @@ export class TemplateStepOneComponent extends TemplateSetupStep   {
 
 
   selectedTemplate(dashboardURL: string) {
-    this.config.dashboard = dashboardURL;
+    this.config.config = dashboardURL;
     super.next();    // Navigation to details page
   }
 

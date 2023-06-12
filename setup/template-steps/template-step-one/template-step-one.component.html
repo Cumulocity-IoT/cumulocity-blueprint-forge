@@ -17,7 +17,7 @@
             <div class="card-group interact-grid card-group-align">
               <div *ngFor="let template of templates" class="col-xs-12 col-sm-3 col-md-3">
                 
-                <div class="card pointer card-container" (click)="selectedTemplate(template?.dashboard)">
+                <div class="card pointer card-container" (click)="selectedTemplate(template?.config)">
                   <img [src]="template?.thumbnail && template?.thumbnail != '' ? template?.thumbnail : ''" alt="#"
                     class="img-responsive thumbnail" />
                     <div *ngIf="template.comingSoon" class="coming-soon-tag">Coming soon</div>

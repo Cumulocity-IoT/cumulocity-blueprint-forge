@@ -4,8 +4,8 @@ import { AlertService, AppStateService, C8yStepper, SetupComponent } from '@c8y/
 import { TemplateSetupStep } from './../../template-setup-step';
 import { TemplateCatalogService } from '../../template-catalog-setup.service';
 import { catchError } from "rxjs/operators";
-import { AppTemplateDetails, TemplateCatalogEntry } from '../../template-catalog-setup.model';
 import { GalleryItem, ImageItem } from 'ng-gallery';
+import { TemplateBlueprintDetails } from './../../template-setup.model';
 
 @Component({
   selector: 'c8y-template-step-two-details',
@@ -15,7 +15,7 @@ import { GalleryItem, ImageItem } from 'ng-gallery';
   host: { class: 'd-contents' }
 })
 export class TemplateStepTwoDetailsComponent extends TemplateSetupStep {
-  public templateDetails: AppTemplateDetails;
+  public templateDetails: TemplateBlueprintDetails;
   configDetails: any;
   images: GalleryItem[];
   isDashboardChecked = true;
@@ -33,9 +33,9 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep {
     
     this.setup.data$.subscribe(data => { 
     
-    if (data.dashboard && data.dashboard != '') {
+    if (data.config && data.config != '') {
       this.templateDetails = null;
-      this.loadTemplateDetailsCatalog(data.dashboard);
+      this.loadTemplateDetailsCatalog(data.config);
     }
   });
   }
@@ -51,7 +51,7 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep {
                 console.log('Dashboard Catalog: Error in primary endpoint! using fallback...');
                 return this.templateCatalogService.getTemplateDetailsCatalogFallBack(dashboardURL)
             }))
-            .subscribe((catalog: AppTemplateDetails) => {
+            .subscribe((catalog: TemplateBlueprintDetails) => {
               
                 this.templateDetails = catalog;
               
@@ -68,9 +68,9 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep {
                   this.templateDetails.microservices = [];
                 }
 
-                if (this.templateDetails && this.templateDetails.devices === undefined) {
+                /* if (this.templateDetails && this.templateDetails.devices === undefined) {
                   this.templateDetails.devices = [];
-                }
+                } */
 
                 if(this.templateDetails  && this.templateDetails.media) {
                 this.images = this.templateDetails.media.map(item => new ImageItem({ src: item.image }));

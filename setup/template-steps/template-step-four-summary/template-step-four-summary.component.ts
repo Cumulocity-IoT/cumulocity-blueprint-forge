@@ -3,13 +3,11 @@ import { Component } from '@angular/core';
 import { AlertService, AppStateService, C8yStepper, SetupComponent, Widget } from '@c8y/ngx-components';
 import { TemplateSetupStep } from './../../template-setup-step';
 import { TemplateCatalogService } from '../../template-catalog-setup.service';
-import { AppTemplateDetails, DashboardWidgets, DeviceDetails, WidgetDetails } from '../../template-catalog-setup.model';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { DeviceSelectorModalComponent } from './../../../builder/utils/device-selector-modal/device-selector.component';
 import { ApplicationService, IApplication, IManagedObject, InventoryService } from '@c8y/client';
 import { ProgressIndicatorModalComponent } from './../../../builder/utils/progress-indicator-modal/progress-indicator-modal.component';
 import { ProgressIndicatorService } from './../../../builder/utils/progress-indicator-modal/progress-indicator.service';
-import { CumulocityDashboard } from './../../../builder/template-catalog/template-catalog.model';
 import { SettingsService } from './../../../builder/settings/settings.service';
 import { WidgetCatalogService } from './../../../builder/widget-catalog/widget-catalog.service';
 
@@ -48,8 +46,6 @@ export class TemplateStepFourSummaryComponent extends TemplateSetupStep {
     private deviceSelectorModalRef: BsModalRef,
     private progressIndicatorService: ProgressIndicatorService,
     private inventoryService: InventoryService,
-    private appService: ApplicationService,
-    private settingsService: SettingsService,
     private widgetCatalogService: WidgetCatalogService
     
   ) {
@@ -65,11 +61,11 @@ export class TemplateStepFourSummaryComponent extends TemplateSetupStep {
       }
     });
 
-    this.templateCatalogService.widgetConfigDetails.subscribe(widgetData => {
+    /* this.templateCatalogService.widgetConfigDetails.subscribe(widgetData => {
       console.log('Stored widget data', widgetData);
       this.widgetDetails = widgetData;
-    })
-    this.configureAppTest(this.app, this.dashboardConfiguration, this.templateDetails, this.templateDetails)
+    }) */
+   // this.configureAppTest(this.app, this.dashboardConfiguration, this.templateDetails, this.templateDetails)
     
   }
 
@@ -161,7 +157,7 @@ hideProgressModalDialog() {
 
 // this.dashboardConfiguration.dashboardName = (this.dashboardPath ? `${this.dashboardPath}/${this.dashboardConfiguration.dashboardName}` : this.dashboardConfiguration.dashboardName);
 //         await this.catalogService.createDashboard(this.app, this.dashboardConfiguration, this.selectedTemplate, this.templateDetails);
-    async configureAppTest(application, dashboardConfiguration, templateCatalogEntry: AppTemplateDetails, templateDetails: AppTemplateDetails) {
+    async configureAppTest(application, dashboardConfiguration) {
       console.log('Configure app test called', this.widgetDetails?.widgets);
       let dependency =  {
         id: 'boonlogic-config.widget',

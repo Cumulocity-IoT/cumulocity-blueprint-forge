@@ -3,11 +3,9 @@ import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { has, get } from "lodash-es";
-import { IManagedObject, IManagedObjectBinary } from '@c8y/client';
-import { AppTemplateDetails, DashboardDetails, DashboardWidgets, TemplateCatalogEntry } from "./template-catalog-setup.model";
 import { ApplicationService, InventoryBinaryService, InventoryService } from "@c8y/ngx-components/api";
-import { TemplateSetupStep } from "./template-setup-step";
 import { CumulocityDashboard } from "builder/template-catalog/template-catalog.model";
+import { TemplateBlueprintDetails, TemplateBlueprintEntry } from "./template-setup.model";
 
 const packageJson = require('./../package.json');
 @Injectable()
@@ -26,11 +24,11 @@ export class TemplateCatalogService{
 
     private blueprintURL = 'https://presalesglobalprod.apigw-aw-eu.webmethods.io/gateway/GitHubAPIService/1.0/repos/SoftwareAG/global-presales-assets/contents'
 
-    public templateData = new BehaviorSubject<AppTemplateDetails>(undefined);
+    public templateData = new BehaviorSubject<TemplateBlueprintDetails>(undefined);
     templateData$ = this.templateData.asObservable();
 
-    public widgetConfigDetails = new BehaviorSubject<DashboardWidgets>(undefined);
-    widgetConfigDetails$ = this.widgetConfigDetails.asObservable();
+   /*  public widgetConfigDetails = new BehaviorSubject<DashboardWidgets>(undefined);
+    widgetConfigDetails$ = this.widgetConfigDetails.asObservable(); */
   
     constructor(private http: HttpClient, private inventoryService: InventoryService,
         private appService: ApplicationService, 
@@ -45,7 +43,7 @@ export class TemplateCatalogService{
     }
 
 
-    getTemplateCatalog(): Observable<TemplateCatalogEntry[]> {
+    getTemplateCatalog(): Observable<TemplateBlueprintEntry[]> {
         let url = `${this.GATEWAY_URL_GitHubAPI}${this.bluePrintTemplatePath}`;
         if(this.pkgVersion.includes('dev')) {
             url = url + this.devBranchPath;
@@ -55,7 +53,7 @@ export class TemplateCatalogService{
         return this.getDataForTemplateCatalog(url);
     }
 
-    getTemplateDetailsCatalog(dashboardurl): Observable<AppTemplateDetails> {
+    getTemplateDetailsCatalog(dashboardurl): Observable<TemplateBlueprintDetails> {
         let url = `${this.GATEWAY_URL_GitHubAPI}${dashboardurl}`;
         if(this.pkgVersion.includes('dev')) {
             url = url + this.devBranchPath;
@@ -65,7 +63,7 @@ export class TemplateCatalogService{
         return this.getDataForTemplateDetailsCatalog(url);
     }
 
-    getDashboardDetails(dashboardURL): Observable<DashboardWidgets> {
+   /*  getDashboardDetails(dashboardURL): Observable<DashboardWidgets> {
         let url = `${this.GATEWAY_URL_GitHubAPI}${dashboardURL}`;
         if(this.pkgVersion.includes('dev')) {
             url = url + this.devBranchPath;
@@ -73,9 +71,9 @@ export class TemplateCatalogService{
             url = url + this.preprodBranchPath;
         }
         return this.getDataForDashboardDetails(url);
-    }
+    } */
 
-    getTemplateDetailsCatalogFallBack(dashboardurl): Observable<AppTemplateDetails> {
+    getTemplateDetailsCatalogFallBack(dashboardurl): Observable<TemplateBlueprintDetails> {
         let url = `${this.GATEWAY_URL_GitHubAPI_FallBack}${dashboardurl}`;
         this.isFallBackActive = true;
         if(this.pkgVersion.includes('dev')) {
@@ -86,7 +84,7 @@ export class TemplateCatalogService{
         return this.getDataForTemplateDetailsCatalog(url);
     }
 
-    getDashboardDetailsFallBack(dashboardurl): Observable<DashboardWidgets> {
+   /*  getDashboardDetailsFallBack(dashboardurl): Observable<DashboardWidgets> {
         let url = `${this.GATEWAY_URL_GitHubAPI_FallBack}${dashboardurl}`;
         this.isFallBackActive = true;
         if(this.pkgVersion.includes('dev')) {
@@ -95,9 +93,9 @@ export class TemplateCatalogService{
             url = url + this.preprodBranchPath;
         }
         return this.getDataForDashboardDetails(url);
-    }
+    } */
  
-    getTemplateCatalogFallBack(): Observable<TemplateCatalogEntry[]> {
+    getTemplateCatalogFallBack(): Observable<TemplateBlueprintEntry[]> {
         let url = `${this.GATEWAY_URL_GitHubAPI_FallBack}${this.bluePrintTemplatePath}`;
         this.isFallBackActive = true;
         if(this.pkgVersion.includes('dev')) {
@@ -108,7 +106,7 @@ export class TemplateCatalogService{
         return this.getDataForTemplateCatalog(url);
     }
 
-    private getDataForTemplateCatalog(url: string): Observable<TemplateCatalogEntry[]> {
+    private getDataForTemplateCatalog(url: string): Observable<TemplateBlueprintEntry[]> {
         return this.http.get(`${url}`).pipe(map(response => {
             if (!has(response, 'template')) {
                 console.error('Failed to load catalog');
@@ -121,17 +119,16 @@ export class TemplateCatalogService{
                     title: get(entry, 'title'),
                     description: get(entry, 'description'),
                     thumbnail: get(entry, 'thumbnail'),
-                    useCase: get(entry, 'use_case'),
-                    dashboard: get(entry, 'dashboard'),
+                    config: get(entry, 'config'),
                     comingSoon: get(entry, 'coming_soon')
-                } as TemplateCatalogEntry;
+                } as TemplateBlueprintEntry;
                 
             });
             
         }));
     }
 
-    private getDataForDashboardDetails(url: string): Observable<DashboardWidgets> {
+    /* private getDataForDashboardDetails(url: string): Observable<DashboardWidgets> {
         return this.http.get(`${url}`).pipe(map(response => {
            
 
@@ -144,9 +141,9 @@ export class TemplateCatalogService{
             
         }));
         
-    }
+    } */
 
-    private getDataForTemplateDetailsCatalog(url: string): Observable<AppTemplateDetails> {
+    private getDataForTemplateDetailsCatalog(url: string): Observable<TemplateBlueprintDetails> {
         return this.http.get(`${url}`).pipe(map(response => {
             // if (!has(response, 'templateId')) {
             //     console.error('Failed to load catalog');
@@ -163,15 +160,11 @@ export class TemplateCatalogService{
                 microservices: get(catalog, 'microservices'),
                 dashboards: get(catalog, 'dashboards'),
                 description: get(catalog, 'description')
-            } as AppTemplateDetails;
+            } as TemplateBlueprintDetails;
             
             
         }));
     }
-
-
-
-    
 
     downloadBinary(binaryId: string): Observable<ArrayBuffer> {
         return this.http.get(`${this.GATEWAY_URL_GitHubAsset}${binaryId}`, {
