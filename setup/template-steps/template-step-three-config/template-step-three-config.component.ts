@@ -25,7 +25,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
   dashboardWidgets: DashboardWidgets;
   configStepData: any;
   //dashboardWidgets: DashboardWidgets;
-  isDashboardChecked: boolean = false;
   bsModalRef: BsModalRef;
   private progressModal: BsModalRef;
 

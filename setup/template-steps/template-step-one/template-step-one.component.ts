@@ -19,7 +19,6 @@ export class TemplateStepOneComponent extends TemplateSetupStep   {
 
   public filterTemplates: Array<TemplateBlueprintEntry> = [];
   templateDetails: TemplateBlueprintDetails;
-  isDashboardChecked= true;
   constructor(
     public stepper: C8yStepper,
     protected step: CdkStep,

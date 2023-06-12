@@ -26,7 +26,8 @@
                   <div class="list-group-item d-flex" *ngFor="let dashboard of configStepData?.dashboards; let i = index">
                     <div class="list-item-checkbox">
                       <label id="dashboard{{i}}" title="Select" class="c8y-checkbox">
-                        <input type="checkbox" [checked]="dashboard.isChecked" (change)="syncDashboardFlag($event, i)">
+                        <input type="checkbox" [checked]="dashboard.isChecked" (change)="syncDashboardFlag($event, i)"
+                        [disabled]="true" >
                         <span></span>
                       </label>
                     </div>
@@ -47,7 +48,7 @@
                   <div class="list-group-item d-flex" *ngFor="let plugin of configStepData?.plugins; let p =index">
                     <div class="list-item-checkbox">
                       <label id="plugin{{p}}" title="select" class="c8y-checkbox" >
-                        <input type="checkbox" [checked]="isChecked" />
+                        <input type="checkbox" [checked]="isChecked" [disabled]="true"/>
                         <span></span>
                       </label>
                     </div>
@@ -66,7 +67,7 @@
                   <div class="list-group-item d-flex" *ngFor="let microservice of configStepData?.microservices; let m =index">
                     <div class="list-item-checkbox">
                       <label id="microservice{{m}}" title="select" class="c8y-checkbox" >
-                        <input type="checkbox" [checked]="isChecked" />
+                        <input type="checkbox" [checked]="isChecked" [disabled]="true"/>
                         <span></span>
                       </label>
                     </div>
