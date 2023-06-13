@@ -23,7 +23,6 @@ export class TemplateStepFourSummaryComponent extends TemplateSetupStep {
   widgetDetails: any;
   app: any;
   private appList = [];
-  isDashboardChecked= true;
 
   public dashboardConfiguration = {
     dashboardId: '12598412',

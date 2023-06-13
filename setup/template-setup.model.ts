@@ -49,6 +49,7 @@ export interface Dashboards {
     selected?: boolean;
     configured?: boolean;
     deviceId?: string;
+    isChecked?: boolean;
     dashboardWidgets: DashboardWidgets[];
 }
 export interface DashboardWidgets {

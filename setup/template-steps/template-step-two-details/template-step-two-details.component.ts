@@ -18,7 +18,6 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep {
   public templateDetails: TemplateBlueprintDetails;
   configDetails: any;
   images: GalleryItem[];
-  isDashboardChecked = true;
 
   constructor(
     public stepper: C8yStepper,

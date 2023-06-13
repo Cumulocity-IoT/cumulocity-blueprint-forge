@@ -14,7 +14,7 @@ import { AppDataService } from '../../../builder/app-data.service';
 import { ProgressIndicatorModalComponent } from '../../../builder/utils/progress-indicator-modal/progress-indicator-modal.component';
 import { ProgressIndicatorService } from '../../../builder/utils/progress-indicator-modal/progress-indicator.service';
 import { WidgetCatalogService } from '../../../builder/widget-catalog/widget-catalog.service';
-import { Dashboards, MicroserviceDetails, PluginDetails, TemplateBlueprintDetails, TemplateBlueprintEntry } from './../../template-setup.model';
+import { DashboardWidgets, Dashboards, MicroserviceDetails, PluginDetails, TemplateBlueprintDetails, TemplateBlueprintEntry } from './../../template-setup.model';
 import { ApplicationBinaryService } from '../../../builder/application-binary.service';
 import { TemplateCatalogService } from '../../../builder/template-catalog/template-catalog.service';
 
@@ -24,6 +24,7 @@ import { TemplateCatalogService } from '../../../builder/template-catalog/templa
   host: { class: 'd-contents' }
 })
 export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
+  dashboardWidgets: DashboardWidgets;
   private progressModal: BsModalRef;
   private appList = [];
   private microserviceDownloadProgress = interval(3000);
@@ -31,7 +32,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
 
   configStepData: any;
   //dashboardWidgets: DashboardWidgets;
-  isDashboardChecked: boolean = false;
   bsModalRef: BsModalRef;
   newAppName: string;
   newAppContextPath: string;
@@ -74,33 +74,22 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
       console.log('Stored template data', currentData);
       if (currentData) {
         this.configStepData = currentData;
+        this.configStepData.dashboards.map(item =>  item.isChecked = true);
       }
     });
   }
 
-  //TODO: Refector
-  /* dashboardChecked (isDashboardChecked) {
-    let checkboxes = document.getElementsByTagName("input");
-    for (let ch = 0; ch < checkboxes.length; ch++) {
-      if (checkboxes[ch].type === 'checkbox' && checkboxes[ch].checked && checkboxes[ch].parentElement.id === 'dashboard'+ch) {
-        this.isDashboardChecked = true;
-        break;
-      } else {
-        this.isDashboardChecked = false;
-      }
-    }
-    return this.isDashboardChecked;
+  syncDashboardFlag(event, index) {
+    this.configStepData.dashboards[index].isChecked = event.target.checked;
   }
- */
 
   //TODO: Refector // SaveInstall()
-  addCheckedDashboards () {
+  saveandInstall () {
+    console.log('Config step data value while saving', this.configStepData);
     if (this.configStepData && this.configStepData.dashboards) {
-
-      var checkboxes = document.getElementsByTagName("input");
       for (let i = 0; i < this.configStepData.dashboards.length; i++) {
-        if (checkboxes[i].type === 'checkbox' && checkboxes[i].checked) {
-      //  this.loadDashboardDetails(this.configStepData.dashboards[i].config);
+        if (this.configStepData.dashboards[i].isChecked) {
+          // this.loadDashboardDetails(this.configStepData.dashboards[i].dashboard);
         }
       }
     }
