@@ -24,7 +24,7 @@ import { TemplateCatalogService } from '../../../builder/template-catalog/templa
   host: { class: 'd-contents' }
 })
 export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
-  dashboardWidgets: DashboardWidgets;
+ // dashboardWidgets: DashboardWidgets;
   private progressModal: BsModalRef;
   private appList = [];
   private microserviceDownloadProgress = interval(3000);
@@ -48,7 +48,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
     protected appState: AppStateService,
     protected alert: AlertService,
     private templateCatalogSetupService: TemplateCatalogSetupService,
-    private alertService: AlertService,
     private modalService: BsModalService, private applicationBinaryService: ApplicationBinaryService,
     private appIdService: AppIdService, private appService: ApplicationService,
     private appDataService: AppDataService, private widgetCatalogService: WidgetCatalogService,
@@ -84,16 +83,16 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
   }
 
   //TODO: Refector // SaveInstall()
-  saveandInstall () {
-    console.log('Config step data value while saving', this.configStepData);
+  async saveandInstall () {
+    await this.configureApp();
+   /*  console.log('Config step data value while saving', this.configStepData);
     if (this.configStepData && this.configStepData.dashboards) {
       for (let i = 0; i < this.configStepData.dashboards.length; i++) {
         if (this.configStepData.dashboards[i].isChecked) {
           // this.loadDashboardDetails(this.configStepData.dashboards[i].dashboard);
         }
       }
-    }
-    this.next();
+    } */
   }
 
 
@@ -132,7 +131,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
     this.appList = (await this.appService.list({ pageSize: 2000 })).data;
     const currentHost = window.location.host.split(':')[0];
     if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
-        this.alertService.warning("Installation isn't supported when running Application on localhost.");
+        this.alert.warning("Installation isn't supported when running Application on localhost.");
         return;
     }
     // create Dashboard and install dependencies
@@ -226,7 +225,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
             } catch (ex) {
                 this.applicationBinaryService.cancelAppCreation(createdApp);
                 createdApp = null;
-                this.alertService.danger("There is some technical error! Please try after sometime.");
+                this.alert.danger("There is some technical error! Please try after sometime.");
                 console.error(ex.message);
                 /* // prepare translation of static message if it exists
                 const staticErrorMessage =
@@ -251,7 +250,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
             this.widgetCatalogService.updateRemotesInCumulocityJson(widgetBinaryFound).then(async () => {
                 await new Promise(resolve => setTimeout(resolve, 1000));
             }, error => {
-                this.alertService.danger("There is some technical error! Please try after sometime.");
+                this.alert.danger("There is some technical error! Please try after sometime.");
                 console.error(error);
             });
         } else {
@@ -267,7 +266,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
                     this.widgetCatalogService.installPackage(fileOfBlob).then(async () => {
                         await new Promise(resolve => setTimeout(resolve, 5000));
                     }, error => {
-                        this.alertService.danger("There is some technical error! Please try after sometime.");
+                        this.alert.danger("There is some technical error! Please try after sometime.");
                         console.error(error);
                     });
                 });

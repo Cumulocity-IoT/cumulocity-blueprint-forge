@@ -19,7 +19,7 @@ import { Injector, NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NavigationError, Router, RouterModule as NgRouterModule } from '@angular/router';
 import { UpgradeModule as NgUpgradeModule } from '@angular/upgrade/static';
-import { AppStateService, CoreModule, RouterModule} from '@c8y/ngx-components';
+import { AppStateService, CoreModule, RouterModule, hookStepper} from '@c8y/ngx-components';
 import { DashboardUpgradeModule, UpgradeModule, HybridAppModule } from '@c8y/ngx-components/upgrade';
 import { BuilderModule } from "./builder/builder.module";
 import { filter, first, map, startWith, tap, withLatestFrom } from "rxjs/operators";
@@ -42,6 +42,8 @@ import { NgImageSliderModule } from 'ng-image-slider';
 import { GalleryModule } from 'ng-gallery';
 import { LightboxModule } from  'ng-gallery/lightbox';
 import { TemplateStepFourSummaryComponent } from './setup/template-steps/template-step-four-summary/template-step-four-summary.component';
+import { PopoverModule } from 'ngx-bootstrap/popover';
+import { TooltipModule } from 'ngx-bootstrap/tooltip';
 
 @NgModule({
   declarations: [
@@ -72,9 +74,8 @@ import { TemplateStepFourSummaryComponent } from './setup/template-steps/templat
   ],
   providers: [
     TemplateCatalogSetupService,
-    {
-    provide: HOOK_STEPPER,
-      useValue: [
+    hookStepper([
+    
         // {
         //   stepperId: Steppers.SETUP,
         //   component: TemplateStepFourSummaryComponent,
@@ -105,7 +106,7 @@ import { TemplateStepFourSummaryComponent } from './setup/template-steps/templat
           setupId: 'applcationTemplate',
           priority: 30
         }
-      ] as SetupStep[],  multi: true},
+      ] as SetupStep[]),
      
   ]
 })
