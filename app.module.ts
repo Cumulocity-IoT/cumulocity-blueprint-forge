@@ -37,7 +37,7 @@ import { TemplateStepOneComponent } from './setup/template-steps/template-step-o
 import { TemplateSetupStepperButtonsComponent } from './setup/template-setup-stepper-buttons.component';
 import { TemplateStepTwoDetailsComponent } from './setup/template-steps/template-step-two-details/template-step-two-details.component';
 import { TemplateStepThreeConfigComponent } from './setup/template-steps/template-step-three-config/template-step-three-config.component';
-import { TemplateCatalogService } from './setup/template-catalog-setup.service';
+import { TemplateCatalogSetupService } from './setup/template-catalog-setup.service';
 import { NgImageSliderModule } from 'ng-image-slider';
 import { GalleryModule } from 'ng-gallery';
 import { LightboxModule } from  'ng-gallery/lightbox';
@@ -71,7 +71,7 @@ import { TemplateStepFourSummaryComponent } from './setup/template-steps/templat
     LightboxModule.withConfig({})
   ],
   providers: [
-    TemplateCatalogService,
+    TemplateCatalogSetupService,
     {
     provide: HOOK_STEPPER,
       useValue: [

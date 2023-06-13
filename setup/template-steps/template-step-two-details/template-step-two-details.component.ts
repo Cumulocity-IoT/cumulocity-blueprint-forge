@@ -2,7 +2,7 @@ import { CdkStep } from '@angular/cdk/stepper';
 import { Component, ViewEncapsulation  } from '@angular/core';
 import { AlertService, AppStateService, C8yStepper, SetupComponent } from '@c8y/ngx-components';
 import { TemplateSetupStep } from './../../template-setup-step';
-import { TemplateCatalogService } from '../../template-catalog-setup.service';
+import { TemplateCatalogSetupService } from '../../template-catalog-setup.service';
 import { catchError } from "rxjs/operators";
 import { GalleryItem, ImageItem } from 'ng-gallery';
 import { TemplateBlueprintDetails } from './../../template-setup.model';
@@ -26,7 +26,7 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep {
     protected setup: SetupComponent,
     protected appState: AppStateService,
     protected alert: AlertService,
-    private templateCatalogService: TemplateCatalogService,
+    private templateCatalogSetupService: TemplateCatalogSetupService,
     private alertService: AlertService,
   ) {
     super(stepper, step, setup, appState, alert);
@@ -46,10 +46,10 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep {
 
 
   loadTemplateDetailsCatalog(dashboardURL) {
-    this.templateCatalogService.getTemplateDetailsCatalog(dashboardURL)
+    this.templateCatalogSetupService.getTemplateDetailsCatalog(dashboardURL)
             .pipe(catchError(err => {
                 console.log('Dashboard Catalog: Error in primary endpoint! using fallback...');
-                return this.templateCatalogService.getTemplateDetailsCatalogFallBack(dashboardURL)
+                return this.templateCatalogSetupService.getTemplateDetailsCatalogFallBack(dashboardURL)
             }))
             .subscribe((catalog: TemplateBlueprintDetails) => {
               
@@ -57,8 +57,8 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep {
               
                 if(this.templateDetails  && this.templateDetails.media) {
                   this.templateDetails.media.forEach( (media:any) => {
-                    media.image = this.templateCatalogService.getGithubURL(media.image);
-                    media.thumbImage = this.templateCatalogService.getGithubURL(media.thumbImage);
+                    media.image = this.templateCatalogSetupService.getGithubURL(media.image);
+                    media.thumbImage = this.templateCatalogSetupService.getGithubURL(media.thumbImage);
                   });
                 } else {
                   this.templateDetails.media = [];
@@ -78,7 +78,7 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep {
                   this.images = [];
                 }
                 
-                this.templateCatalogService.templateData.next(this.templateDetails);
+                this.templateCatalogSetupService.templateData.next(this.templateDetails);
                
                 
                 

@@ -108,7 +108,7 @@ export class TemplateCatalogModalComponent implements OnInit {
         if(this.dashboard ) {
             console.log("dashboard details", this.dashboard);
             this.selectedTemplate = this.dashboard;
-            this.dashboardConfiguration.dashboardName = this.dashboard.name;
+            this.dashboardConfiguration.dashboardName = this.dashboard.title;
             this.showDetailPage();
             this.loadTemplateDetails(this.dashboard);
         } else {

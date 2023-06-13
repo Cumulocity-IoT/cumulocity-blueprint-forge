@@ -2,7 +2,7 @@ import { CdkStep } from '@angular/cdk/stepper';
 import {  Component } from '@angular/core';
 import { AlertService, AppStateService, C8yStepper, SetupComponent } from '@c8y/ngx-components';
 import { TemplateSetupStep } from './../../template-setup-step';
-import { TemplateCatalogService } from '../../template-catalog-setup.service';
+import { TemplateCatalogSetupService } from '../../template-catalog-setup.service';
 import { catchError } from "rxjs/operators";
 import { TemplateBlueprintDetails, TemplateBlueprintEntry } from './../../template-setup.model';
 
@@ -26,7 +26,7 @@ export class TemplateStepOneComponent extends TemplateSetupStep   {
     protected setup: SetupComponent,
     protected appState: AppStateService,
     protected alert: AlertService,
-    private templateCatalogService: TemplateCatalogService,
+    private templateCatalogSetupService: TemplateCatalogSetupService,
     private alertService: AlertService
   ) {
     super(stepper, step, setup, appState, alert);
@@ -41,17 +41,17 @@ export class TemplateStepOneComponent extends TemplateSetupStep   {
   }
 
   loadTemplateCatalog() {
-    this.templateCatalogService.getTemplateCatalog()
+    this.templateCatalogSetupService.getTemplateCatalog()
             .pipe(catchError(err => {
                 console.log('Dashboard Catalog: Error in primary endpoint! using fallback...');
-                return this.templateCatalogService.getTemplateCatalogFallBack()
+                return this.templateCatalogSetupService.getTemplateCatalogFallBack()
             }))
             .subscribe((catalog: Array<TemplateBlueprintEntry>) => {
                 this.templates = catalog;
                 this.filterTemplates = (this.templates ? this.templates : []);
                 this.filterTemplates.forEach(template => {
                     if (template.thumbnail && template?.thumbnail != '') {
-                        template.thumbnail = this.templateCatalogService.getGithubURL(template.thumbnail);
+                        template.thumbnail = this.templateCatalogSetupService.getGithubURL(template.thumbnail);
                     }
                 })
             }, error => {

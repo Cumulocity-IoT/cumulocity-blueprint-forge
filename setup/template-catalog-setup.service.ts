@@ -9,7 +9,7 @@ import { TemplateBlueprintDetails, TemplateBlueprintEntry } from "./template-set
 
 const packageJson = require('./../package.json');
 @Injectable()
-export class TemplateCatalogService{
+export class TemplateCatalogSetupService{
 
     private GATEWAY_URL_GitHubAsset = '';
     private GATEWAY_URL_GitHubAPI = '';

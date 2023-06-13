@@ -2,7 +2,7 @@ import { CdkStep } from '@angular/cdk/stepper';
 import { Component } from '@angular/core';
 import { AlertService, AppStateService, C8yStepper, SetupComponent, Widget } from '@c8y/ngx-components';
 import { TemplateSetupStep } from './../../template-setup-step';
-import { TemplateCatalogService } from '../../template-catalog-setup.service';
+import { TemplateCatalogSetupService } from '../../template-catalog-setup.service';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { DeviceSelectorModalComponent } from './../../../builder/utils/device-selector-modal/device-selector.component';
 import { ApplicationService, IApplication, IManagedObject, InventoryService } from '@c8y/client';
@@ -41,7 +41,7 @@ export class TemplateStepFourSummaryComponent extends TemplateSetupStep {
     protected setup: SetupComponent,
     protected appState: AppStateService,
     protected alert: AlertService,
-    private templateCatalogService: TemplateCatalogService,
+    private templateCatalogSetupService: TemplateCatalogSetupService,
     private modalService: BsModalService,
     private deviceSelectorModalRef: BsModalRef,
     private progressIndicatorService: ProgressIndicatorService,
@@ -54,7 +54,7 @@ export class TemplateStepFourSummaryComponent extends TemplateSetupStep {
 
   ngOnInit() {
     
-    this.templateCatalogService.templateData.subscribe(currentData => {
+    this.templateCatalogSetupService.templateData.subscribe(currentData => {
       console.log('Stored template data step four', currentData);
       if (currentData) {
         this.templateDetails = currentData;
@@ -166,7 +166,7 @@ hideProgressModalDialog() {
         link: '/blueprintForge/boonLogic/sag-ps-pkg-boonlogic-config-runtime-widget.zip?ref=blueprint-forge'
     }
       await this.inventoryService.create({
-        "c8y_Dashboard": this.templateCatalogService.getCumulocityDashboardRepresentation(dashboardConfiguration, this.widgetDetails.widgets)
+        "c8y_Dashboard": this.templateCatalogSetupService.getCumulocityDashboardRepresentation(dashboardConfiguration, this.widgetDetails.widgets)
     }).then(({ data }) => {
 
       
@@ -219,7 +219,7 @@ hideProgressModalDialog() {
     
 
   downloadAndInstallPackage(link) {
-    this.templateCatalogService.downloadBinary(link)
+    this.templateCatalogSetupService.downloadBinary(link)
                 .subscribe(data => {
                   console.log('Data of install dependency', data);
                     this.progressIndicatorService.setProgress(20);
