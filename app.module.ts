@@ -19,7 +19,7 @@ import { Injector, NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NavigationError, Router, RouterModule as NgRouterModule } from '@angular/router';
 import { UpgradeModule as NgUpgradeModule } from '@angular/upgrade/static';
-import { AppStateService, CoreModule, RouterModule} from '@c8y/ngx-components';
+import { AppStateService, CoreModule, RouterModule, hookStepper} from '@c8y/ngx-components';
 import { DashboardUpgradeModule, UpgradeModule, HybridAppModule } from '@c8y/ngx-components/upgrade';
 import { BuilderModule } from "./builder/builder.module";
 import { filter, first, map, startWith, tap, withLatestFrom } from "rxjs/operators";
@@ -37,11 +37,13 @@ import { TemplateStepOneComponent } from './setup/template-steps/template-step-o
 import { TemplateSetupStepperButtonsComponent } from './setup/template-setup-stepper-buttons.component';
 import { TemplateStepTwoDetailsComponent } from './setup/template-steps/template-step-two-details/template-step-two-details.component';
 import { TemplateStepThreeConfigComponent } from './setup/template-steps/template-step-three-config/template-step-three-config.component';
-import { TemplateCatalogService } from './setup/template-catalog-setup.service';
+import { TemplateCatalogSetupService } from './setup/template-catalog-setup.service';
 import { NgImageSliderModule } from 'ng-image-slider';
 import { GalleryModule } from 'ng-gallery';
 import { LightboxModule } from  'ng-gallery/lightbox';
 import { TemplateStepFourSummaryComponent } from './setup/template-steps/template-step-four-summary/template-step-four-summary.component';
+import { PopoverModule } from 'ngx-bootstrap/popover';
+import { TooltipModule } from 'ngx-bootstrap/tooltip';
 
 @NgModule({
   declarations: [
@@ -71,40 +73,33 @@ import { TemplateStepFourSummaryComponent } from './setup/template-steps/templat
     LightboxModule.withConfig({})
   ],
   providers: [
-    TemplateCatalogService,
-    {
-    provide: HOOK_STEPPER,
-      useValue: [
-        // {
-        //   stepperId: Steppers.SETUP,
-        //   component: TemplateStepFourSummaryComponent,
-        //   label: gettext('Connect'),
-        //   setupId: 'cockpitTopLevelNodes',
-        //   priority: 10
-        // },
-        {
+    TemplateCatalogSetupService,
+    hookStepper([    {
           stepperId: Steppers.SETUP,
           component: TemplateStepThreeConfigComponent,
           label: gettext('Configuration'),
-          setupId: 'cockpitHomeDashboard',
+          setupId: 'blueprintForgeConfig',
           priority: 20,
+          required: true
+
         },
         {
           stepperId: Steppers.SETUP,
           component: TemplateStepTwoDetailsComponent,
           label: gettext('Details'),
-          setupId: 'cockpitFeatures',
+          setupId: 'blueprintForgeTemplateDetail',
           priority: 25,
+          required: true
         },
-        
         {
           stepperId: Steppers.SETUP,
           component: TemplateStepOneComponent,
           label: gettext('App Template'),
-          setupId: 'applcationTemplate',
-          priority: 30,
+          required: true,
+          setupId: 'blueprintForgeApplcationTemplate',
+          priority: 30
         }
-      ] as SetupStep[],  multi: true},
+      ] as SetupStep[]),
      
   ]
 })

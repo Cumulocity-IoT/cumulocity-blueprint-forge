@@ -26,10 +26,10 @@ export interface MediaDetails {
 
 export interface PluginDetails  {
     id: string;
+    contextPath: string,
     title: string;
     description: string;
     link: string;
-    fileName: string;
     requiredPlatformVersion: string;
 }
 
@@ -37,7 +37,6 @@ export interface MicroserviceDetails {
     id: string;
     title: string;
     link: string;
-    fileName: string;
     description: string;
 }
 

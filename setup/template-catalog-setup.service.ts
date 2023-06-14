@@ -6,10 +6,11 @@ import { has, get } from "lodash-es";
 import { ApplicationService, InventoryBinaryService, InventoryService } from "@c8y/ngx-components/api";
 import { CumulocityDashboard } from "builder/template-catalog/template-catalog.model";
 import { TemplateBlueprintDetails, TemplateBlueprintEntry } from "./template-setup.model";
+import { AppBuilderExternalAssetsService } from "app-builder-external-assets";
 
 const packageJson = require('./../package.json');
 @Injectable()
-export class TemplateCatalogService{
+export class TemplateCatalogSetupService{
 
     private GATEWAY_URL_GitHubAsset = '';
     private GATEWAY_URL_GitHubAPI = '';
@@ -22,7 +23,7 @@ export class TemplateCatalogService{
     pkgVersion: any;
     private isFallBackActive = false;
 
-    private blueprintURL = 'https://presalesglobalprod.apigw-aw-eu.webmethods.io/gateway/GitHubAPIService/1.0/repos/SoftwareAG/global-presales-assets/contents'
+   // private blueprintURL = 'https://presalesglobalprod.apigw-aw-eu.webmethods.io/gateway/GitHubAPIService/1.0/repos/SoftwareAG/global-presales-assets/contents'
 
     public templateData = new BehaviorSubject<TemplateBlueprintDetails>(undefined);
     templateData$ = this.templateData.asObservable();
@@ -33,11 +34,16 @@ export class TemplateCatalogService{
     constructor(private http: HttpClient, private inventoryService: InventoryService,
         private appService: ApplicationService, 
         private binaryService: InventoryBinaryService,
+        private externalService: AppBuilderExternalAssetsService
         ) {
-        this.GATEWAY_URL_GitHubAPI = this.blueprintURL;
+        /* this.GATEWAY_URL_GitHubAPI = this.blueprintURL;
         this.GATEWAY_URL_GitHubAsset =  this.blueprintURL;
         this.GATEWAY_URL_GitHubAPI_FallBack = this.blueprintURL;
-        this.GATEWAY_URL_GitHubAsset_FallBack =  this.blueprintURL;
+        this.GATEWAY_URL_GitHubAsset_FallBack =  this.blueprintURL; */
+        this.GATEWAY_URL_GitHubAPI = this.externalService.getURL('GITHUB','gatewayURL_Github');
+        this.GATEWAY_URL_GitHubAsset =  this.externalService.getURL('GITHUB','gatewayURL_GitHubAsset');
+        this.GATEWAY_URL_GitHubAPI_FallBack = this.externalService.getURL('GITHUB','gatewayURL_Github_Fallback');
+        this.GATEWAY_URL_GitHubAsset_FallBack =  this.externalService.getURL('GITHUB','gatewayURL_GitHubAsset_Fallback');
         this.pkgVersion = packageJson.version;
         
     }

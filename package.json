@@ -1,9 +1,9 @@
 {
   "name": "blueprint-forge",
-  "version": "1017.0.156-1.0.0-dev-4",
+  "version": "1017.0.156-1.0.0-dev-7",
   "description": "This is package blueprint to create application dynamically.",
   "scripts": {
-    "start": "c8ycli server -u https://appbuilder.latest.stage.c8y.io/",
+    "start": "c8ycli server ",
     "build": "c8ycli build",
     "deploy": "c8ycli deploy",
     "locale-extract": "c8ycli locale-extract",
@@ -14,9 +14,7 @@
     "prebuild-dev": " gulp clean",
     "postbuild-dev": " gulp bundle"
   },
-  "keywords": [
-    "Blueprint"
-  ],
+  "keywords": ["Blueprint"],
   "author": "Software AG, Global Presales",
   "license": "Apache-2.0",
   "dependencies": {
@@ -102,7 +100,7 @@
         "from": "./ui-assets/img",
         "to": "./img/"
       }],
-      "version": "1017.0.156-1.0.0-dev-4"
+      "version": "1017.0.156-1.0.0-dev-7"
     },
     "cli": {}
   },

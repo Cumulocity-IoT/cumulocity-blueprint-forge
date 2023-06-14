@@ -28,13 +28,16 @@ export abstract class TemplateSetupStep {
     protected setup: SetupComponent,
     protected appState: AppStateService,
     protected alert: AlertService
-  ) {}
+  ) {
+    this.stepper.linear = true;
+  }
 
   async next() {
     this.pending = true;
     try {
       const newConfig = { ...this.setup.data$.value, ...this.config };
       await this.appState.updateCurrentApplicationConfig(newConfig);
+      this.step.completed = true;
       this.setup.stepCompleted(this.stepper.selectedIndex);
       this.setup.data$.next(newConfig);
       this.stepper.next();
