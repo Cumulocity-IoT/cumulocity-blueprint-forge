@@ -74,36 +74,29 @@ import { TooltipModule } from 'ngx-bootstrap/tooltip';
   ],
   providers: [
     TemplateCatalogSetupService,
-    hookStepper([
-    
-        // {
-        //   stepperId: Steppers.SETUP,
-        //   component: TemplateStepFourSummaryComponent,
-        //   label: gettext('Connect'),
-        //   setupId: 'cockpitTopLevelNodes',
-        //   priority: 10
-        // },
-        {
+    hookStepper([    {
           stepperId: Steppers.SETUP,
           component: TemplateStepThreeConfigComponent,
           label: gettext('Configuration'),
-          setupId: 'cockpitHomeDashboard',
-          priority: 20
+          setupId: 'blueprintForgeConfig',
+          priority: 20,
+          required: true
+
         },
         {
           stepperId: Steppers.SETUP,
           component: TemplateStepTwoDetailsComponent,
           label: gettext('Details'),
-          setupId: 'cockpitFeatures',
-          priority: 25
+          setupId: 'blueprintForgeTemplateDetail',
+          priority: 25,
+          required: true
         },
-        
         {
           stepperId: Steppers.SETUP,
           component: TemplateStepOneComponent,
           label: gettext('App Template'),
           required: true,
-          setupId: 'applcationTemplate',
+          setupId: 'blueprintForgeApplcationTemplate',
           priority: 30
         }
       ] as SetupStep[]),

@@ -59,10 +59,8 @@ export class TemplateStepOneComponent extends TemplateSetupStep   {
   }
 
 
-  selectedTemplate(dashboardURL: string) {
+  async selectedTemplate(dashboardURL: string) {
     this.config.config = dashboardURL;
-    super.next();    // Navigation to details page
+    await this.next();    // Navigation to details page
   }
-
-
   }

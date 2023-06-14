@@ -134,10 +134,10 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
   async configureApp() {
     this.appList = (await this.appService.list({ pageSize: 2000 })).data;
     const currentHost = window.location.host.split(':')[0];
-   /*  if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
+    if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
         this.alert.warning("Installation isn't supported when running Application on localhost.");
         return;
-    } */
+    }
     // create Dashboard and install dependencies
     // Also connect with the devices selected
     let totalRemotes = this.configStepData.plugins.length;
