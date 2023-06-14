@@ -87,23 +87,22 @@ import { TemplateStepFourSummaryComponent } from './setup/template-steps/templat
           component: TemplateStepThreeConfigComponent,
           label: gettext('Configuration'),
           setupId: 'cockpitHomeDashboard',
-          priority: 20
+          priority: 20,
         },
         {
           stepperId: Steppers.SETUP,
           component: TemplateStepTwoDetailsComponent,
           label: gettext('Details'),
           setupId: 'cockpitFeatures',
-          priority: 25
+          priority: 25,
         },
         
         {
           stepperId: Steppers.SETUP,
           component: TemplateStepOneComponent,
           label: gettext('App Template'),
-          required: true,
           setupId: 'applcationTemplate',
-          priority: 30
+          priority: 30,
         }
       ] as SetupStep[],  multi: true},
      

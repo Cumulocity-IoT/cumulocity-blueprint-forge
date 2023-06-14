@@ -31,7 +31,7 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep {
     super(stepper, step, setup, appState, alert);
     
     this.setup.data$.subscribe(data => { 
-    
+      // console.log('this.setup.steps in details component', this.setup.steps);
     if (data.config && data.config != '') {
       this.templateDetails = null;
       this.loadTemplateDetailsCatalog(data.config);
@@ -40,9 +40,8 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep {
   }
 
   ngOnInit() {
-    
+   
   }
-
 
   loadTemplateDetailsCatalog(dashboardURL) {
     this.templateCatalogService.getTemplateDetailsCatalog(dashboardURL)
@@ -60,6 +59,7 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep {
                     media.thumbImage = this.templateCatalogService.getGithubURL(media.thumbImage);
                   });
                 } else {
+
                   this.templateDetails.media = [];
                 }
 

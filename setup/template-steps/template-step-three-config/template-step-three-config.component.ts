@@ -49,6 +49,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
     private appDataService: AppDataService, private widgetCatalogService: WidgetCatalogService,
     private progressIndicatorService: ProgressIndicatorService,
   ) {
+    
     super(stepper, step, setup, appState, alert);
 
     this.app = combineLatest([appIdService.appIdDelayedUntilAfterLogin$, this.refreshApp]).pipe(
