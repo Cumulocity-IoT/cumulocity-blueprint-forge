@@ -131,7 +131,7 @@ export class AppBuilderContextDashboardComponent implements OnDestroy {
                         path: this.createDeviceTabPath(this.dashboardId, 'smartrules')
                     })
                 } */
-                tabs.push({
+               /*  tabs.push({
                     label: 'Alarms',
                     icon: 'bell',
                     priority: 2,
@@ -141,7 +141,7 @@ export class AppBuilderContextDashboardComponent implements OnDestroy {
                     icon: 'bar-chart',
                     priority: 1,
                     path: this.createDeviceTabPath(this.dashboardId, 'data_explorer')
-                });
+                }); */
             }
 
             const app = (await this.applicationService.detail(this.applicationId)).data as IApplicationBuilderApplication;

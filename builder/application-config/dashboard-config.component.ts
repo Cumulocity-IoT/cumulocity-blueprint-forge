@@ -17,7 +17,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, Renderer2 } from "@angular/core";
-import { ApplicationService, InventoryService, IApplication, UserService } from "@c8y/client";
+import { ApplicationService, InventoryService, IApplication, UserService, IManifest } from "@c8y/client";
 import { Observable, from, Subject, Subscription, BehaviorSubject, combineLatest } from "rxjs";
 import { debounceTime, first, map, switchMap, tap } from "rxjs/operators";
 import { AppBuilderNavigationService } from "../navigation/app-builder-navigation.service";
@@ -294,15 +294,10 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
             const update: any = {
                 id: app.id,
                 name: app.name,
-                key: `application-builder-${app.name}-app-key`,
+                key: `${this.newAppContextPath}-app-key`,
                 applicationBuilder: app.applicationBuilder,
                 icon: app.icon
             };
-
-            if (app.manifest) {
-                app.manifest.icon = app.icon;
-                update.manifest = app.manifest;
-            }
 
             let contextPathUpdated = false;
             const currentAppContextPath = app.contextPath;
@@ -312,8 +307,19 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
                 contextPathUpdated = true;
             }
 
+            let appManifest: any = app.manifest;
+            if (appManifest) {
+                appManifest.contextPath = app.contextPath;
+                appManifest.key = update.key;
+                appManifest.icon = app.icon;
+                appManifest.name = app.name;
+                update.manifest = appManifest;
+            }
             await this.appService.update(update);
-
+            // update manifest
+           /*  await this.appService.storeAppManifest(app.id, {
+                ...appManifest
+            }); */
             if (contextPathUpdated && contextPathFromURL() === currentAppContextPath) {
                 savingAlert.update('Saving application...\nWaiting for redeploy...');
                 // Pause while c8y server reloads the application

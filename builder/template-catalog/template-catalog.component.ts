@@ -268,49 +268,11 @@ export class TemplateCatalogModalComponent implements OnInit {
 
     async installDependency(dependency: DependencyDescription): Promise<void> {
         const currentHost = window.location.host.split(':')[0];
-        if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
+       /*  if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
             this.alertService.warning("Installation isn't supported when running Application Builder on localhost.");
             return;
-        }
-        if (dependency.type === "plugin") {
-            const widgetBinaryFound = this.appList.find(app => app.manifest?.isPackage && (app.name.toLowerCase() === dependency.title?.toLowerCase() ||
-                (app.contextPath && app.contextPath?.toLowerCase() === dependency?.contextPath?.toLowerCase())));
-            this.showProgressModalDialog(`Installing ${dependency.title}`);
-            this.progressIndicatorService.setProgress(10);
-            if (widgetBinaryFound) {
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                this.progressIndicatorService.setProgress(30);
-                this.widgetCatalogService.updateRemotesInCumulocityJson(widgetBinaryFound).then(async () => {
-                    dependency.isInstalled = true;
-                    this.isReloadRequired = true;
-                    await new Promise(resolve => setTimeout(resolve, 1000));
-                    this.hideProgressModalDialog();
-                }, error => {
-                    this.alertService.danger("There is some technical error! Please try after sometime.");
-                    console.error(error);
-                });
-            } else {
-                this.progressIndicatorService.setProgress(10);
-                this.catalogService.downloadBinary(dependency.link)
-                    .subscribe(data => {
-                        this.progressIndicatorService.setProgress(20);
-                        const blob = new Blob([data], {
-                            type: 'application/zip'
-                        });
-                        const fileName = dependency.link.replace(/^.*[\\\/]/, '');
-                        const fileOfBlob = new File([blob], fileName);
-                        this.widgetCatalogService.installPackage(fileOfBlob).then(async () => {
-                            dependency.isInstalled = true;
-                            this.isReloadRequired = true;
-                            await new Promise(resolve => setTimeout(resolve, 5000));
-                            this.hideProgressModalDialog();
-                        }, error => {
-                            this.alertService.danger("There is some technical error! Please try after sometime.");
-                            console.error(error);
-                        });
-                    });
-            }
-        } else { // installing microservice
+        } */
+        if (dependency.type === "microservice") { // installing plugin
             this.showProgressModalDialog(`Downloading ${dependency.title}`);
             this.progressIndicatorService.setProgress(10);
             await new Promise(resolve => setTimeout(resolve, 1000));
@@ -365,6 +327,45 @@ export class TemplateCatalogModalComponent implements OnInit {
                         } */
                     }
                 });
+            
+        } else { // installing plugin
+            const widgetBinaryFound = this.appList.find(app => app.manifest?.isPackage && (app.name.toLowerCase() === dependency.title?.toLowerCase() ||
+                (app.contextPath && app.contextPath?.toLowerCase() === dependency?.contextPath?.toLowerCase())));
+            this.showProgressModalDialog(`Installing ${dependency.title}`);
+            this.progressIndicatorService.setProgress(10);
+            if (widgetBinaryFound) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                this.progressIndicatorService.setProgress(30);
+                this.widgetCatalogService.updateRemotesInCumulocityJson(widgetBinaryFound).then(async () => {
+                    dependency.isInstalled = true;
+                    this.isReloadRequired = true;
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    this.hideProgressModalDialog();
+                }, error => {
+                    this.alertService.danger("There is some technical error! Please try after sometime.");
+                    console.error(error);
+                });
+            } else {
+                this.progressIndicatorService.setProgress(10);
+                this.catalogService.downloadBinary(dependency.link)
+                    .subscribe(data => {
+                        this.progressIndicatorService.setProgress(20);
+                        const blob = new Blob([data], {
+                            type: 'application/zip'
+                        });
+                        const fileName = dependency.link.replace(/^.*[\\\/]/, '');
+                        const fileOfBlob = new File([blob], fileName);
+                        this.widgetCatalogService.installPackage(fileOfBlob).then(async () => {
+                            dependency.isInstalled = true;
+                            this.isReloadRequired = true;
+                            await new Promise(resolve => setTimeout(resolve, 5000));
+                            this.hideProgressModalDialog();
+                        }, error => {
+                            this.alertService.danger("There is some technical error! Please try after sometime.");
+                            console.error(error);
+                        });
+                    });
+            }
         }
     }
     private isDevicesSelected(): boolean {
