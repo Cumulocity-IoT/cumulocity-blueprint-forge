@@ -3,7 +3,7 @@
   "version": "1017.0.156-1.0.0-dev-7",
   "description": "This is package blueprint to create application dynamically.",
   "scripts": {
-    "start": "c8ycli server ",
+    "start": "c8ycli server",
     "build": "c8ycli build",
     "deploy": "c8ycli deploy",
     "locale-extract": "c8ycli locale-extract",
@@ -78,7 +78,6 @@
       "brandingEntry": "./ui-assets/index.less",
       "tabsHorizontal": true,
       "upgrade": true,
-      "forceSetup": true,
       "rightDrawer": true,
       "contentSecurityPolicy": "base-uri 'none'; default-src 'self' 'unsafe-inline' http: https: ws: wss: blob:; connect-src 'self' *.webmethodscloud.com *.aptrinsic.com *.billwerk.com http: https: ws: wss: blob:;  script-src 'self' open.mapquestapi.com *.twitter.com *.twimg.com *.aptrinsic.com 'unsafe-inline' 'unsafe-eval' data:; style-src * 'unsafe-inline' blob:; img-src * data: blob:; font-src * data:; frame-src *; worker-src 'self' blob:;",
       "dynamicOptionsUrl": "/apps/public/public-options/options.json",

@@ -162,7 +162,7 @@ hideProgressModalDialog() {
         id: 'boonlogic-config.widget',
         title: 'BOON_LOGIC',
         repository: 'Cumulocity-Amber-Boon-Logic',
-        link: '/blueprintForge/boonLogic/sag-ps-pkg-boonlogic-config-runtime-widget.zip?ref=blueprint-forge'
+        link: '/blueprintForge/boonLogic/sag-ps-pkg-boonlogic-config-runtime-widget-2.0.1.zip?ref=blueprint-forge'
     }
       await this.inventoryService.create({
         "c8y_Dashboard": this.templateCatalogSetupService.getCumulocityDashboardRepresentation(dashboardConfiguration, this.widgetDetails.widgets)
@@ -207,7 +207,7 @@ hideProgressModalDialog() {
       //     return;
       // }
       this.progressIndicatorService.setProgress(10);
-      let link = "/blueprintForge/boonLogic/sag-ps-pkg-boonlogic-config-runtime-widget.zip?ref=blueprint-forge";
+      let link = "/blueprintForge/boonLogic/sag-ps-pkg-boonlogic-config-runtime-widget-2.0.1.zip?ref=blueprint-forge";
       this.downloadAndInstallPackage(link);
             
 
