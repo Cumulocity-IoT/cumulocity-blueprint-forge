@@ -295,7 +295,7 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
             const update: any = {
                 id: app.id,
                 name: app.name,
-                key: `${this.newAppContextPath}-app-key`,
+                key: app.key,
                 applicationBuilder: app.applicationBuilder,
                 icon: app.icon
             };
