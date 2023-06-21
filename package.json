@@ -3,7 +3,7 @@
   "version": "1017.0.205-1.0.0-dev-8",
   "description": "This is package blueprint to create application dynamically.",
   "scripts": {
-    "start": "c8ycli server ",
+    "start": "c8ycli server",
     "build": "c8ycli build",
     "deploy": "c8ycli deploy",
     "locale-extract": "c8ycli locale-extract",
