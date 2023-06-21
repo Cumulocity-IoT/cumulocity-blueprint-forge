@@ -42,16 +42,16 @@ import { NgImageSliderModule } from 'ng-image-slider';
 import { GalleryModule } from 'ng-gallery';
 import { LightboxModule } from  'ng-gallery/lightbox';
 import { TemplateStepFourSummaryComponent } from './setup/template-steps/template-step-four-summary/template-step-four-summary.component';
-import { PopoverModule } from 'ngx-bootstrap/popover';
-import { TooltipModule } from 'ngx-bootstrap/tooltip';
-
+import { AppConfigComponent } from './setup/app-config.component';
+import { IconSelectorModule } from './icon-selector/icon-selector.module';
 @NgModule({
   declarations: [
     TemplateStepOneComponent, 
     TemplateStepTwoDetailsComponent,
     TemplateStepThreeConfigComponent,
     TemplateStepFourSummaryComponent,
-    TemplateSetupStepperButtonsComponent
+    TemplateSetupStepperButtonsComponent,
+    AppConfigComponent
   ],
   imports: [
     // Upgrade module must be the first
@@ -67,6 +67,7 @@ import { TooltipModule } from 'ngx-bootstrap/tooltip';
     WidgetsModule,
     CustomWidgetsModule,
     NgImageSliderModule,
+    IconSelectorModule,
     GalleryModule.withConfig({
         thumb: false
       }),

@@ -12,9 +12,9 @@
   <div class="inner-scroll flex-grow">
     <div class="container-fluid fit-w">
       <div class="row">
-        <div class="col-md-10 col-lg-9 col-lg-offset-1">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
       <div class="card-group interact-grid" style="text-align:center;padding-top: 10px;">
-        <div class="col-xs-12 col-sm-12 col-md-12">
+        <div class="col-xs-12 col-sm-8 col-md-8">
            <div class="card">
           <div class="card-header">
               <div class="col-xs-12 col-sm-12 col-md-12" style="text-align: left;">
@@ -84,6 +84,19 @@
                     </div>
                   </div>
                 </div>
+            </div>
+          </div>
+        </div>
+        <div  class="col-xs-12 col-sm-4 col-md-4">
+          <div class="card" style="text-align: left;">
+            <div class="card-header">
+                <div class="col-xs-12 col-sm-12 col-md-12" >
+                    <h4 class="card-title">Application Configuration</h4>
+                </div>
+            </div>
+            <div class="card-block" id="appConfingDiv" *ngIf="app | async as app">
+              <blueprint-forge-app-config [appName]="newAppName" [appContextPath]="newAppContextPath" [appIcon]="newAppIcon" [app]="currentApp" [reload]="false" ></blueprint-forge-app-config>
+         
             </div>
           </div>
         </div>
