@@ -96,7 +96,11 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
   //TODO: Refector // SaveInstall()
   async saveandInstall (app: any) {
     if(this.appConfigForm.form.valid) {
-      await this.saveAppChanges(app);
+      if(this.currentApp.name !== this.newAppName || 
+        this.currentApp.contextPath !== this.newAppContextPath || 
+        this.currentApp.applicationBuilder.icon !== this.newAppIcon ) {
+          await this.saveAppChanges(app);
+        }
       await this.configureApp();
     } else {
       this.alert.danger("Please fill required details to proceed further.");
