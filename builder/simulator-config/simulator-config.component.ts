@@ -77,13 +77,13 @@ export class SimulatorConfigComponent implements OnDestroy {
             })
         );
         this.appSubscription = app.subscribe((app) => {
-            if (app && app.applicationBuilder.branding.enabled && (app.applicationBuilder.selectedTheme && app.applicationBuilder.selectedTheme !== 'Default')) {
+            if (app  && app.applicationBuilder && app.applicationBuilder.branding && app.applicationBuilder.branding.enabled && (app.applicationBuilder.selectedTheme && app.applicationBuilder.selectedTheme !== 'Default')) {
                 this.applyTheme = true;
                 this.renderer.addClass(this.document.body, 'simulator-body-theme');
             } else {
                 this.applyTheme = false;
             }
-            if(app.applicationBuilder && app.applicationBuilder?.simulators && app.applicationBuilder?.simulators.length > 0){
+            if(app  &&  app.applicationBuilder && app.applicationBuilder?.simulators && app.applicationBuilder?.simulators.length > 0){
                 this.isSimulatorsExist = true;
             }
         });

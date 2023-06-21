@@ -40,7 +40,7 @@ import { DOCUMENT } from "@angular/common";
 import { moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { AppDataService } from "../app-data.service";
 import { Clipboard } from '@angular/cdk/clipboard';
-
+import { IconSelectorService } from "@c8y/ngx-components/icon-selector";
 export interface DashboardConfig {
     id: string,
     name: string,
@@ -109,6 +109,7 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
     constructor(
         private appIdService: AppIdService, private appService: ApplicationService, private appStateService: AppStateService,
         private inventoryService: InventoryService, private navigation: AppBuilderNavigationService,
+        private iconSelector: IconSelectorService,
         private modalService: BsModalService, private alertService: AlertService, private settingsService: SettingsService,
         private accessRightsService: AccessRightsService, private userService: UserService, private appDataService: AppDataService,
         @Inject(DOCUMENT) private document: Document, private renderer: Renderer2, private cd: ChangeDetectorRef, private clipboard: Clipboard
@@ -329,6 +330,7 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
 
             savingAlert.update('Application saved!', 'success');
             savingAlert.close(1500);
+            location.reload();
         } catch (e) {
             savingAlert.update('Unable to save!\nCheck browser console for details', 'danger');
             throw e;
@@ -728,4 +730,12 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
             return 'applyLight';
         }
     }
+
+    // TODO: we need to see how can we use product icons instead of device selector
+    /* async openIconModal() {
+        const icon = await this.iconSelector.selectIcon();
+        if (icon) {
+          this.newAppIcon = icon;
+        }
+      } */
 }

@@ -1,6 +1,6 @@
 {
   "name": "blueprint-forge",
-  "version": "1017.0.156-1.0.0-dev-7",
+  "version": "1017.0.205-1.0.0-dev-8",
   "description": "This is package blueprint to create application dynamically.",
   "scripts": {
     "start": "c8ycli server ",
@@ -14,7 +14,9 @@
     "prebuild-dev": " gulp clean",
     "postbuild-dev": " gulp bundle"
   },
-  "keywords": ["Blueprint"],
+  "keywords": [
+    "Blueprint"
+  ],
   "author": "Software AG, Global Presales",
   "license": "Apache-2.0",
   "dependencies": {
@@ -28,10 +30,10 @@
     "@angular/platform-browser-dynamic": "14.0.6",
     "@angular/router": "14.0.6",
     "@angular/upgrade": "14.0.6",
-    "@c8y/client": "1017.0.156",
-    "@c8y/ng1-modules": "1017.0.156",
-    "@c8y/ngx-components": "1017.0.156",
-    "@c8y/style": "1017.0.156",
+    "@c8y/client": "1017.0.205",
+    "@c8y/ng1-modules": "1017.0.205",
+    "@c8y/ngx-components": "1017.0.205",
+    "@c8y/style": "1017.0.205",
     "@ng-select/ng-select": "^9.1.0",
     "@ngx-translate/core": "14.0.0",
     "angular": "1.6.9",
@@ -68,17 +70,16 @@
     "jest": "^28.1.3",
     "jest-preset-angular": "^12.2.5",
     "typescript": "4.7.4",
-    "@c8y/cli": "1017.0.156"
+    "@c8y/cli": "1017.0.205"
   },
   "c8y": {
     "application": {
       "name": "Blueprint Forge",
-      "contextPath": "blueprint-forge",
-      "key": "blueprint-forge-application-key",
+      "contextPath": "blueprint-forge-8-1",
+      "key": "blueprint-forge-8-1-app-key",
       "brandingEntry": "./ui-assets/index.less",
       "tabsHorizontal": true,
       "upgrade": true,
-      "forceSetup": true,
       "rightDrawer": true,
       "contentSecurityPolicy": "base-uri 'none'; default-src 'self' 'unsafe-inline' http: https: ws: wss: blob:; connect-src 'self' *.webmethodscloud.com *.aptrinsic.com *.billwerk.com http: https: ws: wss: blob:;  script-src 'self' open.mapquestapi.com *.twitter.com *.twimg.com *.aptrinsic.com 'unsafe-inline' 'unsafe-eval' data:; style-src * 'unsafe-inline' blob:; img-src * data: blob:; font-src * data:; frame-src *; worker-src 'self' blob:;",
       "dynamicOptionsUrl": "/apps/public/public-options/options.json",
@@ -93,16 +94,21 @@
         "required": true,
         "functional": "These cookies are used to support you during your first steps in the product, to deliver content tailored to your needs, and to collect usage statistics."
       },
-      "copy": [{
-        "from": "./ui-assets/fonts",
-        "to": "./fonts/"
-      }, {
-        "from": "./ui-assets/img",
-        "to": "./img/"
-      }],
-      "version": "1017.0.156-1.0.0-dev-7"
+      "copy": [
+        {
+          "from": "./ui-assets/fonts",
+          "to": "./fonts/"
+        },
+        {
+          "from": "./ui-assets/img",
+          "to": "./img/"
+        }
+      ],
+      "version": "1017.0.205-1.0.0-dev-8"
     },
     "cli": {}
   },
-  "browserslist": ["last 2 major versions"]
+  "browserslist": [
+    "last 2 major versions"
+  ]
 }

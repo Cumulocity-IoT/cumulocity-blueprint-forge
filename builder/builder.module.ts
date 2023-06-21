@@ -26,7 +26,7 @@ import {IconSelectorModule} from "../icon-selector/icon-selector.module";
 import {TooltipModule} from "ngx-bootstrap/tooltip";
 import {SortableModule} from "ngx-bootstrap/sortable";
 import {WizardModule} from "../wizard/wizard.module";
-//import {BrandingModule} from "./branding/branding.module";
+import {BrandingModule} from "./branding/branding.module";
 import {AppBuilderNavigationService} from "./navigation/app-builder-navigation.service";
 import {
     AppBuilderConfigNavigationRegistrationService,
@@ -92,7 +92,7 @@ import { SettingsService } from "./settings/settings.service";
         WizardModule,
         TemplateCatalogModule,
         TooltipModule.forRoot(),
-  //      BrandingModule.forRoot(),
+        BrandingModule.forRoot(),
         SimulatorConfigModule,
         DeviceSelectorModule,
         MarkdownModule.forRoot(),
