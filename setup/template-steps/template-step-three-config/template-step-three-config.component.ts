@@ -152,10 +152,10 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
   async configureApp() {
     this.appList = (await this.appService.list({ pageSize: 2000 })).data;
     const currentHost = window.location.host.split(':')[0];
-    if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
+   /*  if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
         this.alert.warning("Installation isn't supported when running Application on localhost.");
         return;
-    }
+    } */
     // create Dashboard and install dependencies
     // Also connect with the devices selected
     let totalRemotes = this.configStepData.plugins.length;
@@ -285,7 +285,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
       });
       const fileName = plugin.link.replace(/^.*[\\\/]/, '');
       const fileOfBlob = new File([blob], fileName);
-      this.widgetCatalogService.installPackage(fileOfBlob).then(async () => {
+      await this.widgetCatalogService.installPackage(fileOfBlob).then(async () => {
         await new Promise(resolve => setTimeout(resolve, 5000));
       }, error => {
         this.alert.danger("There is some technical error! Please try after sometime.");
