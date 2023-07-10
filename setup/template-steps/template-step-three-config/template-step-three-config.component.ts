@@ -1,5 +1,5 @@
 import { CdkStep } from '@angular/cdk/stepper';
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { AlertService, AppStateService, C8yStepper, SetupComponent } from '@c8y/ngx-components';
 import { TemplateSetupStep } from './../../template-setup-step';
 import { TemplateCatalogSetupService } from '../../template-catalog-setup.service';
@@ -9,7 +9,7 @@ import { TemplateCatalogModalComponent } from '../../../builder/template-catalog
 import { Observable, from, Subject, Subscription, BehaviorSubject, combineLatest, interval } from 'rxjs';
 import { debounceTime, first, map, switchMap, tap } from "rxjs/operators";
 import { AppIdService } from '../../../builder/app-id.service';
-import { ApplicationService, IApplication } from '@c8y/client';
+import { ApplicationService, IApplication, IManagedObject } from '@c8y/client';
 import { AppDataService } from '../../../builder/app-data.service';
 import { ProgressIndicatorModalComponent } from '../../../builder/utils/progress-indicator-modal/progress-indicator-modal.component';
 import { ProgressIndicatorService } from '../../../builder/utils/progress-indicator-modal/progress-indicator.service';
@@ -18,6 +18,9 @@ import { DashboardWidgets, Dashboards, MicroserviceDetails, PluginDetails, Templ
 import { ApplicationBinaryService } from '../../../builder/application-binary.service';
 import { TemplateCatalogService } from '../../../builder/template-catalog/template-catalog.service';
 import { HttpResponse } from '@angular/common/http';
+import { AppBuilderExternalAssetsService } from 'app-builder-external-assets';
+import { DeviceSelectorModalComponent } from './../../../builder/utils/device-selector-modal/device-selector.component';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 @Component({
   selector: 'c8y-template-step-three-config',
@@ -25,7 +28,9 @@ import { HttpResponse } from '@angular/common/http';
   host: { class: 'd-contents' }
 })
 export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
+  
  // dashboardWidgets: DashboardWidgets;
+ templateDetails:any;
   private progressModal: BsModalRef;
   private appList = [];
   private microserviceDownloadProgress = interval(3000);
@@ -42,6 +47,10 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
   app: Observable<any>;
   refreshApp = new BehaviorSubject<void>(undefined);
   currentApp: IApplication;
+  private GATEWAY_URL_GitHubAsset = '';
+  private GATEWAY_URL_GitHubAsset_FallBack = '';
+  templateDetailsData: any;
+  form: FormGroup;
   constructor(
     public stepper: C8yStepper,
     protected step: CdkStep,
@@ -52,11 +61,15 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
     private modalService: BsModalService, private applicationBinaryService: ApplicationBinaryService,
     private appIdService: AppIdService, private appService: ApplicationService,
     private appDataService: AppDataService, private widgetCatalogService: WidgetCatalogService,
-    private progressIndicatorService: ProgressIndicatorService, private catalogService: TemplateCatalogService
+    private progressIndicatorService: ProgressIndicatorService, private catalogService: TemplateCatalogService,
+    private externalService: AppBuilderExternalAssetsService,
+    private deviceSelectorModalRef: BsModalRef,
+    private formBuilder: FormBuilder
   ) {
     
     super(stepper, step, setup, appState, alert);
-
+    this.GATEWAY_URL_GitHubAsset =  this.externalService.getURL('GITHUB','gatewayURL_GitHubAsset');
+    this.GATEWAY_URL_GitHubAsset_FallBack =  this.externalService.getURL('GITHUB','gatewayURL_GitHubAsset_Fallback');
     this.app = combineLatest([appIdService.appIdDelayedUntilAfterLogin$, this.refreshApp]).pipe(
       map(([appId]) => appId),
       switchMap(appId => from(
@@ -74,17 +87,25 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
   }
 
   ngOnInit() {
+    // this.templateDetails = JSON.parse(localStorage.getItem('config'));
     this.templateCatalogSetupService.templateData.subscribe(currentData => {
       console.log('Stored template data', currentData);
       if (currentData) {
-        this.configStepData = currentData;
-        this.configStepData.dashboards.map(item =>  item.isChecked = true);
+        this.templateDetails = currentData;
+        this.templateDetails.dashboards.map(item =>  item.isChecked = true);
       }
     });
+   
+    // this.form = this.formBuilder.group({
+    //   selectedDevices: this.formBuilder.array(null, [ Validators.required]),
+    // });
+
+    
   }
 
+
   syncDashboardFlag(event, index) {
-    this.configStepData.dashboards[index].isChecked = event.target.checked;
+    this.templateDetails.dashboards[index].isChecked = event.target.checked;
   }
 
   //TODO: Refector // SaveInstall()
@@ -139,24 +160,28 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
         this.alert.warning("Installation isn't supported when running Application on localhost.");
         return;
     }
+    
+    // Add logic to trim dashboards which are not selected
+    let configDataDashboards = this.templateDetails.dashboards.filter(item => item.isChecked === true);
+
     // create Dashboard and install dependencies
     // Also connect with the devices selected
-    let totalRemotes = this.configStepData.plugins.length;
-    totalRemotes = totalRemotes + this.configStepData.microservices.length;
-    totalRemotes = totalRemotes + this.configStepData.dashboards.length;
+    let totalRemotes = this.templateDetails.plugins.length;
+    totalRemotes = totalRemotes + this.templateDetails.microservices.length;
+    totalRemotes = totalRemotes + configDataDashboards.length;
 
     const eachRemoteProgress: number = Math.floor((totalRemotes > 1 ? (90 / totalRemotes) : 0));
     let overallProgress = 0;
     this.showProgressModalDialog("Verifying plugins...")
     if (totalRemotes > 1) { this.progressIndicatorService.setOverallProgress(overallProgress) }
     this.progressIndicatorService.setOverallProgress(5);
-    for (let plugin of this.configStepData.plugins) {
+    for (let plugin of this.templateDetails.plugins) {
       await this.installPlugin(plugin);
       overallProgress = overallProgress + eachRemoteProgress;
       this.progressIndicatorService.setOverallProgress(overallProgress)
     };
     await new Promise(resolve => setTimeout(resolve, 1000));
-    for (let ms of this.configStepData.microservices) {
+    for (let ms of this.templateDetails.microservices) {
       this.progressIndicatorService.setMessage(`Installing ${ms.title}`);
       this.progressIndicatorService.setProgress(10);
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -166,11 +191,11 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
       this.progressIndicatorService.setOverallProgress(overallProgress)
     };
     await new Promise(resolve => setTimeout(resolve, 1000));
-    for (let db of this.configStepData.dashboards) {
+    for (let db of configDataDashboards) {
       this.progressIndicatorService.setProgress(20);
       this.progressIndicatorService.setMessage(`Installing ${db.title}`);
       await new Promise(resolve => setTimeout(resolve, 1000));
-      const templateDetails = await (await this.loadTemplateDetails(db)).toPromise();
+      const templateDetailsData = await (await this.loadTemplateDetails(db)).toPromise();
       const dashboardConfiguration = {
         dashboardId: '12598412',
         dashboardName: db.title,
@@ -181,7 +206,8 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
         roles: ''
       };
       this.progressIndicatorService.setProgress(40);
-      await this.catalogService.createDashboard(this.currentApp, dashboardConfiguration, db, templateDetails);
+      templateDetailsData.input.devices = db.devices;
+      await this.catalogService.createDashboard(this.currentApp, dashboardConfiguration, db, templateDetailsData);
       this.progressIndicatorService.setProgress(90);
       overallProgress = overallProgress + eachRemoteProgress;
       this.progressIndicatorService.setOverallProgress(overallProgress)
@@ -202,6 +228,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
         this.progressIndicatorService.setProgress(counter);
       }
     });
+    
     const data = await this.templateCatalogSetupService.downloadBinary(microService.link).toPromise();
     let createdApp = null;
     this.microserviceDownloadProgress$.unsubscribe();
@@ -284,5 +311,24 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
             console.log('Dashboard Catalog Details: Error in primary endpoint! using fallback...');
             return this.catalogService.getTemplateDetailsFallBack(db.dashboard);
     }));      
+ }
+
+ openDeviceSelectorDialog(dashboard, index) {
+  this.deviceSelectorModalRef = this.modalService.show(DeviceSelectorModalComponent, { class: 'c8y-wizard', initialState: {} });
+ 
+  
+  this.deviceSelectorModalRef.content.onDeviceSelected.subscribe((selectedDevice: IManagedObject) => {
+      dashboard.name = selectedDevice['name'];
+
+      dashboard.devices = [{
+        type: "Temperature Sensor",
+          placeholder: "device01",
+          reprensentation : {
+            id: selectedDevice.id,
+            name: selectedDevice['name']
+          }
+      }]
+      
+  });
  }
 }

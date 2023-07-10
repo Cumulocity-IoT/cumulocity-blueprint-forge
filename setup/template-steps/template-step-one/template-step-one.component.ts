@@ -29,14 +29,12 @@ export class TemplateStepOneComponent extends TemplateSetupStep   {
     private alertService: AlertService
   ) {
     super(stepper, step, setup, appState, alert);
+ 
+    
   }
 
   ngOnInit() {
     this.loadTemplateCatalog();
-  }
-
-  ngAfterViewInit() {
-    
   }
 
   loadTemplateCatalog() {
@@ -46,6 +44,9 @@ export class TemplateStepOneComponent extends TemplateSetupStep   {
                 return this.templateCatalogSetupService.getTemplateCatalogFallBack()
             }))
             .subscribe((catalog: Array<TemplateBlueprintEntry>) => {
+              
+                
+              
                 this.templates = catalog;
                 this.filterTemplates = (this.templates ? this.templates : []);
                 this.filterTemplates.forEach(template => {
@@ -53,6 +54,8 @@ export class TemplateStepOneComponent extends TemplateSetupStep   {
                         template.thumbnail = this.templateCatalogSetupService.getGithubURL(template.thumbnail);
                     }
                 })
+                // this.setup.data$.next(this.filterTemplates);
+                // localStorage.setItem('config', JSON.stringify(this.filterTemplates));
             }, error => {
                 this.alertService.danger("There is some technical error! Please try after sometime.");
             });

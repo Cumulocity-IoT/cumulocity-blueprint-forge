@@ -16,7 +16,9 @@ export interface TemplateBlueprintDetails {
     plugins?: PluginDetails[];
     microservices?: MicroserviceDetails[];
     dashboards: Dashboards[];
- //   devices?: DeviceDetails[];
+    input : {
+        devices?: DeviceDetails[];
+    }
 }
 
 export interface MediaDetails {
@@ -73,14 +75,14 @@ export interface DashboardWidgets {
     card: boolean
 } */
 
-/* export interface DeviceDetails {
+ export interface DeviceDetails {
     type: string;
     placeholder: string;
-    representation?: {
+    reprensentation?: {
         id: string;
         name: string;
     };
-} */
+} 
 
 
 
