@@ -1,5 +1,5 @@
 import { CdkStep } from '@angular/cdk/stepper';
-import { Component, HostListener } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { AlertService, AppStateService, C8yStepper, SetupComponent } from '@c8y/ngx-components';
 import { TemplateSetupStep } from './../../template-setup-step';
 import { TemplateCatalogSetupService } from '../../template-catalog-setup.service';
@@ -7,7 +7,7 @@ import { catchError } from "rxjs/operators";
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { TemplateCatalogModalComponent } from '../../../builder/template-catalog/template-catalog.component';
 import { Observable, from, Subject, Subscription, BehaviorSubject, combineLatest, interval } from 'rxjs';
-import { debounceTime, first, map, switchMap, tap } from "rxjs/operators";
+import { map, switchMap, tap } from "rxjs/operators";
 import { AppIdService } from '../../../builder/app-id.service';
 import { ApplicationService, IApplication, IManagedObject } from '@c8y/client';
 import { AppDataService } from '../../../builder/app-data.service';
@@ -22,6 +22,10 @@ import { AppBuilderExternalAssetsService } from 'app-builder-external-assets';
 import { DeviceSelectorModalComponent } from './../../../builder/utils/device-selector-modal/device-selector.component';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
+import * as delay from "delay";
+import { UpdateableAlert } from "../../../builder/utils/UpdateableAlert";
+import { contextPathFromURL } from "../../../builder/utils/contextPathFromURL";
+import { NgForm } from '@angular/forms';
 @Component({
   selector: 'c8y-template-step-three-config',
   templateUrl: './template-step-three-config.component.html',
@@ -35,6 +39,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
   private appList = [];
   private microserviceDownloadProgress = interval(3000);
   private microserviceDownloadProgress$: Subscription;
+  @ViewChild("appConfigForm",{static: false}) appConfigForm: NgForm;
 
   configStepData: any;
   //dashboardWidgets: DashboardWidgets;
@@ -51,6 +56,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
   private GATEWAY_URL_GitHubAsset_FallBack = '';
   templateDetailsData: any;
   form: FormGroup;
+  isFormValid = false;
   constructor(
     public stepper: C8yStepper,
     protected step: CdkStep,
@@ -64,7 +70,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
     private progressIndicatorService: ProgressIndicatorService, private catalogService: TemplateCatalogService,
     private externalService: AppBuilderExternalAssetsService,
     private deviceSelectorModalRef: BsModalRef,
-    private formBuilder: FormBuilder
+    private formBuilder: FormBuilder, private alertService: AlertService, private appStateService: AppStateService
   ) {
     
     super(stepper, step, setup, appState, alert);
@@ -90,6 +96,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
     // this.templateDetails = JSON.parse(localStorage.getItem('config'));
     this.templateCatalogSetupService.templateData.subscribe(currentData => {
       console.log('Stored template data', currentData);
+      this.isFormValid= this.appConfigForm?.form.valid;
       if (currentData) {
         this.templateDetails = currentData;
         this.templateDetails.dashboards.map(item =>  item.isChecked = true);
@@ -109,8 +116,19 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
   }
 
   //TODO: Refector // SaveInstall()
-  async saveandInstall () {
-    await this.configureApp();
+  async saveandInstall (app: any) {
+    if(this.appConfigForm.form.valid) {
+      if(this.currentApp.name !== this.newAppName || 
+        this.currentApp.contextPath !== this.newAppContextPath || 
+        this.currentApp.applicationBuilder.icon !== this.newAppIcon ) {
+          await this.saveAppChanges(app);
+        }
+      await this.configureApp();
+    } else {
+      this.alert.danger("Please fill required details to proceed further.");
+        return;
+    }
+   
    /*  console.log('Config step data value while saving', this.configStepData);
     if (this.configStepData && this.configStepData.dashboards) {
       for (let i = 0; i < this.configStepData.dashboards.length; i++) {
@@ -295,7 +313,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
       });
       const fileName = plugin.link.replace(/^.*[\\\/]/, '');
       const fileOfBlob = new File([blob], fileName);
-      this.widgetCatalogService.installPackage(fileOfBlob).then(async () => {
+      await this.widgetCatalogService.installPackage(fileOfBlob).then(async () => {
         await new Promise(resolve => setTimeout(resolve, 5000));
       }, error => {
         this.alert.danger("There is some technical error! Please try after sometime.");
@@ -331,4 +349,58 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
       
   });
  }
+  async saveAppChanges(app) {
+    const savingAlert = new UpdateableAlert(this.alertService);
+    savingAlert.update('Saving application...');
+    try {
+      app.name = this.newAppName;
+      app.applicationBuilder.icon = this.newAppIcon;
+      app.icon = {
+        name: this.newAppIcon,
+        "class": `fa fa-${this.newAppIcon}`
+      };
+
+      const update: any = {
+        id: app.id,
+        name: app.name,
+        key: app.key,
+        applicationBuilder: app.applicationBuilder,
+        icon: app.icon
+      };
+
+      let contextPathUpdated = false;
+      const currentAppContextPath = app.contextPath;
+      if (app.contextPath && app.contextPath != this.newAppContextPath) {
+        app.contextPath = this.newAppContextPath;
+        update.contextPath = this.newAppContextPath;
+        contextPathUpdated = true;
+      }
+
+      let appManifest: any = app.manifest;
+      if (appManifest) {
+        appManifest.contextPath = app.contextPath;
+        appManifest.key = update.key;
+        appManifest.icon = app.icon;
+        appManifest.name = app.name;
+        update.manifest = appManifest;
+      }
+      await this.appService.update(update);
+      
+      if (contextPathUpdated && contextPathFromURL() === currentAppContextPath) {
+        savingAlert.update('Saving application...');
+        // Pause while c8y server reloads the application
+        await delay(5000);
+        window.location = `/apps/${this.newAppContextPath}/${window.location.hash}` as any;
+      }
+
+      savingAlert.update('Application saved!', 'success');
+      savingAlert.close(1500);
+    } catch (e) {
+      savingAlert.update('Unable to save!\nCheck browser console for details', 'danger');
+      throw e;
+    }
+    this.appStateService.currentUser.next(this.appStateService.currentUser.value);
+  }
+
+
 }

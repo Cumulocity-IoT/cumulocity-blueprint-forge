@@ -1,6 +1,6 @@
 {
   "name": "blueprint-forge",
-  "version": "1017.0.205-1.0.0-dev-8",
+  "version": "1017.0.205-1.0.0-dev-9",
   "description": "This is package blueprint to create application dynamically.",
   "scripts": {
     "start": "c8ycli server -u https://appbuilder.eu-latest.cumulocity.com/",
@@ -93,13 +93,16 @@
         "required": true,
         "functional": "These cookies are used to support you during your first steps in the product, to deliver content tailored to your needs, and to collect usage statistics."
       },
-      "copy": [{
-        "from": "./ui-assets/fonts",
-        "to": "./fonts/"
-      }, {
-        "from": "./ui-assets/img",
-        "to": "./img/"
-      }],
+      "copy": [
+        {
+          "from": "./ui-assets/fonts",
+          "to": "./fonts/"
+        },
+        {
+          "from": "./ui-assets/img",
+          "to": "./img/"
+        }
+      ],
       "version": "1017.0.205-1.0.0-dev-8"
     },
     "cli": {}
