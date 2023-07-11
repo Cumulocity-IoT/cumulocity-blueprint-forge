@@ -25,6 +25,7 @@ import * as delay from "delay";
 import { UpdateableAlert } from "../../../builder/utils/UpdateableAlert";
 import { contextPathFromURL } from "../../../builder/utils/contextPathFromURL";
 import { NgForm } from '@angular/forms';
+import { SetupConfigService } from './../../setup-config.service';
 @Component({
   selector: 'c8y-template-step-three-config',
   templateUrl: './template-step-three-config.component.html',
@@ -69,10 +70,11 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
     private progressIndicatorService: ProgressIndicatorService, private catalogService: TemplateCatalogService,
     private externalService: AppBuilderExternalAssetsService,
     private deviceSelectorModalRef: BsModalRef,
-    private alertService: AlertService, private appStateService: AppStateService
+     private alertService: AlertService, private appStateService: AppStateService,
+    protected setupConfigService: SetupConfigService
   ) {
     
-    super(stepper, step, setup, appState, alert);
+    super(stepper, step, setup, appState, alert, setupConfigService);
     this.GATEWAY_URL_GitHubAsset =  this.externalService.getURL('GITHUB','gatewayURL_GitHubAsset');
     this.GATEWAY_URL_GitHubAsset_FallBack =  this.externalService.getURL('GITHUB','gatewayURL_GitHubAsset_Fallback');
     this.app = combineLatest([appIdService.appIdDelayedUntilAfterLogin$, this.refreshApp]).pipe(

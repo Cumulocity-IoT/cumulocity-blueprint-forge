@@ -10,6 +10,7 @@ import { ProgressIndicatorModalComponent } from './../../../builder/utils/progre
 import { ProgressIndicatorService } from './../../../builder/utils/progress-indicator-modal/progress-indicator.service';
 import { SettingsService } from './../../../builder/settings/settings.service';
 import { WidgetCatalogService } from './../../../builder/widget-catalog/widget-catalog.service';
+import { SetupConfigService } from './../../setup-config.service';
 
 @Component({
   selector: 'c8y-template-step-four-summary',
@@ -45,10 +46,11 @@ export class TemplateStepFourSummaryComponent extends TemplateSetupStep {
     private deviceSelectorModalRef: BsModalRef,
     private progressIndicatorService: ProgressIndicatorService,
     private inventoryService: InventoryService,
-    private widgetCatalogService: WidgetCatalogService
+    private widgetCatalogService: WidgetCatalogService,
+    protected setupConfigService: SetupConfigService
     
   ) {
-    super(stepper, step, setup, appState, alert);
+    super(stepper, step, setup, appState, alert, setupConfigService);
   }
 
   ngOnInit() {

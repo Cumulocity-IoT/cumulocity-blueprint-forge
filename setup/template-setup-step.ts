@@ -1,27 +1,20 @@
 import { CdkStep } from '@angular/cdk/stepper';
 import { AppStateService, AlertService, C8yStepper, SetupComponent } from '@c8y/ngx-components';
-import { TemplateBlueprintDetails, TemplateBlueprintEntry } from './template-setup.model';
-
-const DEFAULT_CONFIG: TemplateBlueprintEntry = {
-  templateId: "",
-  title: "",
-  description: "",
-  thumbnail: "",
-  config: "",
-  comingSoon: false,
-};
-const details_config: TemplateBlueprintDetails = {
-  templateId: "",
-  title: "",
-  tagLine: "",
-  description: "",
+import { BlueprintForge } from './template-setup.model';
+import { distinctUntilChanged } from "rxjs/operators";
+import { SetupConfigService } from './setup-config.service';
+const DEFAULT_CONFIG: BlueprintForge = {
+  templateURL: "",
+  selectedStepperIndex: 0,
+  plugins: [],
   dashboards: [],
-  input: {}
-}
+  microservices: [],
+};
+
 export abstract class TemplateSetupStep {
   // config: TemplateBlueprintEntry = DEFAULT_CONFIG;
-  config: any = DEFAULT_CONFIG;
-  detailsConfig: TemplateBlueprintDetails = details_config; 
+  config: any = {}
+  blueprintForge: BlueprintForge = DEFAULT_CONFIG;
   pending = false;
 
   constructor(
@@ -29,14 +22,23 @@ export abstract class TemplateSetupStep {
     protected step: CdkStep,
     protected setup: SetupComponent,
     protected appState: AppStateService,
-    protected alert: AlertService
+    protected alert: AlertService,
+    protected setupConfigService: SetupConfigService
   ) {
     this.stepper.linear = true;
+    this.appState.currentApplicationConfig.pipe( distinctUntilChanged()).subscribe( appConfig => {
+      if(appConfig && appConfig.blueprintForge && appConfig.blueprintForge.selectedStepperIndex > 0){
+        this.blueprintForge = appConfig.blueprintForge;
+        this.setupConfigService.stepCompleted(this.stepper, this.step, this.setup, this.blueprintForge, appConfig);
+      }
+    })
   }
 
   async next() {
     this.pending = true;
     try {
+      this.blueprintForge.selectedStepperIndex = this.stepper.selectedIndex
+      this.config.blueprintForge = this.blueprintForge;
       const newConfig = { ...this.setup.data$.value, ...this.config };
       await this.appState.updateCurrentApplicationConfig(newConfig);
       this.step.completed = true;
