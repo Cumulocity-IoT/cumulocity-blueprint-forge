@@ -6,6 +6,7 @@ import { TemplateCatalogSetupService } from '../../template-catalog-setup.servic
 import { catchError } from "rxjs/operators";
 import { GalleryItem, ImageItem } from 'ng-gallery';
 import { TemplateBlueprintDetails } from './../../template-setup.model';
+import { SetupConfigService } from './../../setup-config.service';
 
 @Component({
   selector: 'c8y-template-step-two-details',
@@ -27,15 +28,17 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep {
     protected alert: AlertService,
     private templateCatalogSetupService: TemplateCatalogSetupService,
     private alertService: AlertService,
+    protected setupConfigService: SetupConfigService
   ) {
-    super(stepper, step, setup, appState, alert);
+    super(stepper, step, setup, appState, alert, setupConfigService);
     
     
 
     this.setup.data$.subscribe(data => { 
-      if (data.config && data.config != '') {
+      if (data.blueprintForge && data.blueprintForge != '') {
         this.templateDetails = null;
-        this.loadTemplateDetailsCatalog(data.config);
+        const templateURL = data.blueprintForge.templateURL;
+        this.loadTemplateDetailsCatalog(templateURL);
       }
     });
   

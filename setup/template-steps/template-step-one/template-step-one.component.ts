@@ -5,6 +5,7 @@ import { TemplateSetupStep } from './../../template-setup-step';
 import { TemplateCatalogSetupService } from '../../template-catalog-setup.service';
 import { catchError } from "rxjs/operators";
 import { TemplateBlueprintDetails, TemplateBlueprintEntry } from './../../template-setup.model';
+import { SetupConfigService } from './../../setup-config.service';
 
 @Component({
   selector: 'c8y-template-step-one',
@@ -26,9 +27,10 @@ export class TemplateStepOneComponent extends TemplateSetupStep   {
     protected appState: AppStateService,
     protected alert: AlertService,
     private templateCatalogSetupService: TemplateCatalogSetupService,
-    private alertService: AlertService
+    private alertService: AlertService,
+    protected setupConfigService: SetupConfigService
   ) {
-    super(stepper, step, setup, appState, alert);
+    super(stepper, step, setup, appState, alert, setupConfigService);
  
     
   }
@@ -63,7 +65,7 @@ export class TemplateStepOneComponent extends TemplateSetupStep   {
 
 
   async selectedTemplate(dashboardURL: string) {
-    this.config.config = dashboardURL;
+    this.blueprintForge.templateURL = dashboardURL;
     await this.next();    // Navigation to details page
   }
   }
