@@ -17,7 +17,6 @@ export class TemplateCatalogSetupService{
     private GATEWAY_URL_GitHubAsset_FallBack = '';
     private GATEWAY_URL_GitHubAPI_FallBack = '';
     private bluePrintTemplatePath = '/blueprintForge/template.json';
-    private bluePrintTemplateDetailsPath = '/blueprintForge/boonLogic/config.json';
     private devBranchPath = "?ref=blueprint-forge";
     private preprodBranchPath = "?ref=blueprint-forge";
     pkgVersion: any;
@@ -134,20 +133,7 @@ export class TemplateCatalogSetupService{
         }));
     }
 
-    /* private getDataForDashboardDetails(url: string): Observable<DashboardWidgets> {
-        return this.http.get(`${url}`).pipe(map(response => {
-           
-
-            let catalog = response as Array<object>;
-            return {
-              
-                widgets: get(catalog, "widgets")
-            } as DashboardWidgets;
-            
-            
-        }));
-        
-    } */
+ 
 
     private getDataForTemplateDetailsCatalog(url: string): Observable<TemplateBlueprintDetails> {
         return this.http.get(`${url}`).pipe(map(response => {
@@ -162,10 +148,12 @@ export class TemplateCatalogSetupService{
                 title: get(catalog, 'title'),
                 tagLine: get(catalog, 'tagLine'),
                 media: get(catalog, 'media'),
+                devices: get(catalog, 'devices'),
                 plugins: get(catalog, 'plugins'),
                 microservices: get(catalog, 'microservices'),
                 dashboards: get(catalog, 'dashboards'),
-                description: get(catalog, 'description')
+                description: get(catalog, 'description'),
+                input: get(catalog, 'input')
             } as TemplateBlueprintDetails;
             
             

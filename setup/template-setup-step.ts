@@ -15,10 +15,12 @@ const details_config: TemplateBlueprintDetails = {
   title: "",
   tagLine: "",
   description: "",
-  dashboards: []
+  dashboards: [],
+  input: {}
 }
 export abstract class TemplateSetupStep {
-  config: TemplateBlueprintEntry = DEFAULT_CONFIG;
+  // config: TemplateBlueprintEntry = DEFAULT_CONFIG;
+  config: any = DEFAULT_CONFIG;
   detailsConfig: TemplateBlueprintDetails = details_config; 
   pending = false;
 
@@ -30,6 +32,7 @@ export abstract class TemplateSetupStep {
     protected alert: AlertService
   ) {
     this.stepper.linear = true;
+    console.log('this stepper', this.stepper);
   }
 
   async next() {
@@ -40,6 +43,7 @@ export abstract class TemplateSetupStep {
       this.step.completed = true;
       this.setup.stepCompleted(this.stepper.selectedIndex);
       this.setup.data$.next(newConfig);
+      // localStorage.setItem('config', JSON.stringify(newConfig));
       this.stepper.next();
     } catch (ex) {
       this.alert.addServerFailure(ex);

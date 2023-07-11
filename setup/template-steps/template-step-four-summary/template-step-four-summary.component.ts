@@ -69,22 +69,19 @@ export class TemplateStepFourSummaryComponent extends TemplateSetupStep {
   }
 
   openDeviceSelectorDialog(dashboard: any, index): void {
-    console.log('Template details value in summary component', this.templateDetails);
     this.deviceSelectorModalRef = this.modalService.show(DeviceSelectorModalComponent, { class: 'c8y-wizard', initialState: {} });
-    
-    console.log('Devices value', this.templateDetails.devices);
     if (this.templateDetails.devices && this.templateDetails.devices.length === 0) {
       this.templateDetails.devices = [{
         type: "",
         placeholder: "",
-        representation: {
+        reprensentation: {
         id: "",
         name: ""
       }
       }];
     }
     this.deviceSelectorModalRef.content.onDeviceSelected.subscribe((selectedDevice: IManagedObject) => {
-         this.templateDetails.devices[index].representation = {
+         this.templateDetails.devices[index].reprensentation = {
             id: selectedDevice.id,
             name: selectedDevice['name']
         }; 
@@ -157,22 +154,10 @@ hideProgressModalDialog() {
 // this.dashboardConfiguration.dashboardName = (this.dashboardPath ? `${this.dashboardPath}/${this.dashboardConfiguration.dashboardName}` : this.dashboardConfiguration.dashboardName);
 //         await this.catalogService.createDashboard(this.app, this.dashboardConfiguration, this.selectedTemplate, this.templateDetails);
     async configureAppTest(application, dashboardConfiguration) {
-      console.log('Configure app test called', this.widgetDetails?.widgets);
-      let dependency =  {
-        id: 'boonlogic-config.widget',
-        title: 'BOON_LOGIC',
-        repository: 'Cumulocity-Amber-Boon-Logic',
-        link: '/blueprintForge/boonLogic/sag-ps-pkg-boonlogic-config-runtime-widget-2.0.1.zip?ref=blueprint-forge'
-    }
       await this.inventoryService.create({
         "c8y_Dashboard": this.templateCatalogSetupService.getCumulocityDashboardRepresentation(dashboardConfiguration, this.widgetDetails.widgets)
     }).then(({ data }) => {
-
-      
-      
-       console.log('Data in create dashboard', data);
-       
-       this.installDependency(dependency);
+       this.installDependency();
 
         return ;
     }).then(() => {
@@ -197,8 +182,7 @@ hideProgressModalDialog() {
     }
     }
 
-    async installDependency(dependency): Promise<void> {
-      console.log('Install dependency called');
+    async installDependency(): Promise<void> {
       // const currentHost = window.location.host.split(':')[0];
 
       // Check if required
