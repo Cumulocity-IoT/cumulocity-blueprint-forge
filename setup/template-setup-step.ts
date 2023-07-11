@@ -32,7 +32,6 @@ export abstract class TemplateSetupStep {
     protected alert: AlertService
   ) {
     this.stepper.linear = true;
-    console.log('this stepper', this.stepper);
   }
 
   async next() {

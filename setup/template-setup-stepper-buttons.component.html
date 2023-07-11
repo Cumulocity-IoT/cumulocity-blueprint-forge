@@ -8,7 +8,7 @@
   >
     Previous
   </button>
-  <button class="btn btn-primary" type="submit" (click)="onNext.emit()" translate>
+  <button [disabled]="!formValid" class="btn btn-primary" type="submit" (click)="onNext.emit()" translate>
     Continue
   </button>
 </div>

@@ -54,18 +54,10 @@ export class TemplateStepFourSummaryComponent extends TemplateSetupStep {
   ngOnInit() {
     
     this.templateCatalogSetupService.templateData.subscribe(currentData => {
-      console.log('Stored template data step four', currentData);
       if (currentData) {
         this.templateDetails = currentData;
       }
     });
-
-    /* this.templateCatalogService.widgetConfigDetails.subscribe(widgetData => {
-      console.log('Stored widget data', widgetData);
-      this.widgetDetails = widgetData;
-    }) */
-   // this.configureAppTest(this.app, this.dashboardConfiguration, this.templateDetails, this.templateDetails)
-    
   }
 
   openDeviceSelectorDialog(dashboard: any, index): void {
@@ -87,7 +79,6 @@ export class TemplateStepFourSummaryComponent extends TemplateSetupStep {
         }; 
         dashboard.devicesName = selectedDevice['name'];
     });
-    console.log('Devices value after assignment', this.templateDetails.devices);
  }
 
  showProgressModalDialog(message: string): void {
@@ -193,10 +184,6 @@ hideProgressModalDialog() {
       this.progressIndicatorService.setProgress(10);
       let link = "/blueprintForge/boonLogic/sag-ps-pkg-boonlogic-config-runtime-widget-2.0.1.zip?ref=blueprint-forge";
       this.downloadAndInstallPackage(link);
-            
-
-      
-      
   }
 
     
@@ -204,7 +191,6 @@ hideProgressModalDialog() {
   downloadAndInstallPackage(link) {
     this.templateCatalogSetupService.downloadBinary(link)
                 .subscribe(data => {
-                  console.log('Data of install dependency', data);
                     this.progressIndicatorService.setProgress(20);
                     const blob = new Blob([data], {
                         type: 'application/zip'

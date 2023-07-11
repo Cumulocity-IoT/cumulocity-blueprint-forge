@@ -20,7 +20,6 @@ import { TemplateCatalogService } from '../../../builder/template-catalog/templa
 import { HttpResponse } from '@angular/common/http';
 import { AppBuilderExternalAssetsService } from 'app-builder-external-assets';
 import { DeviceSelectorModalComponent } from './../../../builder/utils/device-selector-modal/device-selector.component';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import * as delay from "delay";
 import { UpdateableAlert } from "../../../builder/utils/UpdateableAlert";
@@ -55,8 +54,8 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
   private GATEWAY_URL_GitHubAsset = '';
   private GATEWAY_URL_GitHubAsset_FallBack = '';
   templateDetailsData: any;
-  form: FormGroup;
   isFormValid = false;
+  deviceFormValid : boolean = false;
   constructor(
     public stepper: C8yStepper,
     protected step: CdkStep,
@@ -70,7 +69,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
     private progressIndicatorService: ProgressIndicatorService, private catalogService: TemplateCatalogService,
     private externalService: AppBuilderExternalAssetsService,
     private deviceSelectorModalRef: BsModalRef,
-    private formBuilder: FormBuilder, private alertService: AlertService, private appStateService: AppStateService
+    private alertService: AlertService, private appStateService: AppStateService
   ) {
     
     super(stepper, step, setup, appState, alert);
@@ -93,20 +92,14 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
   }
 
   ngOnInit() {
-    // this.templateDetails = JSON.parse(localStorage.getItem('config'));
     this.templateCatalogSetupService.templateData.subscribe(currentData => {
-      console.log('Stored template data', currentData);
       this.isFormValid= this.appConfigForm?.form.valid;
+      // console.log('is form valid from app config', this.isFormValid);
       if (currentData) {
         this.templateDetails = currentData;
         this.templateDetails.dashboards.map(item =>  item.isChecked = true);
       }
     });
-   
-    // this.form = this.formBuilder.group({
-    //   selectedDevices: this.formBuilder.array(null, [ Validators.required]),
-    // });
-
     
   }
 
@@ -346,7 +339,11 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
             name: selectedDevice['name']
           }
       }]
-      
+      if (dashboard.devices && dashboard.devices[0].reprensentation.id !== null && dashboard.devices[0].reprensentation.id !== undefined) {
+        this.deviceFormValid = true;
+      } else {
+        this.deviceFormValid = false;
+      }
   });
  }
   async saveAppChanges(app) {

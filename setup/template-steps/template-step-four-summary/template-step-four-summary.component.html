@@ -58,6 +58,7 @@
       </div>
     </div>
     <c8y-template-setup-stepper-buttons
+    [formValid]="true"
     [index]="stepper.selectedIndex"
     (onNext)="configureAppTest()"
     (onBack)="back()"
