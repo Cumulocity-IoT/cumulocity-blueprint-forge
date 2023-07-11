@@ -1,3 +1,12 @@
+
+// This is for storing configuration
+export interface BlueprintForge {
+    templateURL?: string;
+    selectedStepperIndex?: number;
+    plugins?: PluginDetails[];
+    microservices?: MicroserviceDetails[];
+    dashboards: Dashboards[];
+}
 export interface TemplateBlueprintEntry {
     templateId: string;
     title: string;
@@ -31,6 +40,7 @@ export interface PluginDetails  {
     description: string;
     link: string;
     requiredPlatformVersion: string;
+    selected?: boolean;
 }
 
 export interface MicroserviceDetails {
@@ -38,6 +48,7 @@ export interface MicroserviceDetails {
     title: string;
     link: string;
     description: string;
+    selected?: boolean;
 }
 
 export interface Dashboards {
