@@ -42,7 +42,6 @@ export abstract class TemplateSetupStep {
       this.step.completed = true;
       this.setup.stepCompleted(this.stepper.selectedIndex);
       this.setup.data$.next(newConfig);
-      // localStorage.setItem('config', JSON.stringify(newConfig));
       this.stepper.next();
     } catch (ex) {
       this.alert.addServerFailure(ex);

@@ -45,18 +45,22 @@
                         <div *ngIf="dashboard.isDeviceRequired" class="col-sm-4 col-xs-12 text-muted">
                           <form class="form-inline" name="deviceForm" #deviceForm="ngForm">
                             <div class="form-group" class="col-sm-12 col-md-12 col-xs-12" style="padding:0">
-                              <div class="form-group col-sm-12 col-md-6 col-xs-12" style="padding:0; max-width: 100%; width: 43.8%;">
+                              <div class="form-group col-sm-12 col-md-9 col-xs-12" style="padding:0; ">
                                   <label class="sr-only" for="selected-device">Select Device/asset for dashboard</label>
                                   
                                   <input *ngIf="dashboard.isDeviceRequired" name="selectedDevice" class="form-control"
-                                  [(ngModel)]="dashboard.name" required readonly
+                                  [(ngModel)]="dashboard.name" required readonly style="width: 100%"
                                       id="selected-device" placeholder="Select Device/Asset" type="text"
                                      >
                               </div>
-                              <div class="col-sm-12 col-md-6 col-xs-12" style="padding-left: 0; max-width: 100%; padding-right: 2%">
+                              <div class="col-sm-12 col-md-2 col-xs-12" style="padding-left: 0; max-width: 100%; padding-right: 2%">
                                 <button type="button" class="btn btn-primary"
-                                  (click)="openDeviceSelectorDialog(dashboard, i)">Select Device/Asset</button>
+                                  (click)="openDeviceSelectorDialog(dashboard, i)">
+                                  <i class="dlt-c8y-icon-edit" (click)="openDeviceSelectorDialog(dashboard, i)"></i>
+                                </button>
+                                  
                               </div>
+                              <div class="col-md-3"></div>
                                 </div>
                           </form>
                         </div>
