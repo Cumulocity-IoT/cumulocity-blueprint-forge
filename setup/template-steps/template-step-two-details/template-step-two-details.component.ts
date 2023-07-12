@@ -1,5 +1,5 @@
 import { CdkStep } from '@angular/cdk/stepper';
-import { Component, ViewEncapsulation  } from '@angular/core';
+import { AfterViewInit, Component, ViewEncapsulation  } from '@angular/core';
 import { AlertService, AppStateService, C8yStepper, SetupComponent } from '@c8y/ngx-components';
 import { TemplateSetupStep } from './../../template-setup-step';
 import { TemplateCatalogSetupService } from '../../template-catalog-setup.service';
@@ -15,7 +15,7 @@ import { SetupConfigService } from './../../setup-config.service';
   encapsulation: ViewEncapsulation.None,
   host: { class: 'd-contents' }
 })
-export class TemplateStepTwoDetailsComponent extends TemplateSetupStep {
+export class TemplateStepTwoDetailsComponent extends TemplateSetupStep implements AfterViewInit{
   public templateDetails: TemplateBlueprintDetails;
   configDetails: any;
   images: GalleryItem[];
@@ -44,8 +44,9 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep {
   
   }
 
-  ngOnInit() {
-   
+  ngAfterViewInit() {
+    this.verifyStepCompleted();
+
   }
 
   loadTemplateDetailsCatalog(dashboardURL) {

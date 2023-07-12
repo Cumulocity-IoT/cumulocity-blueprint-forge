@@ -1,5 +1,5 @@
 import { CdkStep } from '@angular/cdk/stepper';
-import { Component, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { AlertService, AppStateService, C8yStepper, SetupComponent } from '@c8y/ngx-components';
 import { TemplateSetupStep } from './../../template-setup-step';
 import { TemplateCatalogSetupService } from '../../template-catalog-setup.service';
@@ -31,7 +31,7 @@ import { SetupConfigService } from './../../setup-config.service';
   templateUrl: './template-step-three-config.component.html',
   host: { class: 'd-contents' }
 })
-export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
+export class TemplateStepThreeConfigComponent extends TemplateSetupStep implements OnInit, AfterViewInit{
   
  // dashboardWidgets: DashboardWidgets;
  templateDetails:any;
@@ -105,7 +105,10 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
     
   }
 
+  ngAfterViewInit() {
+    this.verifyStepCompleted();
 
+  }
   syncDashboardFlag(event, index) {
     this.templateDetails.dashboards[index].isChecked = event.target.checked;
   }
