@@ -99,7 +99,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
       // console.log('is form valid from app config', this.isFormValid);
       if (currentData) {
         this.templateDetails = currentData;
-        this.templateDetails.dashboards.map(item =>  item.isChecked = true);
       }
     });
     
@@ -107,7 +106,13 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
 
 
   syncDashboardFlag(event, index) {
-    this.templateDetails.dashboards[index].isChecked = event.target.checked;
+    this.templateDetails.dashboards[index].selected = event.target.checked;
+  }
+  syncPluginFlag(event, index) {
+    this.templateDetails.plugins[index].selected = event.target.checked;
+  }
+  syncMicroserviceFlag(event, index) {
+    this.templateDetails.microservices[index].selected = event.target.checked;
   }
 
   //TODO: Refector // SaveInstall()
@@ -175,12 +180,14 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
     }
     
     // Add logic to trim dashboards which are not selected
-    let configDataDashboards = this.templateDetails.dashboards.filter(item => item.isChecked === true);
+    let configDataDashboards = this.templateDetails.dashboards.filter(item => item.selected === true);
+    let configDataPlugins = this.templateDetails.plugins.filter(item => item.selected === true);
+    let configDataMicroservices = this.templateDetails.microservices.filter(item => item.selected === true);
 
     // create Dashboard and install dependencies
     // Also connect with the devices selected
-    let totalRemotes = this.templateDetails.plugins.length;
-    totalRemotes = totalRemotes + this.templateDetails.microservices.length;
+    let totalRemotes = configDataPlugins.length;
+    totalRemotes = totalRemotes + configDataMicroservices.length;
     totalRemotes = totalRemotes + configDataDashboards.length;
 
     const eachRemoteProgress: number = Math.floor((totalRemotes > 1 ? (90 / totalRemotes) : 0));
@@ -188,13 +195,13 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep {
     this.showProgressModalDialog("Verifying plugins...")
     if (totalRemotes > 1) { this.progressIndicatorService.setOverallProgress(overallProgress) }
     this.progressIndicatorService.setOverallProgress(5);
-    for (let plugin of this.templateDetails.plugins) {
+    for (let plugin of configDataPlugins) {
       await this.installPlugin(plugin);
       overallProgress = overallProgress + eachRemoteProgress;
       this.progressIndicatorService.setOverallProgress(overallProgress)
     };
     await new Promise(resolve => setTimeout(resolve, 1000));
-    for (let ms of this.templateDetails.microservices) {
+    for (let ms of configDataMicroservices) {
       this.progressIndicatorService.setMessage(`Installing ${ms.title}`);
       this.progressIndicatorService.setProgress(10);
       await new Promise(resolve => setTimeout(resolve, 1000));

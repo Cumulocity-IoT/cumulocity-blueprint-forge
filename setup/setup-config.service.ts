@@ -12,13 +12,14 @@ export class SetupConfigService{
 
     stepCompleted(stepper: C8yStepper, step: CdkStep, setup: SetupComponent, blueprintForge: BlueprintForge, newConfig: any) {
         while(this.stepperIndex <= blueprintForge.selectedStepperIndex ){
-          this.stepperIndex ++;       
+          this.stepperIndex++;       
           setTimeout(() => {  
             step.completed = true;
             setup.stepCompleted(stepper.selectedIndex);
             setup.data$.next(newConfig);
             stepper.next();
            }, 10);
+           console.log('stepper selected index', stepper.selectedIndex, 'new config', newConfig, 'this.stepperIndex', this.stepperIndex, 'blueprintForge.selectedStepperIndex', blueprintForge.selectedStepperIndex);
         }
     }
 }
