@@ -26,14 +26,12 @@ export abstract class TemplateSetupStep {
     protected setupConfigService: SetupConfigService
   ) {
     this.stepper.linear = true;
-    this.appState.currentApplicationConfig.pipe( distinctUntilChanged()).subscribe( appConfig => {
-      if(appConfig && appConfig.blueprintForge && appConfig.blueprintForge.selectedStepperIndex > 0){
-        this.blueprintForge = appConfig.blueprintForge;
-        this.setupConfigService.stepCompleted(this.stepper, this.step, this.setup, this.blueprintForge, appConfig);
-      }
-    })
   }
 
+  verifyStepCompleted() {
+     this.blueprintForge = this.setupConfigService.stepCompleted(this.stepper, this.step, this.setup);
+     if(!this.blueprintForge) { this.blueprintForge = DEFAULT_CONFIG;}
+  }
   async next() {
     this.pending = true;
     try {

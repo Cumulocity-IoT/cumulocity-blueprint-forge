@@ -1,5 +1,5 @@
 import { CdkStep } from '@angular/cdk/stepper';
-import {  Component } from '@angular/core';
+import {  AfterViewInit, OnInit, Component } from '@angular/core';
 import { AlertService, AppStateService, C8yStepper, SetupComponent } from '@c8y/ngx-components';
 import { TemplateSetupStep } from './../../template-setup-step';
 import { TemplateCatalogSetupService } from '../../template-catalog-setup.service';
@@ -13,7 +13,7 @@ import { SetupConfigService } from './../../setup-config.service';
   styleUrls: ['./template-step-one.component.css'],
   host: { class: 'd-contents' }
 })
-export class TemplateStepOneComponent extends TemplateSetupStep   {
+export class TemplateStepOneComponent extends TemplateSetupStep implements OnInit, AfterViewInit  {
 
 
   public templates: Array<TemplateBlueprintEntry> = [];
@@ -39,6 +39,10 @@ export class TemplateStepOneComponent extends TemplateSetupStep   {
     this.loadTemplateCatalog();
   }
 
+  ngAfterViewInit() {
+    this.verifyStepCompleted();
+
+  }
   loadTemplateCatalog() {
     this.templateCatalogSetupService.getTemplateCatalog()
             .pipe(catchError(err => {
