@@ -84,11 +84,6 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep implement
                 }
                 
                 
-                // this.config = this.templateDetails;
-                // localStorage.setItem('config', JSON.stringify(this.templateDetails));
-                // this.setup.data$.next(this.templateDetails);
-                
-                
                 this.templateCatalogSetupService.templateData.next(this.templateDetails);
                 
                

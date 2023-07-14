@@ -56,7 +56,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   private GATEWAY_URL_GitHubAsset_FallBack = '';
   templateDetailsData: any;
   isFormValid = false;
-  deviceFormValid : boolean = false;
+  deviceFormValid : boolean;
   constructor(
     public stepper: C8yStepper,
     protected step: CdkStep,
@@ -100,11 +100,19 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       if (currentData) {
         this.templateDetails = currentData;
       }
-    });
+      // In case of no device 
+      if (!(this.templateDetails?.input) || !(this.templateDetails?.input?.devices) || !(this.templateDetails?.input?.devices?.length > 0)) {
+          this.deviceFormValid = true;
+        } else {
+          this.deviceFormValid = false;
+        }
+      });
+    
     
   }
 
   ngAfterViewInit() {
+    
     this.verifyStepCompleted();
 
   }
@@ -351,7 +359,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
             name: selectedDevice['name']
           }
       }]
-      if (dashboard.devices && dashboard.devices[0].reprensentation.id !== null && dashboard.devices[0].reprensentation.id !== undefined) {
+      if (dashboard.devices && dashboard.devices[0].reprensentation.id !== null && dashboard.devices[0].reprensentation.id !== undefined ) {
         this.deviceFormValid = true;
       } else {
         this.deviceFormValid = false;
