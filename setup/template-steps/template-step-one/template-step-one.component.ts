@@ -31,8 +31,6 @@ export class TemplateStepOneComponent extends TemplateSetupStep implements OnIni
     protected setupConfigService: SetupConfigService
   ) {
     super(stepper, step, setup, appState, alert, setupConfigService);
- 
-    
   }
 
   ngOnInit() {
@@ -60,8 +58,6 @@ export class TemplateStepOneComponent extends TemplateSetupStep implements OnIni
                         template.thumbnail = this.templateCatalogSetupService.getGithubURL(template.thumbnail);
                     }
                 })
-                // this.setup.data$.next(this.filterTemplates);
-                // localStorage.setItem('config', JSON.stringify(this.filterTemplates));
             }, error => {
                 this.alertService.danger("There is some technical error! Please try after sometime.");
             });

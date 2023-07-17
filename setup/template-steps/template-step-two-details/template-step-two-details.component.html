@@ -2,9 +2,7 @@
     <div class="container-fluid flex-no-shrink fit-w">
       <div class="row separator-bottom">
         <div class="col-md-8 col-md-offset-2 col-lg-6 col-lg-offset-3  p-t-24 p-l-16 p-r-16">
-
           <div class="h3-style l-h-base text-medium">{{templateDetails?.title}}</div>
-          
           <div class="lead text-normal p-style">
             {{templateDetails?.tagLine}}
           </div>
@@ -18,12 +16,6 @@
             <div class="card">
               <div class="card-block">
                 <div class="card-block">
-                 <!--  <ng-image-slider #nav [images]="templateDetails?.media"
-                  [infinite]="false"
-                [autoSlide]="1"
-                [imageSize]="{width: '100%', height: '400'}"
-                slideImage="1"
-                 ></ng-image-slider> -->  
                  <gallery [items]="images"   [dots]=true  [autoPlay]="true" class="galleryDiv" [counter]="false"></gallery>
                 </div>
                 </div>

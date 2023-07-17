@@ -6,7 +6,7 @@ import { TemplateCatalogSetupService } from '../../template-catalog-setup.servic
 import { catchError } from "rxjs/operators";
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { TemplateCatalogModalComponent } from '../../../builder/template-catalog/template-catalog.component';
-import { Observable, from, Subject, Subscription, BehaviorSubject, combineLatest, interval } from 'rxjs';
+import { Observable, from, Subscription, BehaviorSubject, combineLatest, interval } from 'rxjs';
 import { map, switchMap, tap } from "rxjs/operators";
 import { AppIdService } from '../../../builder/app-id.service';
 import { ApplicationService, IApplication, IManagedObject } from '@c8y/client';
@@ -14,10 +14,9 @@ import { AppDataService } from '../../../builder/app-data.service';
 import { ProgressIndicatorModalComponent } from '../../../builder/utils/progress-indicator-modal/progress-indicator-modal.component';
 import { ProgressIndicatorService } from '../../../builder/utils/progress-indicator-modal/progress-indicator.service';
 import { WidgetCatalogService } from '../../../builder/widget-catalog/widget-catalog.service';
-import { DashboardWidgets, Dashboards, MicroserviceDetails, PluginDetails, TemplateBlueprintDetails, TemplateBlueprintEntry } from './../../template-setup.model';
+import { Dashboards, MicroserviceDetails, PluginDetails } from './../../template-setup.model';
 import { ApplicationBinaryService } from '../../../builder/application-binary.service';
 import { TemplateCatalogService } from '../../../builder/template-catalog/template-catalog.service';
-import { HttpResponse } from '@angular/common/http';
 import { AppBuilderExternalAssetsService } from 'app-builder-external-assets';
 import { DeviceSelectorModalComponent } from './../../../builder/utils/device-selector-modal/device-selector.component';
 
@@ -34,7 +33,6 @@ import { SettingsService } from '../../../builder/settings/settings.service';
 })
 export class TemplateStepThreeConfigComponent extends TemplateSetupStep implements OnInit, AfterViewInit{
   
- // dashboardWidgets: DashboardWidgets;
  templateDetails:any;
   private progressModal: BsModalRef;
   private appList = [];
@@ -43,7 +41,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   @ViewChild("appConfigForm",{static: false}) appConfigForm: NgForm;
 
   configStepData: any;
-  //dashboardWidgets: DashboardWidgets;
   bsModalRef: BsModalRef;
   newAppName: string;
   newAppContextPath: string;
@@ -53,8 +50,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   app: Observable<any>;
   refreshApp = new BehaviorSubject<void>(undefined);
   currentApp: IApplication;
-  private GATEWAY_URL_GitHubAsset = '';
-  private GATEWAY_URL_GitHubAsset_FallBack = '';
   templateDetailsData: any;
   isFormValid = false;
   deviceFormValid : boolean;
@@ -76,8 +71,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   ) {
     
     super(stepper, step, setup, appState, alert, setupConfigService);
-    this.GATEWAY_URL_GitHubAsset =  this.externalService.getURL('GITHUB','gatewayURL_GitHubAsset');
-    this.GATEWAY_URL_GitHubAsset_FallBack =  this.externalService.getURL('GITHUB','gatewayURL_GitHubAsset_Fallback');
     this.app = combineLatest([appIdService.appIdDelayedUntilAfterLogin$, this.refreshApp]).pipe(
       map(([appId]) => appId),
       switchMap(appId => from(
@@ -97,7 +90,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   ngOnInit() {
     this.templateCatalogSetupService.templateData.subscribe(currentData => {
       this.isFormValid= this.appConfigForm?.form.valid;
-      // console.log('is form valid from app config', this.isFormValid);
       if (currentData) {
         this.templateDetails = currentData;
       }
@@ -108,14 +100,10 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
           this.deviceFormValid = false;
         }
       });
-    
-    
   }
 
   ngAfterViewInit() {
-    
     this.verifyStepCompleted();
-
   }
   syncDashboardFlag(event, index) {
     this.templateDetails.dashboards[index].selected = event.target.checked;
@@ -140,32 +128,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       this.alert.danger("Please fill required details to proceed further.");
         return;
     }
-   
-   /*  console.log('Config step data value while saving', this.configStepData);
-    if (this.configStepData && this.configStepData.dashboards) {
-      for (let i = 0; i < this.configStepData.dashboards.length; i++) {
-        if (this.configStepData.dashboards[i].isChecked) {
-          // this.loadDashboardDetails(this.configStepData.dashboards[i].dashboard);
-        }
-      }
-    } */
   }
-
-
- /*  loadDashboardDetails(configURL) {
-    this.templateCatalogService.getDashboardDetails(configURL)
-            .pipe(catchError(err => {
-                console.log('Dashboard Catalog: Error in primary endpoint! using fallback...');
-                return this.templateCatalogService.getDashboardDetailsFallBack(configURL)
-            }))
-            .subscribe((response: DashboardWidgets) => {
-                console.log('Dashboard config details', response);
-                this.dashboardWidgets = response;
-                this.templateCatalogService.widgetConfigDetails.next(this.dashboardWidgets);
-            }, error => {
-                this.alertService.danger("There is some technical error! Please try after sometime.");
-            });
-  } */
 
  // TODO: Phase II
   showDashboardCatalogDialog(app: any, dashboard: Dashboards) {
@@ -191,7 +154,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
         return;
     }
     
-    // Add logic to trim dashboards which are not selected
+    // Filter dashboards which are selected
     let configDataDashboards = this.templateDetails.dashboards.filter(item => item.selected === true);
     let configDataPlugins = this.templateDetails.plugins.filter(item => item.selected === true);
     let configDataMicroservices = this.templateDetails.microservices.filter(item => item.selected === true);
@@ -298,14 +261,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       createdApp = null;
       this.alert.danger("There is some technical error! Please try after sometime.");
       console.error(ex.message);
-      /* // prepare translation of static message if it exists
-      const staticErrorMessage =
-          ERROR_MESSAGES[ex.message] && this.translateService.instant(ERROR_MESSAGES[ex.message]);
-      // if there is no static message, use dynamic one from the exception
-      this.errorMessage = staticErrorMessage ?? ex.message;
-      if (!this.errorMessage && !this.uploadCanceled) {
-          this.alertService.addServerFailure(ex);
-      } */
     }
   }
 
