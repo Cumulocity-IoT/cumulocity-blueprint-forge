@@ -21,6 +21,7 @@ import { ApplicationService, ApplicationType, IApplication, IManifest, IResultLi
 import { AlertService, AppStateService, ModalService, Status, ZipService, gettext } from "@c8y/ngx-components";
 import { BehaviorSubject, Observable } from 'rxjs';
 import { get, kebabCase } from 'lodash-es';
+import { SettingsService } from "./settings/settings.service";
 const CUMULOCITY_JSON = 'cumulocity.json';
 const MICROSERVICE_NAME_MAX_LENGTH = 23;
 
@@ -38,6 +39,7 @@ export class ApplicationBinaryService {
         private applicationService: ApplicationService,
         private zipService: ZipService,
         private tenantService: TenantService,
+        private settingService: SettingsService
     ) { }
 
     async createAppForArchive(archive, isPackageTypeArchive = false): Promise<IApplication> {
@@ -139,7 +141,16 @@ export class ApplicationBinaryService {
     //====================
     async uploadMicroservice(file: File, microservice: IApplication): Promise<void> {
         const subscribeToCurrentTenant = await this.askIfActivationAfterUploadNeeded();
-        await this.uploadArchiveToApp(file, microservice);
+        const microserviceApp: IApplication = await this.uploadArchiveToApp(file, microservice);
+        if(microserviceApp) {
+            if(window && window['aptrinsic'] ){
+                window['aptrinsic']('track', 'gp_microservice_installed', {
+                    "microserviceName": microserviceApp.name,
+                    "tenantId": this.settingService.getTenantName()
+                 });
+            }
+        }
+
         await this.subscribeMicroservice(microservice, subscribeToCurrentTenant);
     }
 

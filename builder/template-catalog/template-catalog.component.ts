@@ -336,7 +336,7 @@ export class TemplateCatalogModalComponent implements OnInit {
             if (widgetBinaryFound) {
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 this.progressIndicatorService.setProgress(30);
-                this.widgetCatalogService.updateRemotesInCumulocityJson(widgetBinaryFound).then(async () => {
+                this.widgetCatalogService.updateRemotesInCumulocityJson(widgetBinaryFound, true).then(async () => {
                     dependency.isInstalled = true;
                     this.isReloadRequired = true;
                     await new Promise(resolve => setTimeout(resolve, 1000));

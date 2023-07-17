@@ -217,7 +217,7 @@ export class WidgetCatalogService {
   }
 
 
-  async updateRemotesInCumulocityJson(pluginBinary: any) {
+  async updateRemotesInCumulocityJson(pluginBinary: any, isBinaryFound: boolean) {
     await new Promise(resolve => setTimeout(resolve, 2000));
     this.progressIndicatorService.setProgress(50);
     const currentApp: IApplication = (await this.getCurrentApp(true));
@@ -240,6 +240,12 @@ export class WidgetCatalogService {
         id: currentApp.id,
         config
       } as any)).data;
+
+      if (isBinaryFound && window && window['aptrinsic']) {
+          window['aptrinsic']('track', 'gp_runtime_widget_installed', {
+            "widgetName": pluginBinary.name
+          });
+      }
     }
     return this.settingsService.updateAppConfigurationForPlugin(remotes)
   }
@@ -346,7 +352,7 @@ export class WidgetCatalogService {
           }
          
         }
-        return this.updateRemotesInCumulocityJson(packageApp)
+        return this.updateRemotesInCumulocityJson(packageApp, false)
       }
       catch(e) {
         console.log(e);

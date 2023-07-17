@@ -310,7 +310,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
     if (widgetBinaryFound) {
       await new Promise(resolve => setTimeout(resolve, 1000));
       this.progressIndicatorService.setProgress(30);
-      await this.widgetCatalogService.updateRemotesInCumulocityJson(widgetBinaryFound).then(async () => {
+      await this.widgetCatalogService.updateRemotesInCumulocityJson(widgetBinaryFound, true).then(async () => {
         await new Promise(resolve => setTimeout(resolve, 1000));
       }, error => {
         this.alert.danger("There is some technical error! Please try after sometime.");
