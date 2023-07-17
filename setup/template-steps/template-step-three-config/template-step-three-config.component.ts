@@ -26,6 +26,7 @@ import { UpdateableAlert } from "../../../builder/utils/UpdateableAlert";
 import { contextPathFromURL } from "../../../builder/utils/contextPathFromURL";
 import { NgForm } from '@angular/forms';
 import { SetupConfigService } from './../../setup-config.service';
+import { SettingsService } from '../../../builder/settings/settings.service';
 @Component({
   selector: 'c8y-template-step-three-config',
   templateUrl: './template-step-three-config.component.html',
@@ -71,7 +72,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
     private externalService: AppBuilderExternalAssetsService,
     private deviceSelectorModalRef: BsModalRef,
      private alertService: AlertService, private appStateService: AppStateService,
-    protected setupConfigService: SetupConfigService
+    protected setupConfigService: SetupConfigService, private settingsService: SettingsService
   ) {
     
     super(stepper, step, setup, appState, alert, setupConfigService);
@@ -243,6 +244,13 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       overallProgress = overallProgress + eachRemoteProgress;
       this.progressIndicatorService.setOverallProgress(overallProgress)
     };
+    if (window && window['aptrinsic']) {
+      window['aptrinsic']('track', 'gp_blueprint_forge_template_installed', {
+          "templateName": this.templateDetails.title,
+          "appName": this.currentApp.name,
+          "tenantId": this.settingsService.getTenantName(),
+      });
+  }
     this.hideProgressModalDialog();
     this.next();
   }
