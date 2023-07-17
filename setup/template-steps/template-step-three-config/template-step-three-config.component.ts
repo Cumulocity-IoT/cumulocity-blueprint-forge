@@ -238,7 +238,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       };
       this.progressIndicatorService.setProgress(40);
       templateDetailsData.input.devices = db.devices;
-      await this.catalogService.createDashboard(this.currentApp, dashboardConfiguration, db, templateDetailsData);
+      await this.catalogService.createDashboard(this.currentApp, dashboardConfiguration, db, templateDetailsData, this.templateDetails.title);
       this.progressIndicatorService.setProgress(90);
       overallProgress = overallProgress + eachRemoteProgress;
       this.progressIndicatorService.setOverallProgress(overallProgress)

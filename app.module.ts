@@ -189,7 +189,7 @@ export class AppModule extends HybridAppModule {
                     }
                 });
                 if (window && window['aptrinsic']) {
-                    window['aptrinsic']('track', 'gp_appbuilder_apppage_viewed', {
+                    window['aptrinsic']('track', 'gp_blueprint_forge_apppage_viewed', {
                         "appId": appId,
                         "tenantId": this.settingsService.getTenantName(),
                         "dashboardId": dashboardId,
@@ -199,7 +199,7 @@ export class AppModule extends HybridAppModule {
             } else if (urlParams.length > 1) {
                 other = urlParams[1];
                 if (window && window['aptrinsic']) {
-                    window['aptrinsic']('track', 'gp_appbuilder_page_viewed', {
+                    window['aptrinsic']('track', 'gp_blueprint_forge_apppage_viewed', {
                         "tenantId": this.settingsService.getTenantName(),
                         "pageId": other
                     });

@@ -28,6 +28,7 @@ import { AppBuilderNavigationService } from "../navigation/app-builder-navigatio
 import { Alert, AlertService } from "@c8y/ngx-components";
 import { AppBuilderExternalAssetsService } from 'app-builder-external-assets';
 import { DashboardConfig } from "builder/application-config/dashboard-config.component";
+import { SettingsService } from "../settings/settings.service";
 
 const packageJson = require('./../../package.json');
 @Injectable()
@@ -49,7 +50,7 @@ export class TemplateCatalogService {
     constructor(private http: HttpClient, private inventoryService: InventoryService,
         private appService: ApplicationService, private navigation: AppBuilderNavigationService,
         private binaryService: InventoryBinaryService, private alertService: AlertService,
-        private externalService: AppBuilderExternalAssetsService) {
+        private externalService: AppBuilderExternalAssetsService, private settingsService: SettingsService) {
         this.GATEWAY_URL_GitHubAPI = this.externalService.getURL('GITHUB','gatewayURL_Github');
         this.GATEWAY_URL_GitHubAsset =  this.externalService.getURL('GITHUB','gatewayURL_GitHubAsset');
         this.GATEWAY_URL_GitHubAPI_FallBack = this.externalService.getURL('GITHUB','gatewayURL_Github_Fallback');
@@ -171,7 +172,7 @@ export class TemplateCatalogService {
         });
     }
 
-    async createDashboard(application, dashboardConfiguration, templateCatalogEntry: TemplateCatalogEntry, templateDetails: TemplateDetails) {
+    async createDashboard(application, dashboardConfiguration, templateCatalogEntry: TemplateCatalogEntry, templateDetails: TemplateDetails, templateTitle?) {
         templateDetails = await this.uploadBinariesToC8Y(templateDetails);
         templateDetails = this.updateTemplateWidgetsWithInput(templateDetails);
 
@@ -198,7 +199,14 @@ export class TemplateCatalogService {
                     }
                 }
             ];
-
+            if (window && window['aptrinsic']) {
+                window['aptrinsic']('track', 'gp_blueprint_forge_dashboard_created', {
+                    "templateName": templateTitle,
+                    "appName": application.name,
+                    "tenantId": this.settingsService.getTenantName(),
+                    "dashboardName": templateCatalogEntry.title
+                });
+            }
             return this.appService.update({
                 id: application.id,
                 applicationBuilder: application.applicationBuilder
