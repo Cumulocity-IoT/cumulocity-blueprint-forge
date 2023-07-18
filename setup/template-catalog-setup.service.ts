@@ -18,27 +18,21 @@ export class TemplateCatalogSetupService{
     private GATEWAY_URL_GitHubAPI_FallBack = '';
     private bluePrintTemplatePath = '/blueprintForge/template.json';
     private devBranchPath = "?ref=blueprint-forge";
-    private preprodBranchPath = "?ref=blueprint-forge";
+    private preprodBranchPath = "?ref=preprod";
     pkgVersion: any;
     private isFallBackActive = false;
 
-   // private blueprintURL = 'https://presalesglobalprod.apigw-aw-eu.webmethods.io/gateway/GitHubAPIService/1.0/repos/SoftwareAG/global-presales-assets/contents'
 
     public templateData = new BehaviorSubject<TemplateBlueprintDetails>(undefined);
     templateData$ = this.templateData.asObservable();
 
-   /*  public widgetConfigDetails = new BehaviorSubject<DashboardWidgets>(undefined);
-    widgetConfigDetails$ = this.widgetConfigDetails.asObservable(); */
-  
+ 
     constructor(private http: HttpClient, private inventoryService: InventoryService,
         private appService: ApplicationService, 
         private binaryService: InventoryBinaryService,
         private externalService: AppBuilderExternalAssetsService
         ) {
-        /* this.GATEWAY_URL_GitHubAPI = this.blueprintURL;
-        this.GATEWAY_URL_GitHubAsset =  this.blueprintURL;
-        this.GATEWAY_URL_GitHubAPI_FallBack = this.blueprintURL;
-        this.GATEWAY_URL_GitHubAsset_FallBack =  this.blueprintURL; */
+
         this.GATEWAY_URL_GitHubAPI = this.externalService.getURL('GITHUB','gatewayURL_Github');
         this.GATEWAY_URL_GitHubAsset =  this.externalService.getURL('GITHUB','gatewayURL_GitHubAsset');
         this.GATEWAY_URL_GitHubAPI_FallBack = this.externalService.getURL('GITHUB','gatewayURL_Github_Fallback');
@@ -68,16 +62,6 @@ export class TemplateCatalogSetupService{
         return this.getDataForTemplateDetailsCatalog(url);
     }
 
-   /*  getDashboardDetails(dashboardURL): Observable<DashboardWidgets> {
-        let url = `${this.GATEWAY_URL_GitHubAPI}${dashboardURL}`;
-        if(this.pkgVersion.includes('dev')) {
-            url = url + this.devBranchPath;
-        } else if (this.pkgVersion.includes('rc')) {
-            url = url + this.preprodBranchPath;
-        }
-        return this.getDataForDashboardDetails(url);
-    } */
-
     getTemplateDetailsCatalogFallBack(dashboardurl): Observable<TemplateBlueprintDetails> {
         let url = `${this.GATEWAY_URL_GitHubAPI_FallBack}${dashboardurl}`;
         this.isFallBackActive = true;
@@ -89,17 +73,6 @@ export class TemplateCatalogSetupService{
         return this.getDataForTemplateDetailsCatalog(url);
     }
 
-   /*  getDashboardDetailsFallBack(dashboardurl): Observable<DashboardWidgets> {
-        let url = `${this.GATEWAY_URL_GitHubAPI_FallBack}${dashboardurl}`;
-        this.isFallBackActive = true;
-        if(this.pkgVersion.includes('dev')) {
-            url = url + this.devBranchPath;
-        } else if (this.pkgVersion.includes('rc')) {
-            url = url + this.preprodBranchPath;
-        }
-        return this.getDataForDashboardDetails(url);
-    } */
- 
     getTemplateCatalogFallBack(): Observable<TemplateBlueprintEntry[]> {
         let url = `${this.GATEWAY_URL_GitHubAPI_FallBack}${this.bluePrintTemplatePath}`;
         this.isFallBackActive = true;
@@ -137,11 +110,6 @@ export class TemplateCatalogSetupService{
 
     private getDataForTemplateDetailsCatalog(url: string): Observable<TemplateBlueprintDetails> {
         return this.http.get(`${url}`).pipe(map(response => {
-            // if (!has(response, 'templateId')) {
-            //     console.error('Failed to load catalog');
-            //     return undefined;
-            // }
-
             let catalog = response as Array<object>;
             return {
                 templateId: get(catalog, "templateId"),
@@ -155,7 +123,6 @@ export class TemplateCatalogSetupService{
                 description: get(catalog, 'description'),
                 input: get(catalog, 'input')
             } as TemplateBlueprintDetails;
-            
             
         }));
     }
@@ -198,7 +165,6 @@ export class TemplateCatalogSetupService{
 
     private getWidgetsAsChildren(widgets): object {
         let children = {};
-        console.log('Widgets value in get widgets as children', widgets);
         widgets.forEach(widget => {
             widget.id = this.generateId();
             children[this.generateId()] = widget;
@@ -215,7 +181,4 @@ export class TemplateCatalogSetupService{
     private generateRandomInteger(min, max): number {
       return Math.floor(Math.random() * Math.floor(max) + min);
     }
-    
-
-
 }

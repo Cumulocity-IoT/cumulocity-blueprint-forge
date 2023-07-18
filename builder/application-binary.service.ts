@@ -209,11 +209,6 @@ export class ApplicationBinaryService {
 
         const binaryMo = await binaryService.getXMLHttpResponse(this.xhr);
 
-        // TODO commented it due to: https://cumulocity.atlassian.net/browse/MTM-48553
-        // Add it back when BE fixes issues with activeVersion.
-        // if (isNewVersion) {
-        //   return await this.getApplication(app);
-        // }
         return (await this.setAppActiveVersion(app, (binaryMo.binaryId || binaryMo.id) as string)).data;
     }
 

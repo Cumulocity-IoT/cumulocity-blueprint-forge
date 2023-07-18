@@ -37,7 +37,7 @@ export class WidgetCatalogService {
   pkgVersion: any;
   private WidgetCatalogPath = '/widgetCatalog/widget-catalog.json';
   private DemoCatalogWidgetsPath = '/demoCatalogWidgets/demo-catalog-widgets.json';
-  private devBranchPath = "?ref=development";
+  private devBranchPath = "?ref=blueprint-forge";
   private preprodBranchPath = "?ref=preprod";
   private GATEWAY_URL_GitHubAsset = '';
   private GATEWAY_URL_GitHubAPI = '';

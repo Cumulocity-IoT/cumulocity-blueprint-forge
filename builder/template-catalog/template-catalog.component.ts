@@ -106,7 +106,6 @@ export class TemplateCatalogModalComponent implements OnInit {
         
         this.globalRoles = await this.accessRightsService.getAllGlobalRoles();
         if(this.dashboard ) {
-            console.log("dashboard details", this.dashboard);
             this.selectedTemplate = this.dashboard;
             this.dashboardConfiguration.dashboardName = this.dashboard.title;
             this.showDetailPage();
