@@ -1,0 +1,43 @@
+  <form #stepForm="ngForm" name="form" class="d-contents">
+    <div class="container-fluid flex-no-shrink fit-w">
+      <div class="row separator-bottom">
+        <div class="col-md-8 col-md-offset-2 col-lg-6 col-lg-offset-3  p-t-24 p-l-16 p-r-16">
+          <div class="h3-style l-h-base text-medium">{{templateDetails?.title}}</div>
+          <div class="lead text-normal p-style">
+            {{templateDetails?.tagLine}}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="inner-scroll flex-grow">
+      <div class="container-fluid fit-w">
+        <div class="card-group interact-grid" style="text-align:center;padding-top: 10px;">
+          <div class="col-xs-12 col-sm-6 col-md-6 ">
+            <div class="card">
+              <div class="card-block">
+                <div class="card-block">
+                 <gallery [items]="images"   [dots]=true  [autoPlay]="true" class="galleryDiv" [counter]="false"></gallery>
+                </div>
+                </div>
+          </div>
+          </div>
+          <div class="col-xs-12 col-sm-6 col-md-6 ">
+            <div class="card">
+              <div [innerHTML]="templateDetails?.description" class="card-block text-left">
+          </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+    
+    <c8y-template-setup-stepper-buttons
+     [formValid]="true"
+      [index]="stepper.selectedIndex"
+      (onNext)="next()"
+      (onBack)="back()"
+    >
+    </c8y-template-setup-stepper-buttons>
+  </form>
+
+  

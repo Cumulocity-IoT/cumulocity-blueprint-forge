@@ -1,0 +1,89 @@
+<c8y-title>Simulators</c8y-title>
+<ng-container *ngIf="simulatorConfigById$ | async as simulatorConfigById">
+<div class="card-group interact-grid" *ngIf="lockStatus$ | async as lockStatus">
+    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3" style="min-height: 165px">
+        <button *ngIf="userHasAdminRights && (lockStatus.isLockOwned || !isSimulatorsExist) else locked" [ngClass]="{'add-card-color' : applyTheme}"  (click)="showCreateSimulatorDialog()" class="card add-card">
+            <i  style="font-size: 36px;" c8y-icon="plus-circle" class="text-muted dlt-c8y-icon-plus-circle"></i>
+            <br>Add Simulator
+        </button>
+       
+        <ng-template #locked>
+            <div class="card card-block text-center add-card" [ngClass]="{'add-card-color' : applyTheme}">
+               <i c8yIcon="lock"></i><br>
+                <ng-container *ngIf="lockStatus.isLocked && lockStatus.lockStatus else gettingStatus">
+                    <span *ngIf="!isUnlocking else unlocking">Locked <small *ngIf="userHasAdminRights">(<a class="clickable" (click)="forceUnlock()" [ngClass]="{'label-color': applyTheme}">Force Unlock</a>)</small></span>
+                    <ng-template #unlocking>Unlocking...</ng-template>
+                    <p class="text-truncate"><small class="text-muted">Locked By :
+                            {{lockStatus.lockStatus.lockedBy}}</small></p>
+                    <p class="text-truncate"><small class="text-muted">Locked On:
+                            {{lockStatus.lockStatus.lockedOn | date:'d MMMM yyyy HH:mm'}}</small></p>
+                </ng-container>
+                <ng-template #gettingStatus>
+                    <span>Getting lock status...</span>
+                </ng-template>
+            </div>
+        </ng-template>
+    </div>
+    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3" *ngFor="let simulatorIdConfigPair of $any(simulatorConfigById) | keyvalue: unsorted">
+        <ng-container *ngIf="simulatorIdConfigPair.value as simulatorConfig">
+        <ng-container *ngIf="simulationStrategiesService.strategiesByName.get(simulatorConfig.type) as simulationStrategyFactory">
+        <ng-container *ngIf="simulationStrategyFactory.getSimulatorMetadata() as simulationStrategyMetadata">
+        <div class="card"  [ngClass]="{'card-color' : applyTheme}">
+            <div *ngIf="simulatorConfig.serverSide" style="position: absolute; right: 30px; top: 17px;" title="Run on Server">
+                <i c8yIcon="server"></i>
+            </div>
+            <div class="card-actions m-t-0">
+            <div class="dropdown" dropdown (click)="$event.stopPropagation()" *ngIf="userHasAdminRights && lockStatus.isLockOwned">
+                <button title="Settings" id="appSettings-{{simulatorConfig.name}}" class="dropdown-toggle c8y-dropdown" dropdownToggle type="button" [ngClass]="{'label-color': applyTheme}">
+                    <i c8yIcon="ellipsis-v"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right" *dropdownMenu role="menu">
+                    <li role="menuitem">
+                        <a class="dropdown-item clickable" (click)="showEditSimulatorDialog(simulatorConfig)">
+                            <i c8yIcon="edit" [ngClass]="{'label-color': applyTheme}"></i><span [ngClass]="{'label-color': applyTheme}"> Edit</span>
+                        </a>
+                    </li>
+                    <li role="menuitem">
+                        <a class="dropdown-item clickable" (click)="exportSimulatorConfig(simulatorConfig)">
+                            <i c8yIcon="download" [ngClass]="{'label-color': applyTheme}"></i> <span [ngClass]="{'label-color': applyTheme}"> Export</span>
+                        </a>
+                    </li>
+                    <li role="menuitem">
+                        <a class="dropdown-item clickable" (click)="deleteSimulator(simulatorConfig)">
+                            <i c8yIcon="times" [ngClass]="{'label-color': applyTheme}"></i> <span [ngClass]="{'label-color': applyTheme}"> Remove</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+            <div class="card-header separator">
+                <div class="card-icon">
+                    <i [c8yIcon]="simulationStrategyMetadata.icon"></i>
+                </div>
+                <div class="text-truncate card-title" [title]="simulatorConfig.name">
+                    {{simulatorConfig.name}}
+                </div>
+            </div>
+            <div class="card-block row" style="margin-bottom: 5px;">
+                <div class="col-xs-6">
+                    <label class="c8y-switch"  [ngClass]="{'label-color': applyTheme}">
+                        <input type="checkbox" [disabled]="!userHasAdminRights || !lockStatus.isLockOwned" [ngModel]="simulatorConfig.started" (ngModelChange)="changeSimulatorStarted(simulatorConfig, $event)"/>
+                        <span></span>
+                        {{simulatorConfig.started ? 'Running' : 'Paused'}}
+                    </label>
+                </div>
+                <div class="col-xs-6 text-right">
+                    <p class="text-truncate" title="{{simulationStrategyMetadata.name}}"><small class="text-muted">Type: {{simulationStrategyMetadata.name}}</small></p>
+                    <p class="text-truncate" *ngIf="simulatorConfig.config?.deviceId as deviceId"><small class="text-muted">Device: {{deviceId}}</small></p>
+                   
+                </div>
+            </div>
+        </div>
+        </ng-container>
+        </ng-container>
+        </ng-container>
+    </div>
+</div>
+</ng-container>
+
+

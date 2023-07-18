@@ -1,0 +1,162 @@
+<form #stepForm="ngForm" name="form" class="d-contents">
+  <div class="container-fluid flex-no-shrink fit-w">
+    <div class="row separator-bottom">
+      <div class="col-md-8 col-md-offset-2 col-lg-6 col-lg-offset-3 p-t-24 p-l-16 p-r-16">
+        <div class="h3-style l-h-base text-medium">{{templateDetails?.title}}</div>
+        <p class="lead text-normal" translate>
+          {{templateDetails?.tagLine}}
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="inner-scroll flex-grow">
+    <div class="container-fluid fit-w">
+      <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
+      <div class="card-group interact-grid" style="text-align:center;padding-top: 10px;">
+        <div class="col-xs-12 col-sm-8 col-md-9">
+           <div class="card">
+          <div class="card-header">
+              <div class="col-xs-12 col-sm-12 col-md-12" style="text-align: left;">
+                  <h4 class="card-title">Ensuring a Seamless Setup: Unveiling the Components Ready to Empower Your Experience!</h4>
+              </div>
+          </div>
+          <div class="card-block" id="dashboardDiv">
+              <div class="list-group">
+                  <div class="list-group-item d-flex" *ngFor="let dashboard of templateDetails?.dashboards; let i = index">
+                    <div class="list-item-checkbox">
+                      <label id="dashboard{{i}}" title="Select" class="c8y-checkbox">
+                        <input type="checkbox" [checked]="dashboard.selected" (change)="syncDashboardFlag($event, i)"
+                        >
+                        <span></span>
+                      </label>
+                    </div>
+                
+                    <div class="list-item-icon">
+                      <i title="Dashboard" c8yIcon="dashboard"></i>
+                    </div>
+                
+                    <div class="list-item-body text-left">
+                      <div class="d-flex row">
+                        <span class="col-sm-4 col-xs-12">{{dashboard.title}}</span>
+                        <div class="col-sm-4 col-xs-12 text-muted">
+                          <span translate>{{dashboard.description}}</span>
+                        </div>
+                        <div *ngIf="dashboard.isDeviceRequired" class="col-sm-4 col-xs-12 text-muted">
+                          <form class="form-inline" name="deviceForm" #deviceForm="ngForm">
+                            <div class="form-group" class="col-sm-12 col-md-12 col-xs-12" style="padding:0">
+                              <div class="form-group col-sm-12 col-md-9 col-xs-12" style="padding:0; margin: 0">
+                                  <label class="sr-only" for="selected-device">Select Device/asset for dashboard</label>
+                                  
+                                  <input *ngIf="dashboard.isDeviceRequired" name="selectedDevice" class="form-control"
+                                  [(ngModel)]="dashboard.name" required readonly style="width: 100%"
+                                      id="selected-device" placeholder="Select Device/Asset" type="text"
+                                     >
+                              </div>
+                              <div class="col-sm-12 col-md-2 col-xs-12" style="padding-left: 0; max-width: 100%; padding-right: 2%; text-align: end">
+                                <button type="button" class="btn btn-primary"
+                                  (click)="openDeviceSelectorDialog(dashboard, i)">
+                                  <i class="dlt-c8y-icon-edit"></i>
+                                </button>
+                                  
+                              </div>
+                              <div class="col-md-3"></div>
+                                </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+
+
+                    
+                  </div>
+                  <div class="list-group-item d-flex" *ngFor="let plugin of templateDetails?.plugins; let p =index">
+                    <div class="list-item-checkbox">
+                      <label id="plugin{{p}}" title="select" class="c8y-checkbox" >
+                        <input type="checkbox" [checked]="plugin.selected"  (change)="syncPluginFlag($event, p)"/>
+                        <span></span>
+                      </label>
+                    </div>
+                    <div class="list-item-icon">
+                      <i title="Plugin" c8yIcon="big-parcel"></i>
+                    </div>
+                    <div class="list-item-body text-left">
+                      <div class="d-flex row">
+                        <span class="col-sm-4 col-xs-12">{{plugin.title}}</span>
+                        <div class="col-sm-8 col-xs-12 text-muted">
+                          <span translate>{{plugin.description}}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="list-group-item d-flex" *ngFor="let microservice of templateDetails?.microservices; let m =index">
+                    <div class="list-item-checkbox">
+                      <label id="microservice{{m}}" title="select" class="c8y-checkbox" >
+                        <input type="checkbox" [checked]="microservice.selected"  (change)="syncMicroserviceFlag($event, m)"/>
+                        <span></span>
+                      </label>
+                    </div>
+                    <div class="list-item-icon">
+                      <i title="Microservice" c8yIcon="microchip"></i>
+                    </div>
+                    <div class="list-item-body text-left">
+                      <div class="d-flex row">
+                        <span class="col-sm-4 col-xs-12">{{microservice.title}}</span>
+                        <div class="col-sm-8 col-xs-12 text-muted">
+                          <span translate>{{microservice.description}}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+          </div>
+        </div>
+        
+        <div  class="col-xs-12 col-sm-4 col-md-3">
+          <div class="card" style="text-align: left;">
+            <div class="card-header">
+                <div class="col-xs-12 col-sm-12 col-md-12" >
+                    <h4 class="card-title">Application Configuration</h4>
+                </div>
+            </div>
+            <div class="card-block" id="appConfingDiv" *ngIf="app | async as app">
+                <form name="appConfigForm" #appConfigForm="ngForm">
+                    <div class="form-group">
+                        <label for="name" [ngClass]="{'label-color': applyTheme}"><span>Name</span></label>
+                        <input type="text" class="form-control" id="name" name="name"
+                            placeholder="e.g. My First Application (required)" required [(ngModel)]="newAppName">
+                    </div>
+            
+                    <div class="form-group" *ngIf="app.contextPath != undefined">
+                        <label for="contextpath" [ngClass]="{'label-color': applyTheme}"><span>Context
+                                Path</span></label>
+                        <input type="text" class="form-control" id="contextpath" name="contextpath"
+                            placeholder="e.g. my-app (required)" required [(ngModel)]="newAppContextPath">
+                    </div>
+                    <div class="form-group">
+                        <label for="icon" [ngClass]="{'label-color': applyTheme}"><span>Icon</span></label>
+                        <icon-selector id="icon" name="icon" [(value)]="newAppIcon"></icon-selector>
+                    </div>
+                </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      </div>
+      </div>
+    </div>
+  </div>
+
+
+  <c8y-template-setup-stepper-buttons
+    [formValid]="(deviceFormValid && appConfigForm?.form.valid) ? true : false"
+    [index]="stepper.selectedIndex"
+    (onNext)="saveandInstall(currentApp)"
+    (onBack)="back()"
+  >
+  </c8y-template-setup-stepper-buttons>
+  <div class="alerts">
+    <c8y-alert-outlet></c8y-alert-outlet>
+   </div>
+</form>

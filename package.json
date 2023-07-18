@@ -1,14 +1,19 @@
 {
   "name": "blueprint-forge",
-  "version": "1.0.0-dev-1",
-  "description": "This is package blueprint to create application dynamically.",
+  "version": "1017.0.205-1.0.0-rc-1",
+  "description": "Blueprint Forge enables template driven approach of integrating pre-build and market-ready industry solutions with a seemless user experience.",
   "scripts": {
-    "start": "c8ycli server ",
+    "start": "c8ycli server",
     "build": "c8ycli build",
+    "build-dev": "c8ycli build --env.mode=development",
     "deploy": "c8ycli deploy",
     "locale-extract": "c8ycli locale-extract",
     "postinstall": "ngcc",
-    "test": "jest"
+    "test": "jest",
+    "prebuild": " gulp clean",
+    "postbuild": " gulp bundle",
+    "prebuild-dev": " gulp clean",
+    "postbuild-dev": " gulp bundle"
   },
   "keywords": ["Blueprint"],
   "author": "Software AG, Global Presales",
@@ -24,12 +29,28 @@
     "@angular/platform-browser-dynamic": "14.0.6",
     "@angular/router": "14.0.6",
     "@angular/upgrade": "14.0.6",
-    "@c8y/client": "1017.0.151",
-    "@c8y/ngx-components": "1017.0.151",
+    "@c8y/client": "1017.0.205",
+    "@c8y/ng1-modules": "1017.0.205",
+    "@c8y/ngx-components": "1017.0.205",
+    "@c8y/style": "1017.0.205",
+    "@ng-select/ng-select": "^9.1.0",
     "@ngx-translate/core": "14.0.0",
+    "angular": "1.6.9",
+    "css-vars-ponyfill": "^2.4.8",
+    "app-builder-external-assets": "file:binary/app-builder-external-assets-3.2.0.tgz",
+    "crypto-js": "^4.1.1",
+    "delay": "^5.0.0",
+    "font-awesome": "^4.7.0",
+    "fontawesome": "^4.7.2",
+    "jszip": "^3.10.1",
+    "lodash-es": "^4.0.0",
+    "ng-gallery": "^7.1.2",
+    "ng-image-slider": "^6.1.0",
+    "ngx-bootstrap": "9.0.0",
+    "ngx-markdown": "^14.0.1",
+    "reflect-metadata": "^0.1.13",
     "rxjs": "~6.6.3",
-    "zone.js": "~0.11.7",
-    "@c8y/style": "1017.0.151"
+    "zone.js": "~0.11.7"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "14.0.6",
@@ -38,23 +59,53 @@
     "@angular/service-worker": "14.0.6",
     "@angular/localize": "14.0.6",
     "@types/jest": "^28.1.6",
+    "@types/lodash-es": "^4.17.3",
+    "@types/webpack": "^5.28.0",
+    "del": "^6.1.1",
+    "file-loader": "^6.2.0",
+    "gulp": "^4.0.2",
+    "gulp-json-editor": "^2.5.6",
+    "gulp-zip": "^5.0.1",
     "jest": "^28.1.3",
     "jest-preset-angular": "^12.2.5",
     "typescript": "4.7.4",
-    "@c8y/cli": "1017.0.151"
+    "@c8y/cli": "1017.0.205"
   },
   "c8y": {
     "application": {
       "name": "Blueprint Forge",
       "contextPath": "blueprint-forge",
       "key": "blueprint-forge-application-key",
+      "brandingEntry": "./ui-assets/index.less",
+      "tabsHorizontal": true,
+      "upgrade": true,
+      "rightDrawer": true,
+      "contentSecurityPolicy": "base-uri 'none'; default-src 'self' 'unsafe-inline' http: https: ws: wss: blob:; connect-src 'self' *.webmethodscloud.com *.aptrinsic.com *.billwerk.com http: https: ws: wss: blob:;  script-src 'self' open.mapquestapi.com *.twitter.com *.twimg.com *.aptrinsic.com 'unsafe-inline' 'unsafe-eval' data:; style-src * 'unsafe-inline' blob:; img-src * data: blob:; font-src * data:; frame-src *; worker-src 'self' blob:;",
       "dynamicOptionsUrl": "/apps/public/public-options/options.json",
       "isPackage": true,
-      "package": "blueprint"
+      "package": "blueprint",
+      "cookieBanner": {
+        "cookieBannerTitle": "About cookies on this website",
+        "cookieBannerText": "Cookies are important to the proper functioning of a site. To improve your experience, we use cookies to remember log-in details and provide secure log-in, collect statistics to optimize site functionality, and deliver content tailored to your interests. Click Agree and Proceed to accept cookies and go directly to the site or click Configure preferences for further details and to manage your options. The consent can be revoked at any time.",
+        "policyUrl": "https://www.softwareag.com/en_corporate/privacy.html"
+      },
+      "cookiePreferences": {
+        "required": true,
+        "functional": "These cookies are used to support you during your first steps in the product, to deliver content tailored to your needs, and to collect usage statistics."
+      },
+      "copy": [{
+        "from": "./ui-assets/fonts",
+        "to": "./fonts/"
+      }, {
+        "from": "./ui-assets/img",
+        "to": "./img/"
+      }, {
+        "from": "assets/blueprint-forge.png",
+        "to": "assets/blueprint-forge.png"
+      }],
+      "version": "1017.0.205-1.0.0-rc-1"
     },
     "cli": {}
   },
-  "browserslist": [
-    "last 2 major versions"
-  ]
+  "browserslist": ["last 2 major versions"]
 }
