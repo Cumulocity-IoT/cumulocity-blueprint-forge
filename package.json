@@ -1,7 +1,7 @@
 {
   "name": "blueprint-forge",
   "version": "1017.0.205-1.0.0-rc-1",
-  "description": "This is package blueprint to create application dynamically.",
+  "description": "Blueprint Forge enables template driven approach of integrating pre-build and market-ready industry solutions with a seemless user experience.",
   "scripts": {
     "start": "c8ycli server",
     "build": "c8ycli build",
@@ -99,6 +99,9 @@
       }, {
         "from": "./ui-assets/img",
         "to": "./img/"
+      }, {
+        "from": "assets/blueprint-forge.png",
+        "to": "assets/blueprint-forge.png"
       }],
       "version": "1017.0.205-1.0.0-rc-1"
     },
