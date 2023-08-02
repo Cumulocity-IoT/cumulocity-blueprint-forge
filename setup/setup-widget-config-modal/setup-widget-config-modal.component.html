@@ -1,0 +1,56 @@
+<div class="modal-dialog modal-sm">
+  <div class="modal-content">
+    <div class="c8y-prompt alert alert-warning">
+      
+      <h4 class="text-truncate" translate="">Required Configurations</h4>
+
+      <form #config_form="ngForm">
+      <div *ngFor="let basicConfig of dashboardBasicConfig; let b = index">
+        <h5 class="text-truncate" translate="" style="padding-top: 5%; font-size: medium">{{basicConfig.title}}</h5>
+        <div *ngFor="let widgetConfig of basicConfig.config; let w = index" style="padding-top: 5%">
+          <div *ngIf="!(widgetConfig.type === 'select') ">
+            <label for="" translate="">{{widgetConfig.label}}</label>
+          <input
+            type='{{widgetConfig.type}}'
+            class="form-control"
+            placeholder='{{widgetConfig.placeholder}}'
+            name='{{widgetConfig.fieldName}}'
+            [(ngModel)]="dashboardBasicConfig[b].config[w].name"
+          /> 
+          </div>
+
+          <div *ngIf="widgetConfig.type === 'select'">
+            <select 
+            [(ngModel)]="dashboardBasicConfig[b].config[w].name"
+            class="form-control"
+            name='{{widgetConfig.fieldName}}'>
+              <option *ngFor="let listItems of widgetConfig.dropdownList" [value]="listItems" >{{listItems}}</option>
+          </select>
+          </div>
+          
+        </div>
+      </div>
+    </form>
+    
+      <p class="modal-inner-scroll text-break-word" style="white-space: pre-line;" ng-bind-html="body | translate">
+      <br>
+
+      <div class="alert-footer">
+        
+        <button title="Cancel" class="btn btn-default"
+          (click)="dismiss(config_form)">
+          Cancel
+        </button>
+        <button title="Ok"
+          class="btn btn-primary" (click)="confirm(config_form)">
+          Confirm
+        </button>
+        
+      </div>
+    </div>
+  </div>
+
+
+ 
+  
+</div>

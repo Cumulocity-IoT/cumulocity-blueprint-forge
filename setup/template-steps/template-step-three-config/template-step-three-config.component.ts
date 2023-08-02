@@ -43,9 +43,11 @@ import { contextPathFromURL } from "../../../builder/utils/contextPathFromURL";
 import { NgForm } from '@angular/forms';
 import { SetupConfigService } from './../../setup-config.service';
 import { SettingsService } from '../../../builder/settings/settings.service';
+import { SetupWidgetConfigModalComponent } from '../../../setup/setup-widget-config-modal/setup-widget-config-modal.component';
 @Component({
   selector: 'c8y-template-step-three-config',
   templateUrl: './template-step-three-config.component.html',
+  styleUrls: ['./template-step-three-config.component.css'],
   host: { class: 'd-contents' }
 })
 export class TemplateStepThreeConfigComponent extends TemplateSetupStep implements OnInit, AfterViewInit{
@@ -84,7 +86,8 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
     private externalService: AppBuilderExternalAssetsService,
     private deviceSelectorModalRef: BsModalRef,
      private alertService: AlertService, private appStateService: AppStateService,
-    protected setupConfigService: SetupConfigService, private settingsService: SettingsService
+    protected setupConfigService: SetupConfigService, private settingsService: SettingsService,
+    
   ) {
     
     super(stepper, step, setup, appState, alert, setupConfigService);
@@ -109,6 +112,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       this.isFormValid= this.appConfigForm?.form.valid;
       if (currentData) {
         this.templateDetails = currentData;
+        console.log('template details value', this.templateDetails);
       }
       // In case of no device 
       if (!(this.templateDetails?.input) || !(this.templateDetails?.input?.devices) || !(this.templateDetails?.input?.devices?.length > 0)) {
@@ -147,6 +151,22 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
     }
   }
 
+  showSetupConfigModal(dashboardBasicConfig): BsModalRef {
+    return this.modalService.show(SetupWidgetConfigModalComponent, { class: 'c8y-wizard', initialState: { dashboardBasicConfig } });
+}
+
+async configureBasicInput(dashboard, index) {
+    console.log('Template details in configure basic input', this.templateDetails, 'dashboard value', dashboard);
+    const basicConfigurationRef = this.showSetupConfigModal(dashboard.basicConfig);
+    await basicConfigurationRef.content.event.subscribe(async data => {
+      if (data && data.isConfirm) {
+        console.log('Data value', data, 'dashboard value', dashboard);;
+        this.templateDetails.dashboards[index].basicConfig = data.basicConfigParams;
+        console.log('Template details after assigning basic config', this.templateDetails);
+      }
+    });
+  }
+  
  // TODO: Phase II
   showDashboardCatalogDialog(app: any, dashboard: Dashboards) {
     this.bsModalRef = this.modalService.show(TemplateCatalogModalComponent, { backdrop: 'static', class: 'modal-lg', initialState: { app, dashboard} });
@@ -208,6 +228,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       this.progressIndicatorService.setMessage(`Installing ${db.title}`);
       await new Promise(resolve => setTimeout(resolve, 1000));
       const templateDetailsData = await (await this.loadTemplateDetails(db)).toPromise();
+      console.log('template details data value', templateDetailsData, 'db value', db);
       const dashboardConfiguration = {
         dashboardId: '12598412',
         dashboardName: db.title,
@@ -217,8 +238,44 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
         dashboardVisibility: '',
         roles: ''
       };
+      
       this.progressIndicatorService.setProgress(40);
       templateDetailsData.input.devices = db.devices;
+      console.log('template details data before widget assigning', templateDetailsData?.widgets);
+      if (db.title !== 'Instruction' && db.title !== 'Welcome' && db.title !== 'Help and Support' && db.isConfigRequred) {
+        templateDetailsData.widgets.forEach( widget => {
+          const dbWidgetConfig = db.basicConfig.find( basicConfig => basicConfig.componentId == widget.componentId);
+         if(dbWidgetConfig)  {
+          dbWidgetConfig.config.forEach( item  => {
+            // console.log('Object keys', Object.keys(widget.config));
+
+            // Works if widget config in global presales is not nested
+            if (item.type === 'select') {
+              if(widget.config && widget.config?.hasOwnProperty(item.fieldName)){
+                widget.config[item.fieldName].push(item.name);
+              }
+            } else  {
+              if(widget.config && widget.config?.hasOwnProperty(item.fieldName)){
+                widget.config[item.fieldName] = item.name;
+              }
+            }
+            
+          })
+
+         }
+
+        });
+        // for(let w=0; w < templateDetailsData.widgets.length; w++) {
+        //   if (db.basicConfig[w].componentId === templateDetailsData.widgets[w].componentId) {
+        //     db.basicConfig[w].config.forEach(item => {
+        //      if (templateDetailsData.widgets[w].config.hasOwnProperty(item.fieldName)) templateDetailsData.widgets[w].config[item.fieldName] = item.name;
+        //     })
+        //   }
+        // }
+        
+      }
+      
+      console.log('template details data after widget assigning', templateDetailsData?.widgets);
       await this.catalogService.createDashboard(this.currentApp, dashboardConfiguration, db, templateDetailsData, this.templateDetails.title);
       this.progressIndicatorService.setProgress(90);
       overallProgress = overallProgress + eachRemoteProgress;
@@ -316,13 +373,23 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
     }
 
   }
-  async loadTemplateDetails(db: Dashboards): Promise<Observable<any>> {
-    return this.catalogService.getTemplateDetails(db.dashboard)
-        .pipe(catchError(err => {
-            console.log('Dashboard Catalog Details: Error in primary endpoint! using fallback...');
-            return this.catalogService.getTemplateDetailsFallBack(db.dashboard);
-    }));      
- }
+//   async loadTemplateDetails(db: Dashboards): Promise<Observable<any>> {
+//     return this.catalogService.getTemplateDetails(db.dashboard)
+//       .pipe(map((response) => {
+//         console.log('response in load template details', response);
+//       })).pipe(catchError(err => {
+//             console.log('Dashboard Catalog Details: Error in primary endpoint! using fallback...');
+//             return this.catalogService.getTemplateDetailsFallBack(db.dashboard);
+//     }));  
+//  }
+
+async loadTemplateDetails(db: Dashboards): Promise<Observable<any>> {
+  return this.catalogService.getTemplateDetails(db.dashboard)
+      .pipe(catchError(err => {
+          console.log('Dashboard Catalog Details: Error in primary endpoint! using fallback...');
+          return this.catalogService.getTemplateDetailsFallBack(db.dashboard);
+  }));      
+}
 
  openDeviceSelectorDialog(dashboard, index) {
   this.deviceSelectorModalRef = this.modalService.show(DeviceSelectorModalComponent, { class: 'c8y-wizard', initialState: {} });
@@ -399,5 +466,5 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
     this.appStateService.currentUser.next(this.appStateService.currentUser.value);
   }
 
-
+ 
 }

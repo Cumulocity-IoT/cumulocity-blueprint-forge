@@ -44,13 +44,15 @@ import { LightboxModule } from  'ng-gallery/lightbox';
 import { TemplateStepFourSummaryComponent } from './setup/template-steps/template-step-four-summary/template-step-four-summary.component';
 import { IconSelectorModule } from './icon-selector/icon-selector.module';
 import { SetupConfigService } from './setup/setup-config.service';
+import { SetupWidgetConfigModalComponent } from './setup/setup-widget-config-modal/setup-widget-config-modal.component';
 @NgModule({
   declarations: [
     TemplateStepOneComponent, 
     TemplateStepTwoDetailsComponent,
     TemplateStepThreeConfigComponent,
     TemplateStepFourSummaryComponent,
-    TemplateSetupStepperButtonsComponent
+    TemplateSetupStepperButtonsComponent,
+    SetupWidgetConfigModalComponent
   ],
   imports: [
     // Upgrade module must be the first
