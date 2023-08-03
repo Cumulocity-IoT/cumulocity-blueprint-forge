@@ -45,6 +45,7 @@ import { TemplateStepFourSummaryComponent } from './setup/template-steps/templat
 import { IconSelectorModule } from './icon-selector/icon-selector.module';
 import { SetupConfigService } from './setup/setup-config.service';
 import { SetupWidgetConfigModalComponent } from './setup/setup-widget-config-modal/setup-widget-config-modal.component';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 @NgModule({
   declarations: [
     TemplateStepOneComponent, 
@@ -72,7 +73,8 @@ import { SetupWidgetConfigModalComponent } from './setup/setup-widget-config-mod
     GalleryModule.withConfig({
         thumb: false
       }),
-    LightboxModule.withConfig({})
+    LightboxModule.withConfig({}),
+    BsDropdownModule.forRoot()
   ],
   providers: [
     TemplateCatalogSetupService,SetupConfigService,

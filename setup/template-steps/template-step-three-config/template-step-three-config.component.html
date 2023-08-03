@@ -38,15 +38,20 @@
                 
                     <div class="list-item-body text-left">
                       <div class="d-flex row">
-                        <span class="col-sm-4 col-xs-12">{{dashboard.title}}</span>
+                        <span class="col-sm-3 col-xs-12">{{dashboard.title}}</span>
                         <div class="col-sm-4 col-xs-12 text-muted">
                           <span translate>{{dashboard.description}}</span>
                         </div>
-                        <div class="col-sm-4 col-xs-12 text-muted">
+                        <div class="col-sm-5 col-xs-12 text-muted">
                         <div *ngIf="dashboard.isDeviceRequired">
+                          <!-- <div *ngIf="!devicePopup && !groupPopup && !typePopup" class="btn-group" role="group">
+                            <button type="button" class="btn btn-default" (click)="enableDevicePopup()">Device</button>
+                            <button type="button" class="btn btn-default" (click)="enableGroupPopup()">Group</button>
+                            <button type="button" class="btn btn-default" (click)="enableTypePopup()">Type</button>
+                          </div> -->
                           <form class="form-inline" name="deviceForm" #deviceForm="ngForm">
                             <div class="form-group" class="col-sm-12 col-md-12 col-xs-12" style="padding:0">
-                              <div class="form-group col-sm-12 col-md-9 col-xs-12" style="padding:0; margin: 0">
+                              <div class="form-group col-sm-6 col-md-6 col-xs-12" style="padding:0; margin: 0">
                                   <label class="sr-only" for="selected-device">Select Device/asset for dashboard</label>
                                   
                                   <input *ngIf="dashboard.isDeviceRequired" name="selectedDevice" class="form-control"
@@ -54,15 +59,43 @@
                                       id="selected-device" placeholder="Select Device/Asset" type="text"
                                      >
                               </div>
-                              <div class="col-sm-12 col-md-2 col-xs-12" style="padding-left: 0; max-width: 100%; padding-right: 2%; text-align: end">
+
+
+                              <div class="col-sm-4 col-md-4 col-xs-12 input-group-btn dropdown" style="padding-left: 0; max-width: 100%; text-align: end" dropdown>
+                                <button type="button" dropdownToggle class="btn btn-primary dropdown-toggle c8y-dropdown">
+                                  <span >{{assetButtonText}}</span>
+                                  <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-right" *dropdownMenu>
+                                  <li><button type="button" (click)="openDeviceSelectorDialog(dashboard,'Device/Asset')">Device/Asset</button></li>
+                                  <li><button type="button"(click)="openDeviceSelectorDialog(dashboard, 'Device Group')">Device Group</button></li>
+                                  <li><button type="button"(click)="openDeviceSelectorDialog(dashboard, 'Type')">Type</button></li>
+                                </ul>
+                              </div>
+                              <!-- <div class="col-sm-12 col-md-2 col-xs-12" style="padding-left: 0; max-width: 100%; padding-right: 2%; text-align: end">
                                 <button type="button" class="btn btn-primary"
                                   (click)="openDeviceSelectorDialog(dashboard, i)">
                                   <i class="dlt-c8y-icon-edit"></i>
                                 </button>
                                   
-                              </div>
+                              </div> -->
                               <div class="col-md-3"></div>
                                 </div>
+                               
+                                <!-- <div class="col-md-3 col-sm-3 col-xs-12" *ngIf="(devicePopup && !groupPopup && !typePopup) || (!devicePopup && groupPopup && !typePopup) || (!devicePopup && !groupPopup && typePopup)" class="col-md-3">
+                                  <button type="button" class="btn btn-primary"
+                                  (click)="goBackToToggle()">
+                                  <i class="dlt-c8y-icon-arrow-left"></i>
+                                </button>
+                                </div>
+
+                                <div *ngIf="!devicePopup && groupPopup && !typePopup" class="form-group" class="col-sm-12 col-md-12 col-xs-12" style="padding:0">
+                                 <p>Test</p>
+                                    </div>
+
+                                    <div *ngIf="!devicePopup && !groupPopup && typePopup" class="form-group" class="col-sm-12 col-md-12 col-xs-12" style="padding:0">
+                                      <p>TEst</p>
+                                        </div> -->
                           </form>
                         </div>
                       </div>
@@ -85,8 +118,8 @@
                     </div>
                     <div class="list-item-body text-left">
                       <div class="d-flex row">
-                        <span class="col-sm-4 col-xs-12">{{plugin.title}}</span>
-                        <div class="col-sm-8 col-xs-12 text-muted">
+                        <span class="col-sm-3 col-xs-12">{{plugin.title}}</span>
+                        <div class="col-sm-9 col-xs-12 text-muted">
                           <span translate>{{plugin.description}}</span>
                         </div>
                       </div>
@@ -104,8 +137,8 @@
                     </div>
                     <div class="list-item-body text-left">
                       <div class="d-flex row">
-                        <span class="col-sm-4 col-xs-12">{{microservice.title}}</span>
-                        <div class="col-sm-8 col-xs-12 text-muted">
+                        <span class="col-sm-3 col-xs-12">{{microservice.title}}</span>
+                        <div class="col-sm-9 col-xs-12 text-muted">
                           <span translate>{{microservice.description}}</span>
                         </div>
                       </div>

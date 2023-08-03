@@ -72,6 +72,10 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   templateDetailsData: any;
   isFormValid = false;
   deviceFormValid : boolean;
+  assetButtonText: String = 'Device/Asset';
+  // devicePopup: boolean = false;
+  // typePopup: boolean  = false;
+  // groupPopup: boolean = false;
   constructor(
     public stepper: C8yStepper,
     protected step: CdkStep,
@@ -391,7 +395,8 @@ async loadTemplateDetails(db: Dashboards): Promise<Observable<any>> {
   }));      
 }
 
- openDeviceSelectorDialog(dashboard, index) {
+ openDeviceSelectorDialog(dashboard, modalType) {
+  this.assetButtonText = modalType;
   this.deviceSelectorModalRef = this.modalService.show(DeviceSelectorModalComponent, { class: 'c8y-wizard', initialState: {} });
  
   
@@ -466,5 +471,28 @@ async loadTemplateDetails(db: Dashboards): Promise<Observable<any>> {
     this.appStateService.currentUser.next(this.appStateService.currentUser.value);
   }
 
+  // enableDevicePopup() {
+  //   this.devicePopup = true;
+  //   this.groupPopup = false;
+  //   this.typePopup = false;
+  // }
+
+  // enableGroupPopup() {
+  //   this.devicePopup = false;
+  //   this.groupPopup = true;
+  //   this.typePopup = false;
+  // }
+
+  // enableTypePopup() {
+  //   this.devicePopup = false;
+  //   this.groupPopup = false;
+  //   this.typePopup = true;
+  // }
+
+  // goBackToToggle() {
+  //   this.devicePopup = false;
+  //   this.groupPopup = false;
+  //   this.typePopup = false;
+  // }
  
 }
