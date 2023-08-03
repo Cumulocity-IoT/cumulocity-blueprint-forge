@@ -49,12 +49,21 @@ export class TemplateUpdateModalComponent implements OnInit {
 
     private progressModal: BsModalRef;
 
+    public assetButtonText = "Device/Asset";
+
+    private groupTemplate = false;
+
+    private typeTemplate = false;
+
     constructor(private modalService: BsModalService, private modalRef: BsModalRef, private catalogService: TemplateCatalogService) {
 
     }
 
     ngOnInit(): void {
         this.showLoadingIndicator();
+        if(this.dashboardConfig?.templateType) {
+            this.configureTemplateType(this.dashboardConfig?.templateType);
+        }
         this.catalogService.getTemplateDetails(this.dashboardConfig.templateDashboard.id)
         .pipe(catchError(err => {
             console.log('Dashboard Details: Error in primary endpoint using fallback');
@@ -73,14 +82,36 @@ export class TemplateUpdateModalComponent implements OnInit {
             });
     }
 
-    openDeviceSelectorDialog(index: number): void {
-        this.deviceSelectorModalRef = this.modalService.show(DeviceSelectorModalComponent, { class: 'c8y-wizard', initialState: {} });
+    openDeviceSelectorDialog(index: number, templateType: number): void {
+        this.configureTemplateType(templateType);
+        this.dashboardConfig.templateType = templateType; 
+        this.deviceSelectorModalRef = this.modalService.show(DeviceSelectorModalComponent, { class: 'c8y-wizard', initialState: {templateType} });
         this.deviceSelectorModalRef.content.onDeviceSelected.subscribe((selectedDevice: IManagedObject) => {
             this.templateDetails.input.devices[index].reprensentation = {
                 id: selectedDevice.id,
                 name: selectedDevice['name']
             };
         })
+    }
+
+    private configureTemplateType(templateType: number) {
+        switch (templateType) {
+            case 1:
+                this.assetButtonText = "Device Group";
+                this.groupTemplate = true;
+                this.typeTemplate = false;
+                break;
+            case 2:
+                this.assetButtonText = "Device/Asset Type";
+                this.groupTemplate = false;
+                this.typeTemplate = true;
+                break;
+            default:
+                this.assetButtonText = "Device/Asset";
+                this.groupTemplate = false;
+                this.typeTemplate = false;
+                break;
+        }
     }
 
     onImageSelected(files: FileList, index: number): void {
@@ -104,7 +135,7 @@ export class TemplateUpdateModalComponent implements OnInit {
     async onSaveButtonClicked(): Promise<void> {
         this.showProgressModalDialog('Update Dashboard ...')
 
-        this.catalogService.updateDashboard(this.app, this.dashboardConfig, this.templateDetails, this.index)
+        this.catalogService.updateDashboard(this.app, this.dashboardConfig, this.templateDetails, this.index, this.groupTemplate)
             .then(() => {
                 this.hideProgressModalDialog();
                 this.modalRef.hide();

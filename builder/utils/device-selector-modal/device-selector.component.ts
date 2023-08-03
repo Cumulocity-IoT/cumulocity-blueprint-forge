@@ -32,26 +32,42 @@ export class DeviceSelectorModalComponent implements OnInit {
 
     searchString: string;
 
+    templateType: number;
+
     devices: IManagedObject[] = [];
 
     deviceSelected: IManagedObject;
+
+    title = "Select Device/Asset";
 
     constructor(private modalRef: BsModalRef, private devicesService: DeviceSelectorModalService) { }
 
     ngOnInit(): void {
         this.onDeviceSelected = new Subject();
+        switch (this.templateType) {
+            case 1:
+                this.title = "Select Group/Asset"
+                break;
+            
+            case 2:
+            this.title = "Select Device/Asset Type"
+            break;
+        
+            default:
+                break;
+        }
         this.loadDevices();
     }
 
     loadDevices() {
-        this.devicesService.queryDevices()
+        this.devicesService.queryDevices(this.templateType)
             .then(response => {
                 this.devices = response.data as IManagedObject[];
             });
     }
 
     searchForDevice(): void {
-        this.devicesService.queryDevices(this.searchString)
+        this.devicesService.queryDevices(this.templateType, this.searchString )
             .then(response => {
                 this.devices = response.data as IManagedObject[];
             });

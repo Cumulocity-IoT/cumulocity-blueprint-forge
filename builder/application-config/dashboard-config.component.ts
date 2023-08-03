@@ -49,6 +49,7 @@ export interface DashboardConfig {
     icon: string,
     deviceId?: string,
     roles?: any,
+    templateType?: number,
     groupTemplate: {
         groupId: string
     },

@@ -67,6 +67,12 @@ export class TemplateCatalogModalComponent implements OnInit {
 
     public dashboardPath: string = null;
 
+    public assetButtonText = "Device/Asset";
+
+    private groupTemplate = false;
+
+    private typeTemplate = false;
+
     private appList = [];
 
     public dashboardConfiguration = {
@@ -76,7 +82,8 @@ export class TemplateCatalogModalComponent implements OnInit {
         deviceId: '',
         tabGroup: '',
         dashboardVisibility: '',
-        roles: ''
+        roles: '',
+        templateType: 0 // 0: default, 1: group, 2: type
     };
 
     public selectedDevice: IManagedObject;
@@ -190,8 +197,28 @@ export class TemplateCatalogModalComponent implements OnInit {
         this.currentStep = TemplateCatalogStep.CATALOG;
     }
 
-    openDeviceSelectorDialog(index: number): void {
-        this.deviceSelectorModalRef = this.modalService.show(DeviceSelectorModalComponent, { class: 'c8y-wizard', initialState: {} });
+    openDeviceSelectorDialog(index: number, templateType: number): void {
+       
+        switch (templateType) {
+            case 1:
+                this.assetButtonText = "Device Group";
+                this.groupTemplate = true;
+                this.typeTemplate = false;
+                break;
+            case 2:
+                this.assetButtonText = "Device/Asset Type";
+                this.groupTemplate = false;
+                this.typeTemplate = true;
+                break;
+            default:
+                this.assetButtonText = "Device/Asset";
+                this.groupTemplate = false;
+                this.typeTemplate = false;
+                break;
+        }
+        this.dashboardConfiguration.templateType = templateType;
+
+        this.deviceSelectorModalRef = this.modalService.show(DeviceSelectorModalComponent, { class: 'c8y-wizard', initialState: {templateType} });
         this.deviceSelectorModalRef.content.onDeviceSelected.subscribe((selectedDevice: IManagedObject) => {
             this.templateDetails.input.devices[index].reprensentation = {
                 id: selectedDevice.id,
@@ -224,7 +251,7 @@ export class TemplateCatalogModalComponent implements OnInit {
     async onSaveButtonClicked() {
         this.showProgressModalDialog('Create Dashboard ...')
         this.dashboardConfiguration.dashboardName = (this.dashboardPath ? `${this.dashboardPath}/${this.dashboardConfiguration.dashboardName}` : this.dashboardConfiguration.dashboardName);
-        await this.catalogService.createDashboard(this.app, this.dashboardConfiguration, this.selectedTemplate, this.templateDetails);
+        await this.catalogService.createDashboard(this.app, this.dashboardConfiguration, this.selectedTemplate, this.templateDetails, this.groupTemplate);
 
         this.hideProgressModalDialog();
         this.onSave.next(this.isReloadRequired);

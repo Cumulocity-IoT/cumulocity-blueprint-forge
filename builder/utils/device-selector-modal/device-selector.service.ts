@@ -31,8 +31,13 @@ export class DeviceSelectorModalService {
 
     }
 
-    queryDevices(deviceName?: string): Promise<IResultList<IManagedObject>> {
+    queryDevices(templateType?: number, deviceName?: string): Promise<IResultList<IManagedObject>> {
         let searchString = deviceName ? `*${deviceName}*` : '*';
+        if(templateType == 1){
+            return this.inventoryService.listQuery({ __filter: { __and: [{ __or: [{__has: 'c8y_IsDeviceGroup' }, {__has: 'c8y_IsAsset'  } ]}, { name: searchString }] } }, this.LIST_FILTER);
+        } else if(templateType == 2){
+            return this.inventoryService.listQuery({ __filter: { __and: [{ __or: [{__has: 'c8y_IsDevice' }, {__has: 'c8y_IsAsset'  } ]}, { type: searchString }] } }, this.LIST_FILTER);
+        }
         return this.inventoryService.listQuery({ __filter: { __and: [{ __or: [{__has: 'c8y_IsDevice' }, {__has: 'c8y_IsAsset'  } ]}, { name: searchString }] } }, this.LIST_FILTER);
     }
 }
