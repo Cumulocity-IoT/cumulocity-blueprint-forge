@@ -23,7 +23,7 @@ import { InventoryService, IManagedObject, IResultList } from '@c8y/client';
 export class DeviceSelectorModalService {
 
     private readonly LIST_FILTER = {
-        pageSize: 25,
+        pageSize: 50,
         withTotalPages: true
     };
 

@@ -86,12 +86,22 @@ export class TemplateUpdateModalComponent implements OnInit {
         this.configureTemplateType(templateType);
         this.dashboardConfig.templateType = templateType; 
         this.deviceSelectorModalRef = this.modalService.show(DeviceSelectorModalComponent, { class: 'c8y-wizard', initialState: {templateType} });
-        this.deviceSelectorModalRef.content.onDeviceSelected.subscribe((selectedDevice: IManagedObject) => {
-            this.templateDetails.input.devices[index].reprensentation = {
-                id: selectedDevice.id,
-                name: selectedDevice['name']
-            };
-        })
+        if(templateType == 2) {
+            this.deviceSelectorModalRef.content.onTypeSelected.subscribe((selectedType: string) => {
+                this.templateDetails.input.devices[index].reprensentation = {
+                    id: selectedType,
+                    name: selectedType
+                };
+    
+            });
+        } else {
+            this.deviceSelectorModalRef.content.onDeviceSelected.subscribe((selectedDevice: IManagedObject) => {
+                this.templateDetails.input.devices[index].reprensentation = {
+                    id: selectedDevice.id,
+                    name: selectedDevice['name']
+                };
+            })
+        }
     }
 
     private configureTemplateType(templateType: number) {
@@ -103,7 +113,7 @@ export class TemplateUpdateModalComponent implements OnInit {
                 break;
             case 2:
                 this.assetButtonText = "Device/Asset Type";
-                this.groupTemplate = false;
+                this.groupTemplate = true;
                 this.typeTemplate = true;
                 break;
             default:

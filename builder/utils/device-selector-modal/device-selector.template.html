@@ -16,10 +16,15 @@
             </span>
         </div>
     </form>
-    <div class="list-group device-list">
+    <div class="list-group device-list" *ngIf="templateType !== 2">
         <button *ngFor="let device of devices" type="button" [ngClass]="{'device-selected': isDeviceSelected(device)}"
             class="list-group-item" (click)="selectDevice(device)">{{device.name}} <i c8yIcon="check"
                 *ngIf="isDeviceSelected(device)"></i></button>
+    </div>
+    <div class="list-group device-list" *ngIf="templateType == 2">
+        <button *ngFor="let type of types" type="button" [ngClass]="{'device-selected': isTypeSelected(type)}"
+            class="list-group-item" (click)="selectType(type)">{{type}} <i c8yIcon="check"
+                *ngIf="isTypeSelected(type)"></i></button>
     </div>
 </div>
 <div class="c8y-wizard-footer">
