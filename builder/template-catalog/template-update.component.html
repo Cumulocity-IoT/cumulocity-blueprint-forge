@@ -28,11 +28,6 @@
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label for="tabgroup"><span>Tab Group</span></label>
-                    <input type="text" class="form-control" id="tabgroup" name="tabgroup" placeholder="e.g. TabGroup1"
-                        [(ngModel)]="dashboardConfig.tabGroup">
-                </div>
 
                 <div class="form-group">
                     <label for="icon"><span>Icon</span></label>
@@ -60,6 +55,20 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="form-group" *ngIf="!groupTemplate else groupTemplateTabGroup">
+                    <label for="tabgroup"><span>Tab Group</span></label>
+                    <input type="text" class="form-control" id="tabgroup" name="tabgroup" placeholder="e.g. TabGroup1" [(ngModel)]="dashboardConfig.tabGroup">
+                </div>
+                <ng-template #groupTemplateTabGroup>
+                <div class="form-group">
+                    <label for="tabgroup"><span>Tab Group</span></label>
+                    <select name="tabgroup" id="tabgroup" [(ngModel)]="dashboardConfig.tabGroup">
+                        <option value="deviceId">Device ID</option>
+                        <option value="">None</option>
+                    </select>
+                </div>
+                </ng-template>
 
                 <div class="form-group">
                     <label for="globalRoles"><span>Global Roles (Optional)</span> 

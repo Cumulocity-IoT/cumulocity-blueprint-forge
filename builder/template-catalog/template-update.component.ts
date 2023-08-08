@@ -51,9 +51,7 @@ export class TemplateUpdateModalComponent implements OnInit {
 
     public assetButtonText = "Device/Asset";
 
-    private groupTemplate = false;
-
-    private typeTemplate = false;
+    groupTemplate = false;
 
     constructor(private modalService: BsModalService, private modalRef: BsModalRef, private catalogService: TemplateCatalogService) {
 
@@ -109,17 +107,14 @@ export class TemplateUpdateModalComponent implements OnInit {
             case 1:
                 this.assetButtonText = "Device Group";
                 this.groupTemplate = true;
-                this.typeTemplate = false;
                 break;
             case 2:
                 this.assetButtonText = "Device/Asset Type";
                 this.groupTemplate = true;
-                this.typeTemplate = true;
                 break;
             default:
                 this.assetButtonText = "Device/Asset";
                 this.groupTemplate = false;
-                this.typeTemplate = false;
                 break;
         }
     }

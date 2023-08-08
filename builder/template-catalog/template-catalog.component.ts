@@ -71,8 +71,6 @@ export class TemplateCatalogModalComponent implements OnInit {
 
     private groupTemplate = false;
 
-    private typeTemplate = false;
-
     private appList = [];
 
     public dashboardConfiguration = {
@@ -203,17 +201,14 @@ export class TemplateCatalogModalComponent implements OnInit {
             case 1:
                 this.assetButtonText = "Device Group";
                 this.groupTemplate = true;
-                this.typeTemplate = false;
                 break;
             case 2:
                 this.assetButtonText = "Device/Asset Type";
                 this.groupTemplate = true;
-                this.typeTemplate = true;
                 break;
             default:
                 this.assetButtonText = "Device/Asset";
                 this.groupTemplate = false;
-                this.typeTemplate = false;
                 break;
         }
         this.dashboardConfiguration.templateType = templateType;
