@@ -276,9 +276,9 @@ async configureBasicInput(dashboard, index) {
       }
       
       console.log('template details data after widget assigning', templateDetailsData);
-      if (db.templateType && db.templateType === 1) {
+      if (db.templateType && db.templateType === 1 && !db.isGroupDashboard) {
         this.groupTemplate = true;
-      } else if (db.templateType && db.templateType === 2) {
+      } else if (db.templateType && db.templateType === 2 && !db.isGroupDashboard) {
         this.groupTemplate = true;
       } else {
         this.groupTemplate = false;
