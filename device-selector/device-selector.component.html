@@ -1,4 +1,14 @@
-<div class="row col-xs-12" style="display: inline-flex;"><input type="text" class="form-control"  name="deviceGroup_{{field_id}}"
+<div class="row col-xs-12" style="display: inline-flex;">
+
+    <button *ngIf="isTypeSupport" class="btn btn-default" id="isTypeInput" name="isTypeInput" [(ngModel)]="isTypeInput" 
+        (ngModelChange)="typeInputChange()" btnCheckbox>{{isTypeInput? 'Type' : 'Group/Asset' }}</button>
+    <input *ngIf="isTypeInput" type="text" class="form-control"  name="deviceGroup_{{field_id}}"
+    [placeholder]="placeHolderType" [required]="required" container="body"
+    [(ngModel)]="value" [typeahead]="suggestions$"  (typeaheadLoading)="changeTypeaheadLoading($event)"
+    [typeaheadAsync]="true" typeaheadWaitMs="500"  (typeaheadOnSelect)="onSelectType($event)"
+    [isAnimated]="true" autocomplete="off" [typeaheadOptionsLimit]="5"  [typeaheadMinLength]="3" (typeaheadOnBlur)="typeaheadOnBlurType($event)">
+    
+    <input *ngIf="!isTypeInput" type="text" class="form-control"  name="deviceGroup_{{field_id}}"
     [placeholder]="placeHolder" [required]="required" container="body"
     [(ngModel)]="value" [typeahead]="suggestions$"  (typeaheadLoading)="changeTypeaheadLoading($event)"
     [typeaheadAsync]="true" typeaheadWaitMs="500" typeaheadOptionField="name" (typeaheadOnSelect)="onSelect($event)"

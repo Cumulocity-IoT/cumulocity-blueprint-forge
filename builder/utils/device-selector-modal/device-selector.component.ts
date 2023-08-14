@@ -89,7 +89,6 @@ export class DeviceSelectorModalComponent implements OnInit {
     private getDeviceAssetType() {
         let deviceTypes = Array.from(new Set(this.devices.map(item => item.type)));
         deviceTypes = deviceTypes.filter(n => n);
-        console.log(deviceTypes);
         return deviceTypes;
     }
 

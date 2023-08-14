@@ -398,7 +398,8 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
                         dashboardType: 'group-template'
                     } : {
                         dashboardType: 'standard'
-                    })
+                    }),
+                    templateType: dashboard.templateType
                 }
             });
             this.bsModalRef.content.onSave.subscribe((isReloadRequired: boolean) => {
