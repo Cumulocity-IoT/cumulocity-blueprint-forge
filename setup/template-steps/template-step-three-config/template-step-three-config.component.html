@@ -44,17 +44,13 @@
                         </div>
                         <div class="col-sm-5 col-xs-12 text-muted">
                         <div *ngIf="dashboard.isDeviceRequired">
-                          <!-- <div *ngIf="!devicePopup && !groupPopup && !typePopup" class="btn-group" role="group">
-                            <button type="button" class="btn btn-default" (click)="enableDevicePopup()">Device</button>
-                            <button type="button" class="btn btn-default" (click)="enableGroupPopup()">Group</button>
-                            <button type="button" class="btn btn-default" (click)="enableTypePopup()">Type</button>
-                          </div> -->
+                         
                           <form class="form-inline" name="deviceForm" #deviceForm="ngForm">
                             <div class="form-group" class="col-sm-12 col-md-12 col-xs-12" style="padding:0">
                               <div class="form-group col-sm-6 col-md-6 col-xs-12" style="padding:0; margin: 0">
                                   <label class="sr-only" for="selected-device">Select Device/asset for dashboard</label>
                                   
-                                  <input *ngIf="dashboard.isDeviceRequired" name="selectedDevice" class="form-control"
+                                  <input *ngIf="dashboard.isDeviceRequired" name="selectedItem" class="form-control"
                                   [(ngModel)]="dashboard.name" required readonly style="width: 100%"
                                       id="selected-device" placeholder="Select Device/Asset" type="text"
                                      >
@@ -67,35 +63,14 @@
                                   <span class="caret"></span>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-right" *dropdownMenu>
-                                  <li><button type="button" (click)="openDeviceSelectorDialog(dashboard,'Device/Asset')">Device/Asset</button></li>
-                                  <li><button type="button"(click)="openDeviceSelectorDialog(dashboard, 'Device Group')">Device Group</button></li>
-                                  <li><button type="button"(click)="openDeviceSelectorDialog(dashboard, 'Type')">Type</button></li>
+                                  <li><button type="button" (click)="openDeviceSelectorDialog(dashboard, 0)">Device/Asset</button></li>
+                                  <li><button type="button"(click)="openDeviceSelectorDialog(dashboard, 1)">Device Group</button></li>
+                                  <li><button type="button"(click)="openDeviceSelectorDialog(dashboard, 2)">Device/Asset Type</button></li>
                                 </ul>
                               </div>
-                              <!-- <div class="col-sm-12 col-md-2 col-xs-12" style="padding-left: 0; max-width: 100%; padding-right: 2%; text-align: end">
-                                <button type="button" class="btn btn-primary"
-                                  (click)="openDeviceSelectorDialog(dashboard, i)">
-                                  <i class="dlt-c8y-icon-edit"></i>
-                                </button>
-                                  
-                              </div> -->
                               <div class="col-md-3"></div>
                                 </div>
                                
-                                <!-- <div class="col-md-3 col-sm-3 col-xs-12" *ngIf="(devicePopup && !groupPopup && !typePopup) || (!devicePopup && groupPopup && !typePopup) || (!devicePopup && !groupPopup && typePopup)" class="col-md-3">
-                                  <button type="button" class="btn btn-primary"
-                                  (click)="goBackToToggle()">
-                                  <i class="dlt-c8y-icon-arrow-left"></i>
-                                </button>
-                                </div>
-
-                                <div *ngIf="!devicePopup && groupPopup && !typePopup" class="form-group" class="col-sm-12 col-md-12 col-xs-12" style="padding:0">
-                                 <p>Test</p>
-                                    </div>
-
-                                    <div *ngIf="!devicePopup && !groupPopup && typePopup" class="form-group" class="col-sm-12 col-md-12 col-xs-12" style="padding:0">
-                                      <p>TEst</p>
-                                        </div> -->
                           </form>
                         </div>
                       </div>

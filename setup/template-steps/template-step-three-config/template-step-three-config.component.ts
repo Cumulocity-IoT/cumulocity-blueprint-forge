@@ -57,6 +57,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   private appList = [];
   private microserviceDownloadProgress = interval(3000);
   private microserviceDownloadProgress$: Subscription;
+  private groupTemplate = false;
   @ViewChild("appConfigForm",{static: false}) appConfigForm: NgForm;
 
   configStepData: any;
@@ -73,6 +74,9 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   isFormValid = false;
   deviceFormValid : boolean;
   assetButtonText: String = 'Device/Asset';
+  groupTemplateInDashboard: boolean;
+
+ 
   // devicePopup: boolean = false;
   // typePopup: boolean  = false;
   // groupPopup: boolean = false;
@@ -228,11 +232,13 @@ async configureBasicInput(dashboard, index) {
     };
     await new Promise(resolve => setTimeout(resolve, 1000));
     for (let db of configDataDashboards) {
+      console.log('Db value', db, 'template details', this.templateDetails);
       this.progressIndicatorService.setProgress(20);
       this.progressIndicatorService.setMessage(`Installing ${db.title}`);
       await new Promise(resolve => setTimeout(resolve, 1000));
       const templateDetailsData = await (await this.loadTemplateDetails(db)).toPromise();
       console.log('template details data value', templateDetailsData, 'db value', db);
+      
       const dashboardConfiguration = {
         dashboardId: '12598412',
         dashboardName: db.title,
@@ -240,12 +246,12 @@ async configureBasicInput(dashboard, index) {
         deviceId: '',
         tabGroup: '',
         dashboardVisibility: '',
-        roles: ''
+        roles: '',
+        templateType: db.templateType // 0: default, 1: group, 2: type
       };
       
       this.progressIndicatorService.setProgress(40);
       templateDetailsData.input.devices = db.devices;
-      console.log('template details data before widget assigning', templateDetailsData?.widgets);
       if (db.title !== 'Instruction' && db.title !== 'Welcome' && db.title !== 'Help and Support' && db.isConfigRequred) {
         templateDetailsData.widgets.forEach( widget => {
           const dbWidgetConfig = db.basicConfig.find( basicConfig => basicConfig.componentId == widget.componentId);
@@ -265,22 +271,19 @@ async configureBasicInput(dashboard, index) {
             }
             
           })
-
          }
-
         });
-        // for(let w=0; w < templateDetailsData.widgets.length; w++) {
-        //   if (db.basicConfig[w].componentId === templateDetailsData.widgets[w].componentId) {
-        //     db.basicConfig[w].config.forEach(item => {
-        //      if (templateDetailsData.widgets[w].config.hasOwnProperty(item.fieldName)) templateDetailsData.widgets[w].config[item.fieldName] = item.name;
-        //     })
-        //   }
-        // }
-        
       }
       
-      console.log('template details data after widget assigning', templateDetailsData?.widgets);
-      await this.catalogService.createDashboard(this.currentApp, dashboardConfiguration, db, templateDetailsData, this.templateDetails.title);
+      console.log('template details data after widget assigning', templateDetailsData);
+      if (db.templateType && db.templateType === 1 && !db.isGroupDashboard) {
+        this.groupTemplate = true;
+      } else if (db.templateType && db.templateType === 2 && !db.isGroupDashboard) {
+        this.groupTemplate = true;
+      } else {
+        this.groupTemplate = false;
+      }
+      await this.catalogService.createDashboard(this.currentApp, dashboardConfiguration, db, templateDetailsData, this.groupTemplate);
       this.progressIndicatorService.setProgress(90);
       overallProgress = overallProgress + eachRemoteProgress;
       this.progressIndicatorService.setOverallProgress(overallProgress)
@@ -395,20 +398,55 @@ async loadTemplateDetails(db: Dashboards): Promise<Observable<any>> {
   }));      
 }
 
- openDeviceSelectorDialog(dashboard, modalType) {
-  this.assetButtonText = modalType;
-  this.deviceSelectorModalRef = this.modalService.show(DeviceSelectorModalComponent, { class: 'c8y-wizard', initialState: {} });
- 
-  
-  this.deviceSelectorModalRef.content.onDeviceSelected.subscribe((selectedDevice: IManagedObject) => {
-      dashboard.name = selectedDevice['name'];
+ openDeviceSelectorDialog(dashboard, templateType: number) {
+  switch (templateType) {
+    case 1:
+        this.assetButtonText = "Device Group";
+        this.groupTemplate = true;
+        break;
+    case 2:
+        this.assetButtonText = "Device/Asset Type";
+        this.groupTemplate = true;
+        break;
+    default:
+        this.assetButtonText = "Device/Asset";
+        this.groupTemplate = false;
+        break;
+}
 
+  
+  this.deviceSelectorModalRef = this.modalService.show(DeviceSelectorModalComponent, { class: 'c8y-wizard', initialState: { templateType } });
+ 
+  if(templateType == 2) {
+    this.deviceSelectorModalRef.content.onTypeSelected.subscribe((selectedItem: IManagedObject) => {
+      console.log('selected value on type', selectedItem);
+        dashboard.name = selectedItem;
+        dashboard.templateType = templateType;
+        dashboard.devices = [{
+          type: "Temperature Sensor",
+            placeholder: "device01",
+            reprensentation : {
+              id: selectedItem,
+              name: selectedItem
+            }
+        }]
+        if (dashboard.devices && dashboard.devices[0].reprensentation.id !== null && dashboard.devices[0].reprensentation.id !== undefined ) {
+          this.deviceFormValid = true;
+        } else {
+          this.deviceFormValid = false;
+        }
+    });
+} else {
+  this.deviceSelectorModalRef.content.onDeviceSelected.subscribe((selectedItem: IManagedObject) => {
+    console.log('selected value on device', selectedItem);
+      dashboard.name = selectedItem['name'];
+      dashboard.templateType = templateType;
       dashboard.devices = [{
         type: "Temperature Sensor",
           placeholder: "device01",
           reprensentation : {
-            id: selectedDevice.id,
-            name: selectedDevice['name']
+            id: selectedItem.id,
+            name: selectedItem['name']
           }
       }]
       if (dashboard.devices && dashboard.devices[0].reprensentation.id !== null && dashboard.devices[0].reprensentation.id !== undefined ) {
@@ -417,6 +455,11 @@ async loadTemplateDetails(db: Dashboards): Promise<Observable<any>> {
         this.deviceFormValid = false;
       }
   });
+}
+
+
+  
+  
  }
   async saveAppChanges(app) {
     const savingAlert = new UpdateableAlert(this.alertService);
@@ -471,28 +514,5 @@ async loadTemplateDetails(db: Dashboards): Promise<Observable<any>> {
     this.appStateService.currentUser.next(this.appStateService.currentUser.value);
   }
 
-  // enableDevicePopup() {
-  //   this.devicePopup = true;
-  //   this.groupPopup = false;
-  //   this.typePopup = false;
-  // }
-
-  // enableGroupPopup() {
-  //   this.devicePopup = false;
-  //   this.groupPopup = true;
-  //   this.typePopup = false;
-  // }
-
-  // enableTypePopup() {
-  //   this.devicePopup = false;
-  //   this.groupPopup = false;
-  //   this.typePopup = true;
-  // }
-
-  // goBackToToggle() {
-  //   this.devicePopup = false;
-  //   this.groupPopup = false;
-  //   this.typePopup = false;
-  // }
  
 }
