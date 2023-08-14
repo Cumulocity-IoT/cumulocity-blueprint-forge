@@ -175,7 +175,7 @@ export class AppBuilderContextDashboardComponent implements OnDestroy {
                         //  const childAssets = (await this.inventoryService.childAssetsList(dashboard.deviceId, {pageSize: 2000, query: 'has(c8y_IsDevice)'})).data;
                         let childAssets: IManagedObject[];
                         if(dashboard.templateType && dashboard.templateType == 2) {
-                            childAssets = (await this.inventoryService.listQuery({ __filter: { __and: [{ __or: [{__has: 'c8y_IsDevice' }, {__has: 'c8y_IsAsset'  } ]}, { id: this.tabGroup }] } }, this.LIST_FILTER)).data;
+                            childAssets = (await this.inventoryService.listQuery({ __filter: { __and: [{ __or: [{__has: 'c8y_IsDevice' }, {__has: 'c8y_IsAsset'  } ]}, {__and: [{id: this.tabGroup },{type: dashboard.deviceId }] }] }}, this.LIST_FILTER)).data;
                         } else {
                             childAssets = (await this.inventoryService.childAssetsList(dashboard.deviceId, { pageSize: 2000, query: `$filter=(has(c8y_IsDevice) and (id eq '${this.tabGroup}')) ` })).data;
                         }
