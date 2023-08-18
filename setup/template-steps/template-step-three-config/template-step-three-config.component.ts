@@ -245,9 +245,9 @@ async configureBasicInput(dashboard, index) {
         dashboardIcon:  db.icon,
         deviceId: '',
         tabGroup: '',
-        dashboardVisibility: '',
+        dashboardVisibility: db.visibility,
         roles: '',
-        templateType: db.templateType // 0: default, 1: group, 2: type
+        templateType: db.templateType, // 0: default, 1: group, 2: type
       };
       
       this.progressIndicatorService.setProgress(40);
@@ -283,6 +283,7 @@ async configureBasicInput(dashboard, index) {
       } else {
         this.groupTemplate = false;
       }
+
       await this.catalogService.createDashboard(this.currentApp, dashboardConfiguration, db, templateDetailsData, this.groupTemplate);
       this.progressIndicatorService.setProgress(90);
       overallProgress = overallProgress + eachRemoteProgress;
@@ -456,10 +457,6 @@ async loadTemplateDetails(db: Dashboards): Promise<Observable<any>> {
       }
   });
 }
-
-
-  
-  
  }
   async saveAppChanges(app) {
     const savingAlert = new UpdateableAlert(this.alertService);
