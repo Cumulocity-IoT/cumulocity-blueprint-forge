@@ -192,10 +192,10 @@ async configureBasicInput(dashboard, index) {
   async configureApp() {
     this.appList = (await this.appService.list({ pageSize: 2000 })).data;
     const currentHost = window.location.host.split(':')[0];
-    // if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
-    //     this.alert.warning("Installation isn't supported when running Application on localhost.");
-    //     return;
-    // }
+    if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
+        this.alert.warning("Installation isn't supported when running Application on localhost.");
+        return;
+    }
     
     // Filter dashboards which are selected
     let configDataDashboards = this.templateDetails.dashboards.filter(item => item.selected === true);
