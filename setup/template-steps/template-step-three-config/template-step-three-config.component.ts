@@ -164,13 +164,11 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
 }
 
 async configureBasicInput(dashboard, index) {
-    console.log('Template details in configure basic input', this.templateDetails, 'dashboard value', dashboard);
     const basicConfigurationRef = this.showSetupConfigModal(dashboard.basicConfig);
     await basicConfigurationRef.content.event.subscribe(async data => {
       if (data && data.isConfirm) {
         console.log('Data value', data, 'dashboard value', dashboard);;
         this.templateDetails.dashboards[index].basicConfig = data.basicConfigParams;
-        console.log('Template details after assigning basic config', this.templateDetails);
       }
     });
   }
@@ -194,10 +192,10 @@ async configureBasicInput(dashboard, index) {
   async configureApp() {
     this.appList = (await this.appService.list({ pageSize: 2000 })).data;
     const currentHost = window.location.host.split(':')[0];
-    if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
-        this.alert.warning("Installation isn't supported when running Application on localhost.");
-        return;
-    }
+    // if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
+    //     this.alert.warning("Installation isn't supported when running Application on localhost.");
+    //     return;
+    // }
     
     // Filter dashboards which are selected
     let configDataDashboards = this.templateDetails.dashboards.filter(item => item.selected === true);
@@ -232,12 +230,10 @@ async configureBasicInput(dashboard, index) {
     };
     await new Promise(resolve => setTimeout(resolve, 1000));
     for (let db of configDataDashboards) {
-      console.log('Db value', db, 'template details', this.templateDetails);
       this.progressIndicatorService.setProgress(20);
       this.progressIndicatorService.setMessage(`Installing ${db.title}`);
       await new Promise(resolve => setTimeout(resolve, 1000));
       const templateDetailsData = await (await this.loadTemplateDetails(db)).toPromise();
-      console.log('template details data value', templateDetailsData, 'db value', db);
       
       const dashboardConfiguration = {
         dashboardId: '12598412',
@@ -257,7 +253,6 @@ async configureBasicInput(dashboard, index) {
           const dbWidgetConfig = db.basicConfig.find( basicConfig => basicConfig.componentId == widget.componentId);
          if(dbWidgetConfig)  {
           dbWidgetConfig.config.forEach( item  => {
-            // console.log('Object keys', Object.keys(widget.config));
 
             // Works if widget config in global presales is not nested
             if (item.type === 'select') {
@@ -269,13 +264,12 @@ async configureBasicInput(dashboard, index) {
                 widget.config[item.fieldName] = item.name;
               }
             }
-            
           })
          }
         });
       }
+      console.log('db value', db, templateDetailsData, 'this templatedetails', this.templateDetails);
       
-      console.log('template details data after widget assigning', templateDetailsData);
       if (db.templateType && db.templateType === 1 && !db.isGroupDashboard) {
         this.groupTemplate = true;
       } else if (db.templateType && db.templateType === 2 && !db.isGroupDashboard) {
@@ -379,17 +373,7 @@ async configureBasicInput(dashboard, index) {
       });
 
     }
-
   }
-//   async loadTemplateDetails(db: Dashboards): Promise<Observable<any>> {
-//     return this.catalogService.getTemplateDetails(db.dashboard)
-//       .pipe(map((response) => {
-//         console.log('response in load template details', response);
-//       })).pipe(catchError(err => {
-//             console.log('Dashboard Catalog Details: Error in primary endpoint! using fallback...');
-//             return this.catalogService.getTemplateDetailsFallBack(db.dashboard);
-//     }));  
-//  }
 
 async loadTemplateDetails(db: Dashboards): Promise<Observable<any>> {
   return this.catalogService.getTemplateDetails(db.dashboard)
@@ -399,7 +383,7 @@ async loadTemplateDetails(db: Dashboards): Promise<Observable<any>> {
   }));      
 }
 
- openDeviceSelectorDialog(dashboard, templateType: number) {
+ openDeviceSelectorDialog(dashboard, templateType: number, index) {
   switch (templateType) {
     case 1:
         this.assetButtonText = "Device Group";
@@ -414,8 +398,6 @@ async loadTemplateDetails(db: Dashboards): Promise<Observable<any>> {
         this.groupTemplate = false;
         break;
 }
-
-  
   this.deviceSelectorModalRef = this.modalService.show(DeviceSelectorModalComponent, { class: 'c8y-wizard', initialState: { templateType } });
  
   if(templateType == 2) {
@@ -431,15 +413,40 @@ async loadTemplateDetails(db: Dashboards): Promise<Observable<any>> {
               name: selectedItem
             }
         }]
-        if (dashboard.devices && dashboard.devices[0].reprensentation.id !== null && dashboard.devices[0].reprensentation.id !== undefined ) {
-          this.deviceFormValid = true;
-        } else {
-          this.deviceFormValid = false;
+
+
+        let deviceFieldNotField;
+        for (let dd = 0; dd < this.templateDetails.dashboards.length; dd++) {
+          if (this.templateDetails.dashboards[dd].isDeviceRequired === false ) {
+            deviceFieldNotField = true;
+            
+          } else if (this.templateDetails.dashboards[dd].isDeviceRequired === true ) 
+           if(this.templateDetails.dashboards[dd].devices && this.templateDetails.dashboards[dd].devices[0] && this.templateDetails.dashboards[dd].devices[0]?.reprensentation.id !== null && this.templateDetails.dashboards[dd].devices[0]?.reprensentation.id !== undefined) {
+            deviceFieldNotField = true;
+          } else {
+            deviceFieldNotField = false;
+            break;
+          }
         }
-    });
-} else {
+    
+        this.deviceFormValid = deviceFieldNotField;
+            
+         
+        
+
+      });
+    }
+        
+     
+        
+        // if (dashboard.devices && dashboard.devices[0].reprensentation.id !== null && dashboard.devices[0].reprensentation.id !== undefined ) {
+        //   this.deviceFormValid = true;
+        // } else {
+        //   this.deviceFormValid = false;
+        // }
+    
+else {
   this.deviceSelectorModalRef.content.onDeviceSelected.subscribe((selectedItem: IManagedObject) => {
-    console.log('selected value on device', selectedItem);
       dashboard.name = selectedItem['name'];
       dashboard.templateType = templateType;
       dashboard.devices = [{
@@ -450,13 +457,34 @@ async loadTemplateDetails(db: Dashboards): Promise<Observable<any>> {
             name: selectedItem['name']
           }
       }]
-      if (dashboard.devices && dashboard.devices[0].reprensentation.id !== null && dashboard.devices[0].reprensentation.id !== undefined ) {
-        this.deviceFormValid = true;
+      
+      let deviceFieldNotField;
+    for (let dd = 0; dd < this.templateDetails.dashboards.length; dd++) {
+      if (this.templateDetails.dashboards[dd].isDeviceRequired === false ) {
+        deviceFieldNotField = true;
+        
+      } else if (this.templateDetails.dashboards[dd].isDeviceRequired === true ) 
+       if(this.templateDetails.dashboards[dd].devices && this.templateDetails.dashboards[dd].devices[0] && this.templateDetails.dashboards[dd].devices[0]?.reprensentation.id !== null && this.templateDetails.dashboards[dd].devices[0]?.reprensentation.id !== undefined) {
+        deviceFieldNotField = true;
       } else {
-        this.deviceFormValid = false;
+        deviceFieldNotField = false;
+        break;
       }
+    }
+
+    this.deviceFormValid = deviceFieldNotField;
+      console.log('Dashboard value', dashboard);
+      console.log('template details value', this.templateDetails);
+     
+      
+      // if (dashboard.devices && dashboard.devices[0].reprensentation.id !== null && dashboard.devices[0].reprensentation.id !== undefined ) {
+      //   this.deviceFormValid = true;
+      // } else {
+      //   this.deviceFormValid = false;
+      // }
   });
 }
+
  }
   async saveAppChanges(app) {
     const savingAlert = new UpdateableAlert(this.alertService);
@@ -510,6 +538,4 @@ async loadTemplateDetails(db: Dashboards): Promise<Observable<any>> {
     }
     this.appStateService.currentUser.next(this.appStateService.currentUser.value);
   }
-
- 
 }

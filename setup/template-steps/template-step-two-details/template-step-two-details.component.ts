@@ -58,7 +58,6 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep implement
         this.loadTemplateDetailsCatalog(templateURL);
       }
     });
-  
   }
 
   ngAfterViewInit() {
@@ -89,10 +88,6 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep implement
                 if (this.templateDetails && this.templateDetails.microservices === undefined ) {
                   this.templateDetails.microservices = [];
                 }
-
-                /* if (this.templateDetails && this.templateDetails.devices === undefined) {
-                  this.templateDetails.devices = [];
-                } */
 
                 if(this.templateDetails  && this.templateDetails.media) {
                 this.images = this.templateDetails.media.map(item => new ImageItem({ src: item.image }));

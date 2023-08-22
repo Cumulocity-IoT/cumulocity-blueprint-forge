@@ -63,7 +63,7 @@
                                   <span class="caret"></span>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-right" *dropdownMenu>
-                                  <li><button *ngIf="dashboard.visibility !== 'hidden'" type="button" (click)="openDeviceSelectorDialog(dashboard, 0)">Device/Asset</button></li>
+                                  <li><button *ngIf="dashboard.visibility !== 'hidden'" type="button" (click)="openDeviceSelectorDialog(dashboard, 0, i)">Device/Asset</button></li>
                                   <li><button type="button"(click)="openDeviceSelectorDialog(dashboard, 1)">Device Group</button></li>
                                   <li><button *ngIf="!dashboard.isGroupDashboard && dashboard.visibility !== 'hidden'" type="button"(click)="openDeviceSelectorDialog(dashboard, 2)">Device/Asset Type</button></li>
                                 </ul>
