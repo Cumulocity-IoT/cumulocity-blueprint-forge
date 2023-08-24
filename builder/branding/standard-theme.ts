@@ -76,10 +76,7 @@ export function standardTheme(branding: any) {
         --card-color: ${colorToHex(branding.colors.text)};
         --card-background: ${lighter(branding.colors.primary)};
         --component-background: ${lighter(branding.colors.primary)};
-        --component-label-color:${colorToHex(branding.colors.text)};
-        --link-color:${colorToHex(branding.colors.text)};
-        --link-color-hover: ${colorToHex(branding.colors.text)};
-        
+        --component-label-color:${colorToHex(branding.colors.text)};       
 
         --dropdown-background: ${branding.colors.headerBar ? colorToHex(branding.colors.headerBar) : '#ffffff'};
         --toolbar-background:${branding.colors.toolBar ? colorToHex(branding.colors.toolBar) : '#ffffff'};
@@ -213,13 +210,24 @@ export function standardTheme(branding: any) {
         .more-wrapper .dropdown-menu > li > .btn.btn-link {
             background-color: var(--brand-primary, #fff) !important;
         }
-        .c8y-list__item {
+        
+        .dashboard-grid .card-dashboard  .c8y-list__item {
             background-color: var(--card-background, var(--c8y-component-background-default)) !important;
             color: var(--card-color, #000) !important;
         }
-
+        .dashboard-grid .card-dashboard .dropdown.open > .dropdown-menu li {
+            background-color: var(--card-background, var(--c8y-component-background-default)) !important;
+        }
+        .dashboard-grid .card-dashboard  label.c8y-checkbox  {
+            color: inherit !important;
+        }
         .c8y-switch {
             color: var(--c8y-form-label-color);
+        }
+
+        .c8y-child-assets-selector > .btn {
+            background-color: inherit;
+            color: inherit;
         }
     `;
 
