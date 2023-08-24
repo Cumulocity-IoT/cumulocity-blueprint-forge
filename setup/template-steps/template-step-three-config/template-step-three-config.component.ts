@@ -210,7 +210,9 @@ async configureBasicInput(dashboard, index) {
 
     const eachRemoteProgress: number = Math.floor((totalRemotes > 1 ? (90 / totalRemotes) : 0));
     let overallProgress = 0;
-    this.showProgressModalDialog("Verifying plugins...")
+    if (configDataPlugins && configDataPlugins.length > 0) {
+      this.showProgressModalDialog("Verifying plugins...")
+    }
     if (totalRemotes > 1) { this.progressIndicatorService.setOverallProgress(overallProgress) }
     this.progressIndicatorService.setOverallProgress(5);
     for (let plugin of configDataPlugins) {
@@ -290,7 +292,9 @@ async configureBasicInput(dashboard, index) {
           "tenantId": this.settingsService.getTenantName(),
       });
   }
+  if (configDataPlugins && configDataPlugins.length > 0) {
     this.hideProgressModalDialog();
+  }
     this.next();
   }
 
@@ -428,12 +432,7 @@ async loadTemplateDetails(db: Dashboards): Promise<Observable<any>> {
             break;
           }
         }
-    
         this.deviceFormValid = deviceFieldNotField;
-            
-         
-        
-
       });
     }
         

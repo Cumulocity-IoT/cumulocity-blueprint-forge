@@ -27,7 +27,7 @@
                     <div class="list-item-checkbox">
                       <label id="dashboard{{i}}" title="Select" class="c8y-checkbox">
                         <input type="checkbox" [checked]="dashboard.selected" (change)="syncDashboardFlag($event, i)"
-                        >
+                        [disabled]="dashboard.isMandatory">
                         <span></span>
                       </label>
                     </div>
@@ -84,7 +84,8 @@
                   <div class="list-group-item d-flex" *ngFor="let plugin of templateDetails?.plugins; let p =index">
                     <div class="list-item-checkbox">
                       <label id="plugin{{p}}" title="select" class="c8y-checkbox" >
-                        <input type="checkbox" [checked]="plugin.selected"  (change)="syncPluginFlag($event, p)"/>
+                        <input type="checkbox" [checked]="plugin.selected"  (change)="syncPluginFlag($event, p)"
+                        [disabled]="plugin.isMandatory"/>
                         <span></span>
                       </label>
                     </div>
@@ -103,7 +104,8 @@
                   <div class="list-group-item d-flex" *ngFor="let microservice of templateDetails?.microservices; let m =index">
                     <div class="list-item-checkbox">
                       <label id="microservice{{m}}" title="select" class="c8y-checkbox" >
-                        <input type="checkbox" [checked]="microservice.selected"  (change)="syncMicroserviceFlag($event, m)"/>
+                        <input type="checkbox" [checked]="microservice.selected"  (change)="syncMicroserviceFlag($event, m)"
+                        [disabled]="microservice.isMandatory"/>
                         <span></span>
                       </label>
                     </div>
