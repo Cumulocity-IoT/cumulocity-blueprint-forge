@@ -44,11 +44,10 @@ export function standardTheme(branding: any) {
 
         /*1017 changes */
         --header-text-color:  ${colorToHex(branding.colors.text)};
-        --c8y-headings-color:${colorToHex(branding.colors.text)};
         --c8y-action-bar-color-actions:${colorToHex(branding.colors.text)};
         --c8y-action-bar-icon-color:${colorToHex(branding.colors.text)};
         --c8y-nav-tabs-color-default:${colorToHex(branding.colors.text)};
-        --c8y-nav-tabs-icon-color-active:${colorToHex(branding.colors.textOnActive)};
+      //  --c8y-nav-tabs-icon-color-default:${colorToHex(branding.colors.text)};
         --c8y-action-bar-color-actions-hover:${colorToHex(branding.colors.hover)};
         --c8y-action-bar-background-default: ${colorToHex(branding.colors.toolBar)};
         --header-hover-color: ${colorToHex(branding.colors.hover)};    
@@ -58,36 +57,26 @@ export function standardTheme(branding: any) {
         --navigator-bg-color: ${colorToHex(branding.colors.primary)};
         --navigator-header-bg: ${colorToHex(branding.colors.primary)};
         --c8y-component-icon-dark-color-dark: ${colorToHex(branding.colors.text)};
-        --c8y-component-background-default: ${lighter(branding.colors.primary)};
-        --c8y-form-control-background-default:${darker(branding.colors.primary)};
-        --c8y-form-control-color-default:${colorToHex(branding.colors.text)};
-        --c8y-component-color-default:${colorToHex(branding.colors.text)};
-        --c8y-component-color-actions:${colorToHex(branding.colors.text)};
-        --c8y-component-background-active:  ${lighter(branding.colors.primary)};
-        --c8y-component-form-label-color:  ${darker(branding.colors.text)};
-        --c8y-component-background-odd:  ${colorToHex(branding.colors.primary)};
-        --c8y-component-background-expanded:${darker(branding.colors.primary)}; //Need a higher color
-        --c8y-form-label-color: ${colorToHex(branding.colors.text)};
-        --c8y-component-color-link: ${darker(branding.colors.text)};
-        --c8y-component-icon-color: ${darker(branding.colors.text)};
-        --c8y-nav-tabs-background-default:  ${lighter(branding.colors.primary)};
-        --c8y-form-control-background-focus:  ${lighter(branding.colors.primary)};
-        --c8y-form-control-color-focus:${colorToHex(branding.colors.text)};
-        --c8y-alert-background-default: ${lighter(branding.colors.primary)};
-        --c8y-alert-color-default:${colorToHex(branding.colors.text)};
-
-        --c8y-level-0: ${lighter(branding.colors.primary)};
-        --c8y-level-1-custom: ${lighter(branding.colors.primary,1.1)};
-        --c8y-level-2-custom: ${lighter(branding.colors.primary,1.2)};
-
-        
+       // --c8y-component-background-default: ${darker(branding.colors.primary)};
+      //  --c8y-form-control-background-focus:${darker(branding.colors.primary)};
+      //  --c8y-form-control-background-default:${darker(branding.colors.primary)};
+      //  --c8y-form-control-color-default:${colorToHex(branding.colors.text)};
+      //  --c8y-component-color-default:${colorToHex(branding.colors.text)};
+      //  --c8y-btn-default-background-default: ${lighter(branding.colors.primary)};
+      //  --c8y-btn-default-background-hover:  ${lighter(branding.colors.primary)};
+      //  --c8y-btn-default-background-active:${colorToHex(branding.colors.primary)};
+      //  --c8y-btn-default-background-focus:${colorToHex(branding.colors.primary)};
+     //   --c8y-dropdown-background-default: ${colorToHex(branding.colors.headerBar)};
+        --c8y-component-color-actions:${colorToHex(branding.colors.primary)};
+        --c8y-form-label-color: ${darker(branding.colors.text)};
+      
 
         /* Widget specific */
         --component-color: ${colorToHex(branding.colors.text)};
         --card-color: ${colorToHex(branding.colors.text)};
         --card-background: ${lighter(branding.colors.primary)};
         --component-background: ${lighter(branding.colors.primary)};
-        --component-label-color:${darker(branding.colors.text)};       
+        --component-label-color:${colorToHex(branding.colors.text)};       
 
         --dropdown-background: ${branding.colors.headerBar ? colorToHex(branding.colors.headerBar) : '#ffffff'};
         --toolbar-background:${branding.colors.toolBar ? colorToHex(branding.colors.toolBar) : '#ffffff'};
@@ -134,6 +123,7 @@ export function standardTheme(branding: any) {
         ${branding.logoHeight != undefined ? '' : 'margin-top: -16px;'}
         }
 
+       
         .btn.btn-primary {
         color: ${contrastingTextColor(branding.colors.primary)};
         background-color: var(--brand-primary);
@@ -171,66 +161,108 @@ export function standardTheme(branding: any) {
             background: var(--brand-light, #fff);
             color: var(--navigator-active-color, #000);
         }
+        .card-header-actions .card-title > span {
+            color: var(--component-color, var(--c8y-root-component-color-default)) !important;
+        }
+        .dashboard-grid .card-dashboard{
+            background: var(--brand-light, var(--c8y-component-background-default));
+        }
+        .dashboard-grid .card-dashboard .card {
+            background: inherit;
+        }
+
         .dashboard-grid .card-dashboard  .bg-level-0 {
             background-color: var(--brand-light, var(--c8y-level-0))!important;
-        }       
-       /*  .nav-tabs > li > button {
+        }
+
+        .card.card-dashboard > .card-inner-scroll {
+            color: var(--card-color, var(--c8y-component-background-default));
+        }
+        .nav-tabs > li > button {
         color: var(--navigator-active-bg,#0b385b) !important;
         }
         .nav-tabs > li > button:hover:not([disabled]) {
         color: var(--brand-primary,#1776bf) !important;
-        } */
+        }
+        select.form-control:focus, select:focus {
+        color: ${colorToHex(branding.colors.primary)} !important;
+        }
+        .c8y-dropdown:not(.btn){
+            color: var(--navigator-active-color, var(--c8y-root-component-color-actions)) !important;
+            background-color: transparent !important;
+        }
+
+        .app-switcher {
+            background-color: var(--header-color, var(--c8y-component-background-default));
+        }
         
+        .app-main-header .app-switcher .appLink {
+            color: var(--navigator-color-active, var(--c8y-component-color-default)) !important;
+        }
         .app-switcher-dropdown-menu{
             border: none !important;
+        }
+
+        .pagination > .active > a {
+            border: 1px solid var(--c8y-component-border-color, var(--c8y-root-component-border-color));
+        }
+
+        .pagination > li > a {
+            background-color: transparent !important;
+        }
+
+        .dropdown-menu > li button:not(.btn):not(.c8y-asset-selector__btn):not(.btn-help):not(.btn-add-block):not(.btn-clean) {
+            background-color: var(--brand-primary, #fff) !important;
+            color: var(--navigator-active-color, #000) !important;
+        }
+        .more-wrapper .dropdown-menu > li > .btn.btn-link {
+            background-color: var(--brand-primary, #fff) !important;
+        }
+        
+        .dashboard-grid .card-dashboard  .c8y-list__item {
+            background-color: var(--card-background, var(--c8y-component-background-default)) !important;
+            color: var(--card-color, #000) !important;
+        }
+        .dashboard-grid .card-dashboard .dropdown.open > .dropdown-menu li {
+            background-color: var(--card-background, var(--c8y-component-background-default)) !important;
+        }
+        .dashboard-grid .card-dashboard  .collapse-btn > i {
+            color: var(--card-color, #000);
         }
         .dashboard-grid .card-dashboard  .navbar-default {
             background-color: inherit;
         }
         
-       
+        .dashboard-grid .card-dashboard  label.c8y-checkbox  {
+            color: inherit !important;
+        }
         .dashboard-grid .card-dashboard .form-control {
             background-color: var(--card-background, var(--c8y-component-background-default)) !important;
             color: var(--card-color, #000) !important;
         }
-      
-        label {
-            color: var(--component-label-color);
+        .c8y-switch {
+            color: var(--c8y-form-label-color);
         }
-        
-        [datepicker] table, [uib-datepicker] table, [uib-daypicker] table {
-            background-color: var(--c8y-root-component-background-default, #fff);
-            color:var(--c8y-root-component-color-default, #fff);
+        .modal-content label {
+            color: inherit;
         }
-        .bg-inherit {
-            background-color: var(--card-background, var(--c8y-component-background-default)) !important;
+
+        .c8y-child-assets-selector > .btn {
+            background-color: inherit;
+            color: inherit;
         }
-        .bg-level-1 {
-            background-color: var(--c8y-level-1-custom) !important;
+
+        .label-value-unit-gauge #mask {
+            fill: inherit;
         }
-        .bg-level-2 {
-            background-color: var(--c8y-level-2-custom) !important;
+        .label-value-unit-gauge .center-value, .label-value-unit-gauge .center-label, .label-value-unit-gauge .center-unit, .label-value-unit-gauge .center-date-time {
+            fill: var(--card-color, var(--c8y-root-component-color-default));
         }
-        .ng-select .ng-select-container{            
-            background-color: var(--c8y-form-control-background-default) !important;
-            color: var(--component-color);
+        .label-value-unit-gauge .gauge-svg svg path.track  {
+            stroke: inherit;
         }
-        .ng-dropdown-panel .ng-dropdown-panel-items .ng-option{
-            background-color: var(--c8y-form-control-background-default) !important;
-            color: var(--component-label-color);
-        }
-        .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
-            color: var(--component-color);
-        }
-        .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected, .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected.ng-option-marked{
-            color: var(--component-color);
-        }
-        .ng-select.ng-select-multiple .ng-select-container .ng-value-container .ng-input > input {
-            color: var(--c8y-form-control-color-default);
-        }
-         
-        .c8y-wizard-form {
-            background-color:inherit;
+        .range-display{
+            background-color: inherit;
         }
 
     `;

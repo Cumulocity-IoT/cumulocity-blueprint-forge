@@ -30,9 +30,9 @@ export function colorToHex(color: string): string {
     }
 }
 
-export function lighter(color: string): string {
+export function lighter(color: string, level: number = 1): string {
     try {
-        return d3.color(color).brighter().hex()
+        return d3.color(color).brighter(level).hex()
     } catch (e) {
         return 'white'
     }
