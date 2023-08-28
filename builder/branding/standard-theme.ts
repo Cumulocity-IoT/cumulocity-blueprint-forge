@@ -174,13 +174,7 @@ export function standardTheme(branding: any) {
         .dashboard-grid .card-dashboard  .bg-level-0 {
             background-color: var(--brand-light, var(--c8y-level-0))!important;
         }       
-       /*  .nav-tabs > li > button {
-        color: var(--navigator-active-bg,#0b385b) !important;
-        }
-        .nav-tabs > li > button:hover:not([disabled]) {
-        color: var(--brand-primary,#1776bf) !important;
-        } */
-        
+            
         .app-switcher-dropdown-menu{
             border: none !important;
         }
@@ -195,7 +189,7 @@ export function standardTheme(branding: any) {
         }
       
         label {
-            color: var(--component-label-color);
+            color: var(--component-label-color) !important;
         }
         
         [datepicker] table, [uib-datepicker] table, [uib-daypicker] table {
@@ -232,7 +226,22 @@ export function standardTheme(branding: any) {
         .c8y-wizard-form {
             background-color:inherit;
         }
+        .form-read-only .form-group label {
+            color: var(--component-label-color) !important;
+        }    
 
+        .app-noicon {
+            color: var(--brand-primary);
+        }
+        .c8y-switch input[type=checkbox]+span:after {
+            background-color: var(--component-label-color) !important;
+        }
+        .range-display__range__current {
+            border-top: 2px solid var(--brand-dark, var(--brand-light, var(--c8y-brand-light)));
+        }
+        .range-display--vertical .range-display__range__current {
+            border-left: 2px solid var(--brand-dark, var(--brand-light, var(--c8y-brand-light)));
+        }
     `;
 
     return standardTheme;
