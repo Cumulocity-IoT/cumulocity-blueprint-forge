@@ -19,61 +19,70 @@
 import { colorToHex, contrastingTextColor, lighter } from "./color-util";
 
 export function classicTheme(branding: any) {
+    const _primary_Hex = colorToHex(branding.colors.primary);
+    const _lighter_primary_Hex = lighter(branding.colors.primary);
+    const _active_Hex = colorToHex(branding.colors.active);
+    const _text_primary_Hex = colorToHex(branding.colors.textOnPrimary);
+    const _text_active_Hex = colorToHex(branding.colors.textOnActive);
+    const _hover_Hex = colorToHex(branding.colors.hover);
+    const _text_Hex = colorToHex(branding.colors.text);
+    const _headerBar_Hex = colorToHex(branding.colors.headerBar);
+    const _tabBar_Hex = colorToHex(branding.colors.tabBar);
+    const _toolBar_Hex = colorToHex(branding.colors.toolBar);
+
     const classicTheme = `
     body {
 
         /* Navigator color: */
-        --brand-primary: ${colorToHex(branding.colors.primary)};
-        --brand-light: ${lighter(branding.colors.primary)};
-        --navigator-active-bg: ${colorToHex(branding.colors.active)};
+        --brand-primary: ${_primary_Hex};
+        --brand-light: ${_lighter_primary_Hex};
+        --navigator-active-bg: ${_active_Hex};
 
         /* Navigator text: */
-        --navigator-text-color: ${colorToHex(branding.colors.textOnPrimary)};
-        --navigator-title-color: ${colorToHex(branding.colors.textOnPrimary)};
-        --navigator-active-color: ${colorToHex(branding.colors.textOnActive)};
-        --navigator-hover-color: ${colorToHex(branding.colors.hover)};
+        --navigator-text-color: ${_text_primary_Hex};
+        --navigator-title-color: ${_text_primary_Hex};
+        --navigator-active-color: ${_text_active_Hex};
+        --navigator-hover-color: ${_hover_Hex};
       
 
 
         /* All the other text: */
-        --brand-dark: ${colorToHex(branding.colors.text)};
-         --header-hover-color: ${branding.colors.hover ? colorToHex(branding.colors.hover) : '#14629f'};
-        --header-color: ${branding.colors.headerBar ? colorToHex(branding.colors.headerBar) : '#ffffff'};
-        --dropdown-background: ${branding.colors.headerBar ? colorToHex(branding.colors.headerBar) : '#ffffff'};
-        --toolbar-background:${branding.colors.toolBar ? colorToHex(branding.colors.toolBar) : '#ffffff'};
-        --toolbar-color: ${colorToHex(branding.colors.text)};
-        --page-tabs-background:${branding.colors.tabBar ? colorToHex(branding.colors.tabBar) : '#ffffff'};
-        --toolbar-actions-color-hover: ${branding.colors.toolBar ? colorToHex(branding.colors.hover) : '#14629f'};
-        --toolbar-focus-color: ${colorToHex(branding.colors.text)};
-        --dropdown-actions-color-hover: ${colorToHex(branding.colors.text)};
-        --component-color: ${colorToHex(branding.colors.text)};
-        --component-actions-color-hover: ${colorToHex(branding.colors.text)};
-        --page-tabs-link-color: ${colorToHex(branding.colors.text)};
-        --page-tabs-actions-color: ${colorToHex(branding.colors.text)};
-        --page-tabs-actions-color-hover: ${colorToHex(branding.colors.text)};
+        --brand-dark: ${_text_Hex};
+         --header-hover-color: ${branding.colors.hover ? _hover_Hex : '#14629f'};
+        --header-color: ${branding.colors.headerBar ? _headerBar_Hex : '#ffffff'};
+        --dropdown-background: ${branding.colors.headerBar ? _headerBar_Hex : '#ffffff'};
+        --toolbar-background:${branding.colors.toolBar ? _toolBar_Hex : '#ffffff'};
+        --toolbar-color: ${_text_Hex};
+        --page-tabs-background:${branding.colors.tabBar ? _tabBar_Hex : '#ffffff'};
+        --toolbar-actions-color-hover: ${branding.colors.toolBar ? _hover_Hex : '#14629f'};
+        --toolbar-focus-color: ${_text_Hex};
+        --dropdown-actions-color-hover: ${_text_Hex};
+        --component-color: ${_text_Hex};
+        --component-actions-color-hover: ${_text_Hex};
+        --page-tabs-link-color: ${_text_Hex};
+        --page-tabs-actions-color: ${_text_Hex};
+        --page-tabs-actions-color-hover: ${_text_Hex};
         --list-group-actions-color: var(--component-link-color, #000);
-        --dropdown-active-color:${colorToHex(branding.colors.active)};
-        --tooltip-background: ${colorToHex(branding.colors.active)};/*0b385b*/
-        --tooltip-color: ${colorToHex(branding.colors.textOnActive)};
+        --dropdown-active-color:${_active_Hex};
+        --tooltip-background: ${_active_Hex};/*0b385b*/
+        --tooltip-color: ${_text_active_Hex};
         ${branding.logoHeight != undefined ? '--navigator-platform-logo-height: ' + branding.logoHeight + 'px;' : ''}
 
         /*1017 changes */
-        --header-text-color:  ${colorToHex(branding.colors.text)};
-        --c8y-action-bar-color-actions:${colorToHex(branding.colors.text)};
-        --c8y-action-bar-icon-color:${colorToHex(branding.colors.text)};
-        --c8y-nav-tabs-color-default:${colorToHex(branding.colors.text)};
-        --c8y-nav-tabs-icon-color-default:${colorToHex(branding.colors.text)};
-        --c8y-action-bar-color-actions-hover:${colorToHex(branding.colors.hover)};
-        --c8y-action-bar-background-default: ${colorToHex(branding.colors.toolBar)};
-       // --c8y-nav-tabs-background-default: ${colorToHex(branding.colors.tabBar)};
-       // --c8y-nav-tabs-border-color-default:${colorToHex(branding.colors.tabBar)};
-        --header-hover-color: ${colorToHex(branding.colors.hover)};
+        --header-text-color:  ${_text_Hex};
+        --c8y-action-bar-color-actions:${_text_Hex};
+        --c8y-action-bar-icon-color:${_text_Hex};
+        --c8y-nav-tabs-color-default:${_text_Hex};
+        --c8y-nav-tabs-icon-color-default:${_text_Hex};
+        --c8y-action-bar-color-actions-hover:${_hover_Hex};
+        --c8y-action-bar-background-default: ${_toolBar_Hex};
+        --header-hover-color: ${_hover_Hex};
     
-        --navigator-color-active:  ${colorToHex(branding.colors.textOnPrimary)};
-        --navigator-separator-color: ${colorToHex(branding.colors.primary)};
+        --navigator-color-active:  ${_text_primary_Hex};
+        --navigator-separator-color: ${_primary_Hex};
         --c8y-body-background-color: ${colorToHex("#f2f3f4")};
-        --navigator-bg-color: ${colorToHex(branding.colors.primary)};
-        --navigator-header-bg: ${colorToHex(branding.colors.primary)};
+        --navigator-bg-color: ${_primary_Hex};
+        --navigator-header-bg: ${_primary_Hex};
         --bf-card-bg: ${colorToHex("#fff")};
         --bf-card-color: ${colorToHex("#000")};
 
@@ -147,7 +156,7 @@ export function classicTheme(branding: any) {
         color: var(--brand-primary,#1776bf) !important;
         }
         select.form-control:focus, select:focus {
-        color: ${colorToHex(branding.colors.primary)} !important;
+        color: ${_primary_Hex} !important;
         }
     `;
 

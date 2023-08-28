@@ -78,7 +78,6 @@ export class BrandingService {
             if (app.applicationBuilder.branding && app.applicationBuilder.branding.enabled){
                 const selectedTheme = app.applicationBuilder.selectedTheme;
                 const color = app.applicationBuilder.branding.colors;
-               
                 switch (selectedTheme) {
                     case "Default":
                         this.loadFaviconURL(true, '#1776BF', app.applicationBuilder.icon);
@@ -91,66 +90,21 @@ export class BrandingService {
                         break;
 
                     default:
-                        if(color.primary  === '#ffffff' || color.primary  === '#fff' || color.primary  === 'white') {
-                            this.loadFaviconURL(true, '#1776BF',app.applicationBuilder.icon);
-                            //TODO: white theme
-                        } else {
-                            this.loadFaviconURL(true, color.primary, app.applicationBuilder.icon);
-                            this.appBranding.innerText = standardTheme(app.applicationBuilder.branding);
-                            //TODO: custom theme
-                        }
+
+                        this.loadFaviconURL(true, color.primary, app.applicationBuilder.icon);
+                        this.appBranding.innerText = standardTheme(app.applicationBuilder.branding);
                         break;
                 }
             } else {
                 this.loadFaviconURL(false, null, app.applicationBuilder.icon);
                 this.appBranding.innerText = '';
             }
-
-
-            // The below if condition works only when primary color is white
-           /*  if (app.applicationBuilder.branding && app.applicationBuilder.branding.enabled && app.applicationBuilder.branding.colors
-                && (app.applicationBuilder.branding.colors.primary === '#ffffff' ||
-                app.applicationBuilder.branding.colors.primary === '#f9fafb'|| app.applicationBuilder.branding.colors.primary === '#fff' || app.applicationBuilder.branding.colors.primary === 'white')) {
-                    this.loadFaviconURL(app);
-                    this.appBranding.innerText = `
-                    
-                    
-                    `;
-                   
-
-            } else if (app.applicationBuilder.branding && app.applicationBuilder.branding.enabled && app.applicationBuilder.branding.colors) {
-                this.loadFaviconURL(app);
-
-            } else {
-                /*  const faviconUrl = this.createFaviconUrl('#1776BF', app.applicationBuilder.icon);
-                 this.favicon.setAttribute('type', 'image/png');
-                 this.favicon.setAttribute('href', faviconUrl); */
-                /*this.loadFaviconURL(app);
-                this.appBranding.innerText = '';
-            } */
         } else {
             this.favicon.removeAttribute('type');
             this.favicon.setAttribute('href', 'favicon.ico');
             this.appBranding.innerText = '';
         }
     }
-
-    
-
-   /*  private async loadFaviconURL(app) {
-        await delay(1000);
-        if (app.applicationBuilder.branding && app.applicationBuilder.branding.enabled && app.applicationBuilder.branding.colors) {
-            const faviconUrl = this.createFaviconUrl(app.applicationBuilder.branding.colors.primary, app.applicationBuilder.icon);
-            this.favicon.setAttribute('type', 'image/png');
-            this.favicon.setAttribute('href', faviconUrl);
-        } else {
-            const faviconUrl = this.createFaviconUrl('#1776BF', app.applicationBuilder.icon);
-            this.favicon.setAttribute('type', 'image/png');
-            this.favicon.setAttribute('href', faviconUrl);
-        }
-
-
-    } */
 
     private async loadFaviconURL(isBrandingEnabled: boolean, color: string, icon: any) {
         await delay(1000);

@@ -19,90 +19,109 @@
 import { colorToHex, contrastingTextColor, lighter, darker } from "./color-util";
 
 export function standardTheme(branding: any) {
+    const _primary_Hex = colorToHex(branding.colors.primary);
+    const _lighter_primary_Hex = lighter(branding.colors.primary,0.5);
+    const _lighter_primary_Hex_1_1 = lighter(branding.colors.primary,1.1);
+    const _lighter_primary_Hex_1_2 = lighter(branding.colors.primary,1.5);
+    const _darker_primary_Hex = darker(branding.colors.primary);
+    const _active_Hex = colorToHex(branding.colors.active);
+    const _text_primary_Hex = colorToHex(branding.colors.textOnPrimary);
+    const _text_active_Hex = colorToHex(branding.colors.textOnActive);
+    const _hover_Hex = colorToHex(branding.colors.hover);
+    const _text_Hex = colorToHex(branding.colors.text);
+    const _lighter_text_Hex = lighter(branding.colors.text);
+    const _darker_text_Hex = darker(branding.colors.text);
+    const _headerBar_Hex = colorToHex(branding.colors.headerBar);
+    const _tabBar_Hex = colorToHex(branding.colors.tabBar);
+    const _toolBar_Hex = colorToHex(branding.colors.toolBar);
+
     const standardTheme = `
     body {
 
         /* Navigator color: */
-        --brand-primary: ${colorToHex(branding.colors.primary)};
-        --brand-light: ${lighter(branding.colors.primary)};
-        --navigator-active-bg: ${colorToHex(branding.colors.active)};
+        --brand-primary: ${_primary_Hex};
+        --brand-light: ${_lighter_primary_Hex};
+        --navigator-active-bg: ${_active_Hex};
 
         /* Navigator text: */
-        --navigator-text-color: ${colorToHex(branding.colors.textOnPrimary)};
-        --navigator-title-color: ${colorToHex(branding.colors.textOnPrimary)};
-        --navigator-active-color: ${colorToHex(branding.colors.textOnActive)};
-        --navigator-hover-color: ${colorToHex(branding.colors.hover)};
+        --navigator-text-color: ${_text_primary_Hex};
+        --navigator-title-color: ${_text_primary_Hex};
+        --navigator-active-color: ${_text_active_Hex};
+        --navigator-hover-color: ${_hover_Hex};
       
 
         /* All the other text: */
-        --brand-dark: ${colorToHex(branding.colors.text)};
-        --header-hover-color: ${branding.colors.hover ? colorToHex(branding.colors.hover) : '#14629f'};
-        --header-color: ${branding.colors.headerBar ? colorToHex(branding.colors.headerBar) : '#ffffff'};
-        --page-tabs-background:${branding.colors.tabBar ? colorToHex(branding.colors.tabBar) : '#ffffff'};
+        --brand-dark: ${_text_Hex};
+        --header-hover-color: ${branding.colors.hover ? _hover_Hex : '#14629f'};
+        --header-color: ${branding.colors.headerBar ? _headerBar_Hex : '#ffffff'};
+        --page-tabs-background:${branding.colors.tabBar ? _tabBar_Hex : '#ffffff'};
      
         ${branding.logoHeight != undefined ? '--navigator-platform-logo-height: ' + branding.logoHeight + 'px;' : ''}
 
         /*1017 changes */
-        --header-text-color:  ${colorToHex(branding.colors.text)};
-        --c8y-headings-color:${colorToHex(branding.colors.text)};
-        --c8y-action-bar-color-actions:${colorToHex(branding.colors.text)};
-        --c8y-action-bar-icon-color:${colorToHex(branding.colors.text)};
-        --c8y-nav-tabs-color-default:${colorToHex(branding.colors.text)};
-        --c8y-nav-tabs-icon-color-active:${colorToHex(branding.colors.textOnActive)};
-        --c8y-action-bar-color-actions-hover:${colorToHex(branding.colors.hover)};
-        --c8y-action-bar-background-default: ${colorToHex(branding.colors.toolBar)};
-        --header-hover-color: ${colorToHex(branding.colors.hover)};    
-        --navigator-color-active:  ${colorToHex(branding.colors.textOnPrimary)};
-        --navigator-separator-color: ${colorToHex(branding.colors.primary)};
-        --c8y-body-background-color: ${darker(branding.colors.primary)};
-        --navigator-bg-color: ${colorToHex(branding.colors.primary)};
-        --navigator-header-bg: ${colorToHex(branding.colors.primary)};
-        --c8y-component-icon-dark-color-dark: ${colorToHex(branding.colors.text)};
-        --c8y-component-background-default: ${lighter(branding.colors.primary)};
-        --c8y-form-control-background-default:${darker(branding.colors.primary)};
-        --c8y-form-control-color-default:${colorToHex(branding.colors.text)};
-        --c8y-component-color-default:${colorToHex(branding.colors.text)};
-        --c8y-component-color-actions:${colorToHex(branding.colors.text)};
-        --c8y-component-background-active:  ${lighter(branding.colors.primary)};
-        --c8y-component-form-label-color:  ${darker(branding.colors.text)};
-        --c8y-component-background-odd:  ${colorToHex(branding.colors.primary)};
-        --c8y-component-background-expanded:${darker(branding.colors.primary)}; //Need a higher color
-        --c8y-form-label-color: ${colorToHex(branding.colors.text)};
-        --c8y-component-color-link: ${darker(branding.colors.text)};
-        --c8y-component-icon-color: ${darker(branding.colors.text)};
-        --c8y-nav-tabs-background-default:  ${lighter(branding.colors.primary)};
-        --c8y-form-control-background-focus:  ${lighter(branding.colors.primary)};
-        --c8y-form-control-color-focus:${colorToHex(branding.colors.text)};
-        --c8y-alert-background-default: ${lighter(branding.colors.primary)};
-        --c8y-alert-color-default:${colorToHex(branding.colors.text)};
+        --header-text-color:  ${_text_Hex};
+        --c8y-headings-color:${_text_Hex};
+        --c8y-action-bar-color-actions:${_text_Hex};
+        --c8y-action-bar-icon-color:${_text_Hex};
+        --c8y-nav-tabs-color-default:${_text_Hex};
+        --c8y-nav-tabs-icon-color-active:${_text_active_Hex};
+        --c8y-action-bar-color-actions-hover:${_hover_Hex};
+        --c8y-action-bar-background-default: ${_toolBar_Hex};
+        --header-hover-color: ${_hover_Hex};    
+        --navigator-color-active:  ${_text_primary_Hex};
+        --navigator-separator-color: ${_primary_Hex};
+        --c8y-body-background-color: ${_darker_primary_Hex};
+        --navigator-bg-color: ${_primary_Hex};
+        --navigator-header-bg: ${_primary_Hex};
+        --c8y-component-icon-dark-color-dark: ${_text_Hex};
+        --c8y-component-background-default: ${_lighter_primary_Hex};
+        --c8y-form-control-background-default:${_darker_primary_Hex};
+        --c8y-form-control-color-default:${_text_Hex};
+        --c8y-component-color-default:${_text_Hex};
+        --c8y-component-color-actions:${_text_Hex};
+        --c8y-component-background-active:  ${_lighter_primary_Hex};
+        --c8y-component-form-label-color:  ${_darker_text_Hex};
+        --c8y-component-background-odd:  ${_primary_Hex};
+        --c8y-component-background-expanded:${_darker_primary_Hex}; //Need a higher color
+        --c8y-form-label-color: ${_text_Hex};
+        --c8y-component-color-link: ${_darker_text_Hex};
+        --c8y-component-icon-color: ${_darker_text_Hex};
+        --c8y-nav-tabs-background-default:  ${_lighter_primary_Hex};
+        --c8y-form-control-background-focus:  ${_lighter_primary_Hex};
+        --c8y-form-control-color-focus:${_text_Hex};
+        --c8y-alert-background-default: ${_lighter_primary_Hex};
+        --c8y-alert-color-default:${_text_Hex};
+        --c8y-component-realtime-added: ${_darker_primary_Hex};
+        --c8y-component-spinner-color:${_lighter_text_Hex};
 
-        --c8y-level-0: ${lighter(branding.colors.primary)};
-        --c8y-level-1-custom: ${lighter(branding.colors.primary,1.1)};
-        --c8y-level-2-custom: ${lighter(branding.colors.primary,1.2)};
+        --c8y-level-0: ${_lighter_primary_Hex};
+        --c8y-level-1-custom: ${_lighter_primary_Hex_1_1};
+        --c8y-level-2-custom: ${_lighter_primary_Hex_1_2};
 
         
 
         /* Widget specific */
-        --component-color: ${colorToHex(branding.colors.text)};
-        --card-color: ${colorToHex(branding.colors.text)};
-        --card-background: ${lighter(branding.colors.primary)};
-        --component-background: ${lighter(branding.colors.primary)};
-        --component-label-color:${darker(branding.colors.text)};       
+        --component-color: ${_text_Hex};
+        --card-color: ${_text_Hex};
+        --card-background: ${_lighter_primary_Hex};
+        --component-background: ${_lighter_primary_Hex};
+        --component-label-color:${_darker_text_Hex};   
+        --component-active-background: ${_primary_Hex};
 
-        --dropdown-background: ${branding.colors.headerBar ? colorToHex(branding.colors.headerBar) : '#ffffff'};
-        --toolbar-background:${branding.colors.toolBar ? colorToHex(branding.colors.toolBar) : '#ffffff'};
-        --toolbar-color: ${colorToHex(branding.colors.text)};
-        --toolbar-actions-color-hover: ${branding.colors.toolBar ? colorToHex(branding.colors.hover) : '#14629f'};
-        --toolbar-focus-color: ${colorToHex(branding.colors.text)};
-        --dropdown-actions-color-hover: ${colorToHex(branding.colors.text)};
-        --component-actions-color-hover: ${colorToHex(branding.colors.text)};
-        --page-tabs-link-color: ${colorToHex(branding.colors.text)};
-        --page-tabs-actions-color: ${colorToHex(branding.colors.text)};
-        --page-tabs-actions-color-hover: ${colorToHex(branding.colors.text)};
+        --dropdown-background: ${branding.colors.headerBar ? _headerBar_Hex : '#ffffff'};
+        --toolbar-background:${branding.colors.toolBar ? _toolBar_Hex : '#ffffff'};
+        --toolbar-color: ${_text_Hex};
+        --toolbar-actions-color-hover: ${branding.colors.toolBar ? _hover_Hex : '#14629f'};
+        --toolbar-focus-color: ${_text_Hex};
+        --dropdown-actions-color-hover: ${_text_Hex};
+        --component-actions-color-hover: ${_text_Hex};
+        --page-tabs-link-color: ${_text_Hex};
+        --page-tabs-actions-color: ${_text_Hex};
+        --page-tabs-actions-color-hover: ${_text_Hex};
         --list-group-actions-color: var(--component-link-color, #000);
-        --dropdown-active-color:${colorToHex(branding.colors.active)};
-        --tooltip-background: ${colorToHex(branding.colors.active)};/*0b385b*/
-        --tooltip-color: ${colorToHex(branding.colors.textOnActive)};
+        --dropdown-active-color:${_active_Hex};
+        --tooltip-background: ${_active_Hex};/*0b385b*/
+        --tooltip-color: ${_text_active_Hex};
 
         }
 
@@ -211,16 +230,16 @@ export function standardTheme(branding: any) {
         }
         .ng-dropdown-panel .ng-dropdown-panel-items .ng-option{
             background-color: var(--c8y-form-control-background-default) !important;
-            color: var(--component-label-color);
+            color: var(--component-label-color) !important;
         }
         .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-marked {
-            color: var(--component-color);
+            color: var(--component-color) !important;
         }
         .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected, .ng-dropdown-panel .ng-dropdown-panel-items .ng-option.ng-option-selected.ng-option-marked{
-            color: var(--component-color);
+            color: var(--component-color) !important;
         }
         .ng-select.ng-select-multiple .ng-select-container .ng-value-container .ng-input > input {
-            color: var(--c8y-form-control-color-default);
+            color: var(--c8y-form-control-color-default) !important;
         }
          
         .c8y-wizard-form {
@@ -241,6 +260,9 @@ export function standardTheme(branding: any) {
         }
         .range-display--vertical .range-display__range__current {
             border-left: 2px solid var(--brand-dark, var(--brand-light, var(--c8y-brand-light)));
+        }
+        .input-group-addon {
+            background-color:inherit !important;
         }
     `;
 

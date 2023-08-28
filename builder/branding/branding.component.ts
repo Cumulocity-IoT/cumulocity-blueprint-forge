@@ -215,6 +215,9 @@ export class BrandingComponent implements OnDestroy {
         });
     }
 
+    activateCustomeTheme() {
+        this.customTheme = !this.customTheme;
+    }
     async deleteTheme(app) {
         let finalApp = app.applicationBuilder.customBranding.filter((theme) => theme.themeName !== this.themeName);
         app.applicationBuilder.customBranding = finalApp;

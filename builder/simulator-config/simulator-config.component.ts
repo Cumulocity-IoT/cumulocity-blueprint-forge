@@ -178,7 +178,7 @@ export class SimulatorConfigComponent implements OnDestroy {
             simulator: simulatorConfig
         });
         // We could just wait for them to refresh, but it's nicer to instantly refresh
-       // await this.simSvc.checkForSimulatorConfigChanges();
+        await this.simSvc.checkForSimulatorConfigChanges();
     }
 
     ngOnDestroy(): void {
