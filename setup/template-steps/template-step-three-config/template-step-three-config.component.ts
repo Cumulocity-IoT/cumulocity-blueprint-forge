@@ -208,17 +208,23 @@ async configureBasicInput(dashboard, index) {
     totalRemotes = totalRemotes + configDataMicroservices.length;
     totalRemotes = totalRemotes + configDataDashboards.length;
 
+    // this.showProgressModalDialog("Installing dependencies")
+
     const eachRemoteProgress: number = Math.floor((totalRemotes > 1 ? (90 / totalRemotes) : 0));
     let overallProgress = 0;
-    if (configDataPlugins && configDataPlugins.length > 0) {
-      this.showProgressModalDialog("Verifying plugins...")
-    }
+    this.showProgressModalDialog("Verifying dependencies...")
+    // if (configDataDashboards && configDataDashboards.length > 0) {
+    //   this.progressIndicatorService.setMessage('Installing dashboards');
+    // }
+    // if (configDataPlugins && configDataPlugins.length > 0) {
+    //   this.progressIndicatorService.setMessage(`Installing plugins`);
+    // }
     if (totalRemotes > 1) { this.progressIndicatorService.setOverallProgress(overallProgress) }
     this.progressIndicatorService.setOverallProgress(5);
     for (let plugin of configDataPlugins) {
       await this.installPlugin(plugin);
       overallProgress = overallProgress + eachRemoteProgress;
-      this.progressIndicatorService.setOverallProgress(overallProgress)
+      this.progressIndicatorService.setOverallProgress(overallProgress);
     };
     await new Promise(resolve => setTimeout(resolve, 1000));
     for (let ms of configDataMicroservices) {
@@ -292,9 +298,11 @@ async configureBasicInput(dashboard, index) {
           "tenantId": this.settingsService.getTenantName(),
       });
   }
-  if (configDataPlugins && configDataPlugins.length > 0) {
-    this.hideProgressModalDialog();
-  }
+  // if (configDataPlugins && configDataPlugins.length > 0) {
+  //   this.hideProgressModalDialog();
+  // }
+
+  this.hideProgressModalDialog();
     this.next();
   }
 

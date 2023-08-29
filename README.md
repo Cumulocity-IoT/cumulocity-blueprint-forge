@@ -10,6 +10,10 @@ with a seemless user experience.
 * **Easy Customizaton:** Provides option to select dashboards and unselect dashboards.
 * **Dashboard Catalog:** User can select any pre-designed template for dashboard and ability to install dependent runtime widgets.
 * **Installation of plugins and microservice:** Provides option to install plugins and microservices while creating an application.
+* **Provision to add essential dashboards:** Effortlessly Craft Applications Using Demo Template's Essential Dashboards and Features – Explore the Overview, Receive a Warm Welcome, Find Help and Support.
+* **Blank Template support:** The Blank Template Lets You Build Applications from Scratch, No Dashboards or Plugins Preselected.
+* **Support for Device group and Asset Type:** Link not just devices, user can also link Device Group and Asset type with the dashboard.
+* **Configure while creating:** User can configure the application while creating it.
 
 ## Installation
 
