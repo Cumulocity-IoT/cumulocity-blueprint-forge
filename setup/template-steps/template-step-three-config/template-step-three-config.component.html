@@ -151,6 +151,25 @@
                         <label for="icon" [ngClass]="{'label-color': applyTheme}"><span>Icon</span></label>
                         <icon-selector id="icon" name="icon" [(value)]="newAppIcon"></icon-selector>
                     </div>
+                    <hr />
+                    <div class="card-header">
+                      <h4 translate>Themes</h4>
+                    </div>
+                    <div class="row col-md-12 col-sm-12 col-xs-12 form-group">
+                        <button class="btn"
+                        style="--brand-primary: #f9fafb; border: solid 1px #011f3d;background-color: #f9fafb;color:#011f3d; margin-bottom: 10px;margin-left: 8px;"
+                        (click)="setTheme(currentApp, '#f9fafb', '#e7ebee', '#011f3d', '#011f3d', '#512950','#058192', '#ffffff', '#ffffff', '#ffffff','Default')">Default</button>
+                        <button class="btn"
+                        style="--brand-primary: #1776bf; border: solid 1px var(--brand-light);background-color: #1776bf;color:#fff;margin-bottom: 10px;"
+                        (click)="setTheme(currentApp, '#1776bf', '#14629F', '#0b385b', '#ffffff', '#ffffff','#14629F', '#ffffff', '#ffffff', '#ffffff','Classic')">Classic</button>
+                        <button class="btn"
+                        style="--brand-primary: #011f3d; border: solid 1px var(--brand-light);background-color: #011f3d;color:#fff;margin-bottom: 10px;"
+                        (click)="setTheme(currentApp, '#011f3d', '#14629F', '#ffffff', '#ffffff', '#ffffff','#ffffff', '#012c57', '#012c57', '#012c57','Navy Blue')">Navy
+                        Blue</button>
+                        <button class="btn"
+                        style="--brand-primary: #243138; border: solid 1px var(--brand-light);background-color: #243138;color:#fff;margin-bottom: 10px;"
+                        (click)="setTheme(currentApp, '#243138', '#13202a', '#ffffff', '#ffffff', '#ffffff','#ffffff', '#334650','#334650', '#334650', 'Dark')">Dark</button>
+                     </div>
                 </form>
             </div>
           </div>

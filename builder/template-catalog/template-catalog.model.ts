@@ -91,5 +91,6 @@ export interface CumulocityDashboard {
     global: boolean;
     isFrozen?: boolean;
     priority?: number;
+    classes?: object
 }
 

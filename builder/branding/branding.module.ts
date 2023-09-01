@@ -1,5 +1,5 @@
 /*
-* Copyright (c) 2023 Software AG, Darmstadt, Germany and/or its licensors
+* Copyright (c) 2019 Software AG, Darmstadt, Germany and/or its licensors
 *
 * SPDX-License-Identifier: Apache-2.0
 *
@@ -18,18 +18,18 @@
 
 import {ModuleWithProviders, NgModule} from "@angular/core";
 
-//import {BrandingComponent} from "./branding.component";
+import {BrandingComponent} from "./branding.component";
 import {CommonModule} from "@angular/common";
 import {BrandingService} from "./branding.service";
 import {switchMap} from "rxjs/operators";
 import {from, of} from "rxjs";
 import {ApplicationService} from "@c8y/client";
 import {CoreModule} from "@c8y/ngx-components";
-//import {BrandingDirtyGuardService} from "./branding-dirty-guard.service";
+import {BrandingDirtyGuardService} from "./branding-dirty-guard.service";
 import { ButtonsModule } from 'ngx-bootstrap/buttons';
 import {AppIdService} from "../app-id.service";
 import { AppDataService } from "./../../builder/app-data.service";
-//import { CustomBrandingComponent } from "./custom-branding.component";
+import { CustomBrandingComponent } from "./custom-branding.component";
 @NgModule({
     imports: [
         CommonModule,
@@ -37,10 +37,10 @@ import { AppDataService } from "./../../builder/app-data.service";
         ButtonsModule.forRoot()
     ],
     declarations: [
-  //      BrandingComponent,
-  //      CustomBrandingComponent
+        BrandingComponent,
+        CustomBrandingComponent
     ],entryComponents: [
-  //      CustomBrandingComponent
+        CustomBrandingComponent
     ],
 })
 export class BrandingModule {
@@ -63,7 +63,7 @@ export class BrandingModule {
             ngModule: BrandingModule,
             providers: [
                 BrandingService,
- //               BrandingDirtyGuardService
+                BrandingDirtyGuardService
             ]
         }
     }

@@ -61,6 +61,20 @@ export class RedirectToApp implements CanActivate {
                     version: packageJson.version,
                     dashboards: [],
                     simulators: [],
+                    selectedTheme: 'Default',
+                    branding: {
+                        colors: {
+                            primary: '#1776BF',
+                            active: '#14629F',
+                            text: '#0b385b',
+                            textOnPrimary: 'white',
+                            textOnActive: 'white',
+                            hover: '#14629F',
+                            headerBar: 'white',
+                            toolBar: 'white',
+                            tabBar: 'white'
+                        }
+                    },
                     icon: appIcon
                 },
                 icon: {
