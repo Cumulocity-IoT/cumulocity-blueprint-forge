@@ -337,6 +337,7 @@ export class TemplateCatalogService {
             icon: dashboardConfiguration.dashboardIcon,
             global: true,
             isFrozen: true,
+            classes:dashboardConfiguration.classes
         };
     }
 

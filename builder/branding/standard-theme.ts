@@ -93,6 +93,7 @@ export function standardTheme(branding: any) {
         --c8y-alert-color-default:${_text_Hex};
         --c8y-component-realtime-added: ${_darker_primary_Hex};
         --c8y-component-spinner-color:${_lighter_text_Hex};
+        --c8y-component-color-text-muted: ${_text_Hex};
 
         --c8y-level-0: ${_lighter_primary_Hex};
         --c8y-level-1-custom: ${_lighter_primary_Hex_1_1};
