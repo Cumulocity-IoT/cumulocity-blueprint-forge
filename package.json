@@ -1,6 +1,6 @@
 {
   "name": "blueprint-forge",
-  "version": "1017.0.205-1.0.1-dev",
+  "version": "1017.0.205-1.0.2-dev",
   "description": "Blueprint Forge enables template driven approach of integrating pre-build and market-ready industry solutions with a seemless user experience.",
   "scripts": {
     "start": "c8ycli server ",
@@ -15,10 +15,7 @@
     "prebuild-dev": " gulp clean",
     "postbuild-dev": " gulp bundle"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/SoftwareAG/cumulocity-blueprint-forge.git"
-  },
+  "repository": "git+https://github.com/SoftwareAG/cumulocity-blueprint-forge.git",
   "keywords": ["Blueprint"],
   "author": "Software AG, Global Presales",
   "license": "Apache-2.0",
@@ -108,7 +105,7 @@
         "from": "assets/blueprint-forge.png",
         "to": "assets/blueprint-forge.png"
       }],
-      "version": "1017.0.205-1.0.1-dev"
+      "version": "1017.0.205-1.0.2-dev"
     },
     "cli": {}
   },
