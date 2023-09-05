@@ -216,6 +216,9 @@ export function standardTheme(branding: any) {
             background-color: var(--c8y-root-component-background-default, #fff);
             color:var(--c8y-root-component-color-default, #fff);
         }
+        [datepicker] table .text-muted , [uib-datepicker] table .text-muted , [uib-daypicker] table .text-muted {
+            color: var(--component-label-color);
+        }
         .bg-inherit {
             background-color: var(--card-background, var(--c8y-component-background-default)) !important;
         }
@@ -264,6 +267,17 @@ export function standardTheme(branding: any) {
         }
         .input-group-addon {
             background-color:inherit !important;
+        }
+        .uib-weeks .h6, .bs-datepicker-body table td.week span {
+            color: var(--component-label-color);
+        }
+
+        .bs-datepicker, .bs-datepicker-body table  {
+            background-color: var(--c8y-root-component-background-default, #fff);
+            color: var(--c8y-root-component-color-default, #fff);
+        }
+        .bs-datepicker-head button {
+            color: var(--brand-primary);   
         }
     `;
 

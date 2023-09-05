@@ -56,7 +56,6 @@ export class CustomBrandingComponent implements OnInit{
      }
 
     ngOnInit() {
-        //console.log(this.app);
         if (this.config === 'edit') {
             this.themeName = this.theme;
         }

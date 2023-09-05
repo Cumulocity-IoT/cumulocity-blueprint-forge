@@ -121,7 +121,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       this.isFormValid = this.appConfigForm?.form.valid;
       if (currentData) {
         this.templateDetails = currentData;
-        console.log('template details value', this.templateDetails);
       }
       // In case of no device 
       if (!(this.templateDetails?.input) || !(this.templateDetails?.input?.devices) || !(this.templateDetails?.input?.devices?.length > 0)) {
@@ -167,7 +166,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
     const basicConfigurationRef = this.showSetupConfigModal(dashboard.basicConfig);
     await basicConfigurationRef.content.event.subscribe(async data => {
       if (data && data.isConfirm) {
-        console.log('Data value', data, 'dashboard value', dashboard);;
         this.templateDetails.dashboards[index].basicConfig = data.basicConfigParams;
       }
     });
@@ -283,7 +281,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
           }
         });
       }
-      console.log('db value', db, templateDetailsData, 'this templatedetails', this.templateDetails);
 
       if (db.templateType && db.templateType === 1 && !db.isGroupDashboard) {
         this.groupTemplate = true;
@@ -421,7 +418,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
 
     if (templateType == 2) {
       this.deviceSelectorModalRef.content.onTypeSelected.subscribe((selectedItem: IManagedObject) => {
-        console.log('selected value on type', selectedItem);
         dashboard.name = selectedItem;
         dashboard.templateType = templateType;
         dashboard.devices = [{
@@ -487,8 +483,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
         }
 
         this.deviceFormValid = deviceFieldNotField;
-        console.log('Dashboard value', dashboard);
-        console.log('template details value', this.templateDetails);
 
 
         // if (dashboard.devices && dashboard.devices[0].reprensentation.id !== null && dashboard.devices[0].reprensentation.id !== undefined ) {

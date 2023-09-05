@@ -62,7 +62,15 @@ export function generalBranding(app: any) {
     
     .navigatorContent .link.active {
         border-left-color: var(--navigator-active-color);
-    }`;
+    }
+    
+    
+    .dashboard.dashboard-theme-branded .c8y-empty-state a {
+        color: var(--link-color,var(--c8y-component-color-link,var(--c8y-root-component-color-link)));
+    }
+    `;
+
+    
     
     return commonBranding;
 }
