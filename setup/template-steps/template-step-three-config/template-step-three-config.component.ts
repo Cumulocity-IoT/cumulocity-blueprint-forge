@@ -120,7 +120,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       this.isFormValid= this.appConfigForm?.form.valid;
       if (currentData) {
         this.templateDetails = currentData;
-        console.log('template details value', this.templateDetails);
       }
       // In case of no device 
       if (!(this.templateDetails?.input) || !(this.templateDetails?.input?.devices) || !(this.templateDetails?.input?.devices?.length > 0)) {
@@ -167,7 +166,6 @@ async configureBasicInput(dashboard, index) {
     const basicConfigurationRef = this.showSetupConfigModal(dashboard.basicConfig);
     await basicConfigurationRef.content.event.subscribe(async data => {
       if (data && data.isConfirm) {
-        console.log('Data value', data, 'dashboard value', dashboard);;
         this.templateDetails.dashboards[index].basicConfig = data.basicConfigParams;
       }
     });
@@ -208,17 +206,11 @@ async configureBasicInput(dashboard, index) {
     totalRemotes = totalRemotes + configDataMicroservices.length;
     totalRemotes = totalRemotes + configDataDashboards.length;
 
-    // this.showProgressModalDialog("Installing dependencies")
 
     const eachRemoteProgress: number = Math.floor((totalRemotes > 1 ? (90 / totalRemotes) : 0));
     let overallProgress = 0;
     this.showProgressModalDialog("Verifying dependencies...")
-    // if (configDataDashboards && configDataDashboards.length > 0) {
-    //   this.progressIndicatorService.setMessage('Installing dashboards');
-    // }
-    // if (configDataPlugins && configDataPlugins.length > 0) {
-    //   this.progressIndicatorService.setMessage(`Installing plugins`);
-    // }
+    
     if (totalRemotes > 1) { this.progressIndicatorService.setOverallProgress(overallProgress) }
     this.progressIndicatorService.setOverallProgress(5);
     for (let plugin of configDataPlugins) {
@@ -276,7 +268,6 @@ async configureBasicInput(dashboard, index) {
          }
         });
       }
-      console.log('db value', db, templateDetailsData, 'this templatedetails', this.templateDetails);
       
       if (db.templateType && db.templateType === 1 && !db.isGroupDashboard) {
         this.groupTemplate = true;
@@ -414,7 +405,6 @@ async loadTemplateDetails(db: Dashboards): Promise<Observable<any>> {
  
   if(templateType == 2) {
     this.deviceSelectorModalRef.content.onTypeSelected.subscribe((selectedItem: IManagedObject) => {
-      console.log('selected value on type', selectedItem);
         dashboard.name = selectedItem;
         dashboard.templateType = templateType;
         dashboard.devices = [{
@@ -443,14 +433,7 @@ async loadTemplateDetails(db: Dashboards): Promise<Observable<any>> {
         this.deviceFormValid = deviceFieldNotField;
       });
     }
-        
-     
-        
-        // if (dashboard.devices && dashboard.devices[0].reprensentation.id !== null && dashboard.devices[0].reprensentation.id !== undefined ) {
-        //   this.deviceFormValid = true;
-        // } else {
-        //   this.deviceFormValid = false;
-        // }
+
     
 else {
   this.deviceSelectorModalRef.content.onDeviceSelected.subscribe((selectedItem: IManagedObject) => {
@@ -480,15 +463,6 @@ else {
     }
 
     this.deviceFormValid = deviceFieldNotField;
-      console.log('Dashboard value', dashboard);
-      console.log('template details value', this.templateDetails);
-     
-      
-      // if (dashboard.devices && dashboard.devices[0].reprensentation.id !== null && dashboard.devices[0].reprensentation.id !== undefined ) {
-      //   this.deviceFormValid = true;
-      // } else {
-      //   this.deviceFormValid = false;
-      // }
   });
 }
 
