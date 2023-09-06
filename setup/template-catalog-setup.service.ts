@@ -184,9 +184,6 @@ export class TemplateCatalogSetupService{
 
         return this.http.get(`${this.GATEWAY_URL_GitHubAsset}${link}`).pipe(map(response => {
             let dashboardFields = response as Array<object>;
-            console.log('Dashboard fields', dashboardFields);
-            
-            
         })).pipe(catchError(err => {
             console.log('Template Catalog: Download Binary: Error in primary endpoint! using fallback...');
             return this.http.get(`${this.GATEWAY_URL_GitHubAsset_FallBack}${link}`, {

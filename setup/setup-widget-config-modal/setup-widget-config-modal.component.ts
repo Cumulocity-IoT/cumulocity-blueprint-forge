@@ -44,7 +44,6 @@ export class SetupWidgetConfigModalComponent {
     }
 
     confirm(config_form) {
-        console.log('dashboard basic config', this.dashboardBasicConfig);
         this.storeBasicConfig = JSON.parse(JSON.stringify(this.dashboardBasicConfig));
         config_form.reset();
         this.event.emit({ isConfirm: true, basicConfigParams: this.storeBasicConfig  });

@@ -39,19 +39,19 @@
                 </button>
                 <ul class="dropdown-menu dropdown-menu-right" *dropdownMenu role="menu">
                     <li role="menuitem">
-                        <a class="dropdown-item clickable" (click)="showEditSimulatorDialog(simulatorConfig)">
+                        <button type="button" title="Edit" (click)="showEditSimulatorDialog(simulatorConfig)">
                             <i c8yIcon="edit" [ngClass]="{'label-color': applyTheme}"></i><span [ngClass]="{'label-color': applyTheme}"> Edit</span>
-                        </a>
+                        </button>
                     </li>
                     <li role="menuitem">
-                        <a class="dropdown-item clickable" (click)="exportSimulatorConfig(simulatorConfig)">
+                        <button type="button" title="Export" (click)="exportSimulatorConfig(simulatorConfig)">
                             <i c8yIcon="download" [ngClass]="{'label-color': applyTheme}"></i> <span [ngClass]="{'label-color': applyTheme}"> Export</span>
-                        </a>
+                        </button>
                     </li>
                     <li role="menuitem">
-                        <a class="dropdown-item clickable" (click)="deleteSimulator(simulatorConfig)">
+                        <button type="button" title="Remove" (click)="deleteSimulator(simulatorConfig)">
                             <i c8yIcon="times" [ngClass]="{'label-color': applyTheme}"></i> <span [ngClass]="{'label-color': applyTheme}"> Remove</span>
-                        </a>
+                        </button>
                     </li>
                 </ul>
             </div>

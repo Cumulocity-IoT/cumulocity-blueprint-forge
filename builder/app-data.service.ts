@@ -23,7 +23,7 @@ import { ApplicationService, IApplication } from "@c8y/client";
 @Injectable({providedIn: 'root'})
 export class AppDataService {
 
-    APP_DETAILS_REFRESH_INTERVAL = 5000; // Milliseconds
+    APP_DETAILS_REFRESH_INTERVAL = 2000; // Milliseconds
 
     private appDetails: Observable<any>;
     private appId: string | number = '';
