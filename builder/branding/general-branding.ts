@@ -68,6 +68,10 @@ export function generalBranding(app: any) {
     .dashboard.dashboard-theme-branded .c8y-empty-state a {
         color: var(--link-color,var(--c8y-component-color-link,var(--c8y-root-component-color-link)));
     }
+
+    .ng-select.ng-select-single .ng-select-container .ng-value-container {
+        color: var(--c8y-form-control-color-default) !important;
+    }
     `;
 
     

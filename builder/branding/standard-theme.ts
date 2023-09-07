@@ -94,6 +94,7 @@ export function standardTheme(branding: any) {
         --c8y-component-realtime-added: ${_darker_primary_Hex};
         --c8y-component-spinner-color:${_lighter_text_Hex};
         --c8y-component-color-text-muted: ${_text_Hex};
+        --c8y-component-background-hover: ${_lighter_primary_Hex_1_1};
 
         --c8y-level-0: ${_lighter_primary_Hex};
         --c8y-level-1-custom: ${_lighter_primary_Hex_1_1};
@@ -230,7 +231,7 @@ export function standardTheme(branding: any) {
         }
         .ng-select .ng-select-container{            
             background-color: var(--c8y-form-control-background-default) !important;
-            color: var(--component-color);
+            color: var(--component-color) !important;
         }
         .ng-dropdown-panel .ng-dropdown-panel-items .ng-option{
             background-color: var(--c8y-form-control-background-default) !important;
@@ -275,6 +276,9 @@ export function standardTheme(branding: any) {
         .bs-datepicker, .bs-datepicker-body table  {
             background-color: var(--c8y-root-component-background-default, #fff);
             color: var(--c8y-root-component-color-default, #fff);
+        }
+        .bs-datepicker-body table td, .bs-datepicker-body table th {
+            color: var(--c8y-root-component-color-default, #fff) !important;
         }
         .bs-datepicker-head button {
             color: var(--brand-primary);   
