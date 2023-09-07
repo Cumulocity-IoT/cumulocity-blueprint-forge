@@ -206,17 +206,11 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
     totalRemotes = totalRemotes + configDataMicroservices.length;
     totalRemotes = totalRemotes + configDataDashboards.length;
 
-    // this.showProgressModalDialog("Installing dependencies")
 
     const eachRemoteProgress: number = Math.floor((totalRemotes > 1 ? (90 / totalRemotes) : 0));
     let overallProgress = 0;
     this.showProgressModalDialog("Verifying dependencies...")
-    // if (configDataDashboards && configDataDashboards.length > 0) {
-    //   this.progressIndicatorService.setMessage('Installing dashboards');
-    // }
-    // if (configDataPlugins && configDataPlugins.length > 0) {
-    //   this.progressIndicatorService.setMessage(`Installing plugins`);
-    // }
+    
     if (totalRemotes > 1) { this.progressIndicatorService.setOverallProgress(overallProgress) }
     this.progressIndicatorService.setOverallProgress(5);
     for (let plugin of configDataPlugins) {
@@ -281,7 +275,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
           }
         });
       }
-
+      
       if (db.templateType && db.templateType === 1 && !db.isGroupDashboard) {
         this.groupTemplate = true;
       } else if (db.templateType && db.templateType === 2 && !db.isGroupDashboard) {
@@ -413,11 +407,11 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
         this.assetButtonText = "Device/Asset";
         this.groupTemplate = false;
         break;
-    }
-    this.deviceSelectorModalRef = this.modalService.show(DeviceSelectorModalComponent, { class: 'c8y-wizard', initialState: { templateType } });
-
-    if (templateType == 2) {
-      this.deviceSelectorModalRef.content.onTypeSelected.subscribe((selectedItem: IManagedObject) => {
+}
+  this.deviceSelectorModalRef = this.modalService.show(DeviceSelectorModalComponent, { class: 'c8y-wizard', initialState: { templateType } });
+ 
+  if(templateType == 2) {
+    this.deviceSelectorModalRef.content.onTypeSelected.subscribe((selectedItem: IManagedObject) => {
         dashboard.name = selectedItem;
         dashboard.templateType = templateType;
         dashboard.devices = [{
@@ -447,53 +441,39 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       });
     }
 
-
-
-    // if (dashboard.devices && dashboard.devices[0].reprensentation.id !== null && dashboard.devices[0].reprensentation.id !== undefined ) {
-    //   this.deviceFormValid = true;
-    // } else {
-    //   this.deviceFormValid = false;
-    // }
-
-    else {
-      this.deviceSelectorModalRef.content.onDeviceSelected.subscribe((selectedItem: IManagedObject) => {
-        dashboard.name = selectedItem['name'];
-        dashboard.templateType = templateType;
-        dashboard.devices = [{
-          type: "Temperature Sensor",
+    
+else {
+  this.deviceSelectorModalRef.content.onDeviceSelected.subscribe((selectedItem: IManagedObject) => {
+      dashboard.name = selectedItem['name'];
+      dashboard.templateType = templateType;
+      dashboard.devices = [{
+        type: "Temperature Sensor",
           placeholder: "device01",
-          reprensentation: {
+          reprensentation : {
             id: selectedItem.id,
             name: selectedItem['name']
           }
-        }]
-
-        let deviceFieldNotField;
-        for (let dd = 0; dd < this.templateDetails.dashboards.length; dd++) {
-          if (this.templateDetails.dashboards[dd].isDeviceRequired === false) {
-            deviceFieldNotField = true;
-
-          } else if (this.templateDetails.dashboards[dd].isDeviceRequired === true)
-            if (this.templateDetails.dashboards[dd].devices && this.templateDetails.dashboards[dd].devices[0] && this.templateDetails.dashboards[dd].devices[0]?.reprensentation.id !== null && this.templateDetails.dashboards[dd].devices[0]?.reprensentation.id !== undefined) {
-              deviceFieldNotField = true;
-            } else {
-              deviceFieldNotField = false;
-              break;
-            }
-        }
-
-        this.deviceFormValid = deviceFieldNotField;
-
-
-        // if (dashboard.devices && dashboard.devices[0].reprensentation.id !== null && dashboard.devices[0].reprensentation.id !== undefined ) {
-        //   this.deviceFormValid = true;
-        // } else {
-        //   this.deviceFormValid = false;
-        // }
-      });
+      }]
+      
+      let deviceFieldNotField;
+    for (let dd = 0; dd < this.templateDetails.dashboards.length; dd++) {
+      if (this.templateDetails.dashboards[dd].isDeviceRequired === false ) {
+        deviceFieldNotField = true;
+        
+      } else if (this.templateDetails.dashboards[dd].isDeviceRequired === true ) 
+       if(this.templateDetails.dashboards[dd].devices && this.templateDetails.dashboards[dd].devices[0] && this.templateDetails.dashboards[dd].devices[0]?.reprensentation.id !== null && this.templateDetails.dashboards[dd].devices[0]?.reprensentation.id !== undefined) {
+        deviceFieldNotField = true;
+      } else {
+        deviceFieldNotField = false;
+        break;
+      }
     }
 
-  }
+    this.deviceFormValid = deviceFieldNotField;
+  });
+}
+
+ }
   async saveAppChanges(app) {
     const savingAlert = new UpdateableAlert(this.alertService);
     savingAlert.update('Saving application...');
