@@ -83,6 +83,7 @@ export function standardTheme(branding: any) {
         --c8y-component-form-label-color:  ${_darker_text_Hex};
         --c8y-component-background-odd:  ${_primary_Hex};
         --c8y-component-background-expanded:${_darker_primary_Hex}; //Need a higher color
+        --c8y-page-sticky-header-background-default: ${_lighter_primary_Hex};
         --c8y-form-label-color: ${_text_Hex};
         --c8y-component-color-link: ${_darker_text_Hex};
         --c8y-component-icon-color: ${_darker_text_Hex};
