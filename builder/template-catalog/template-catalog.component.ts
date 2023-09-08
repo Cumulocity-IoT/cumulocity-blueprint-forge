@@ -179,11 +179,19 @@ export class TemplateCatalogModalComponent implements OnInit {
                 dependency.visible = true;
             } else {
                 this.verifyWidgetCompatibility(dependency);
-                this.componentService.getById(dependency.id).then(widget => {
-                    dependency.isInstalled = (widget != undefined);
-                });
+                if(dependency.ids && dependency.ids.length > 0) {
+                    Promise.all(dependency.ids.map( async id => {
+                        return ( await this.componentService.getById(id) ? true : false);
+                    })).then ((widgetStatusList: boolean[]) => {
+                        const widgetObj =  widgetStatusList.find(widget => !widget);
+                        dependency.isInstalled = (widgetObj == undefined);
+                    })
+                } else  {
+                    this.componentService.getById(dependency.id).then(widget => {
+                        dependency.isInstalled = (widget != undefined);
+                    });
+                }
             }
-
         };
     }
 
@@ -348,14 +356,6 @@ export class TemplateCatalogModalComponent implements OnInit {
                         createdApp = null;
                         this.alertService.danger("There is some technical error! Please try after sometime.");
                         console.error(ex.message);
-                        /* // prepare translation of static message if it exists
-                        const staticErrorMessage =
-                            ERROR_MESSAGES[ex.message] && this.translateService.instant(ERROR_MESSAGES[ex.message]);
-                        // if there is no static message, use dynamic one from the exception
-                        this.errorMessage = staticErrorMessage ?? ex.message;
-                        if (!this.errorMessage && !this.uploadCanceled) {
-                            this.alertService.addServerFailure(ex);
-                        } */
                     }
                 });
             

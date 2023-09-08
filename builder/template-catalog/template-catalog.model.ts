@@ -71,7 +71,8 @@ export interface BinaryDescription {
 }
 
 export interface DependencyDescription {
-    id: string;
+    id?: string;
+    ids?: string[];
     title: string;
     repository: string;
     link: string;
