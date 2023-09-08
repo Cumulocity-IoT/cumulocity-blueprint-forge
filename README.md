@@ -14,7 +14,7 @@ with a seemless user experience.
 * **Blank Template support:** The Blank Template Lets You Build Applications from Scratch, No Dashboards or Plugins Preselected.
 * **Support for Device group and Asset Type:** Link not just devices, user can also link Device Group and Asset type with the dashboard.
 * **Configure while creating:** User can configure the application while creating it.
-
+* **Custom Branding:** Provides flexibility and control over application’s look and feel. Now user can use color picker to choose millions of colors to customize branding. Header, Action bar and tab bar are also customizable. User can add his own branding by choosing different colors of his choice in the application. 
 ## Installation
 
 ### Install Blueprint Forge
@@ -62,6 +62,21 @@ You have created an application.
 13. It will take a while to install the dependent packages. Then click on `Save and Reload`.
 
 Congratulations! You have successfully created an application using Blueprint Forge with template of your choice.
+
+### User Guide
+
+#### How to upgrade Blueprint Forge application
+
+Blueprint Forge application can be upgraded if new version update is available. If newer update is available, an icon (on hover of it, it shows "Update available") is seen next to the application version below the application name. 
+
+Follow below steps to upgrade your application:
+
+1. Go to Applications -> All applications. 
+2. Click on the Blueprint Forge application name which is created. You will be navigated to Application Properties.
+3. You will see "Update available" button in the Properties. Click on it.
+4. Pop up appears for confirmation. Click on "Update" to upgrade your application.
+
+Congratulations! You have successfully updated your application. You can see the latest version next to your application name.
 
 
 In order to deploy an application, use `npm run deploy` or build it with `npm run build`, zip application files and upload manually as a package in your tenant Administration application. 
