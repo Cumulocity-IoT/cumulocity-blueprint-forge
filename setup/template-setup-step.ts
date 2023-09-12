@@ -18,7 +18,6 @@
 import { CdkStep } from '@angular/cdk/stepper';
 import { AppStateService, AlertService, C8yStepper, SetupComponent } from '@c8y/ngx-components';
 import { BlueprintForge } from './template-setup.model';
-import { distinctUntilChanged } from "rxjs/operators";
 import { SetupConfigService } from './setup-config.service';
 const DEFAULT_CONFIG: BlueprintForge = {
   templateURL: "",
@@ -29,7 +28,6 @@ const DEFAULT_CONFIG: BlueprintForge = {
 };
 
 export abstract class TemplateSetupStep {
-  // config: TemplateBlueprintEntry = DEFAULT_CONFIG;
   config: any = {}
   blueprintForge: BlueprintForge = DEFAULT_CONFIG;
   pending = false;

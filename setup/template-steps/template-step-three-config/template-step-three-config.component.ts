@@ -69,7 +69,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   isChecked: boolean = true;
 
   app: Observable<any>;
-  refreshApp = new BehaviorSubject<void>(undefined);
   currentApp: IApplication;
   templateDetailsData: any;
   isFormValid = false;
@@ -78,9 +77,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   groupTemplateInDashboard: boolean;
 
 
-  // devicePopup: boolean = false;
-  // typePopup: boolean  = false;
-  // groupPopup: boolean = false;
   constructor(
     public stepper: C8yStepper,
     protected step: CdkStep,
@@ -100,15 +96,11 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   ) {
 
     super(stepper, step, setup, appState, alert, setupConfigService);
-    this.app = combineLatest([appIdService.appIdDelayedUntilAfterLogin$, this.refreshApp]).pipe(
-      map(([appId]) => appId),
-      switchMap(appId => from(
-        this.appDataService.getAppDetails(appId)
-      )),
-      tap((app: IApplication & { applicationBuilder: any }) => { // TODO: do this a nicer way....
+    this.app = this.appStateService.currentApplication.pipe(
+      tap((app: IApplication & { applicationBuilder: any }) => { 
         this.newAppName = app.name;
         this.newAppContextPath = app.contextPath;
-        this.newAppIcon = app.applicationBuilder.icon;
+        this.newAppIcon = (app.applicationBuilder && app.applicationBuilder.icon ? app.applicationBuilder.icon: "bathtub");
       })
     );
     this.app.subscribe(app => {
@@ -148,7 +140,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
     if (this.appConfigForm.form.valid) {
       if (this.currentApp.name !== this.newAppName ||
         this.currentApp.contextPath !== this.newAppContextPath ||
-        this.currentApp.applicationBuilder.icon !== this.newAppIcon) {
+        (this.currentApp.applicationBuilder && this.currentApp.applicationBuilder.icon !== this.newAppIcon)) {
         await this.saveAppChanges(app);
       }
       await this.configureApp(app);
@@ -296,10 +288,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
         "tenantId": this.settingsService.getTenantName(),
       });
     }
-    // if (configDataPlugins && configDataPlugins.length > 0) {
-    //   this.hideProgressModalDialog();
-    // }
-
     this.hideProgressModalDialog();
     this.next();
   }
@@ -440,8 +428,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
         this.deviceFormValid = deviceFieldNotField;
       });
     }
-
-    
 else {
   this.deviceSelectorModalRef.content.onDeviceSelected.subscribe((selectedItem: IManagedObject) => {
       dashboard.name = selectedItem['name'];

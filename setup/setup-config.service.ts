@@ -29,8 +29,6 @@ export class SetupConfigService{
             this.appConfig = appConfig;
     })
     }
-    
-
     stepCompleted(stepper: C8yStepper, step: CdkStep, setup: SetupComponent) {
         if(this.appConfig && this.appConfig.blueprintForge && this.appConfig.blueprintForge.selectedStepperIndex > 0){
             while(this.stepperIndex <= (this.appConfig.blueprintForge.selectedStepperIndex  + 1) ){
