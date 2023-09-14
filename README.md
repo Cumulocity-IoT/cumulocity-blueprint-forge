@@ -6,9 +6,9 @@ with a seemless user experience.
 ![BlueprintForge](assets/blueprint-forge.png)
 
 ## Features
-* **Integrate ready solutions:** Blueprint Forge allows template driven approach to integrate ready solutions seemlessly.
-* **Easy Customizaton:** Provides option to select dashboards and unselect dashboards.
-* **Dashboard Catalog:** User can select any pre-designed template for dashboard and ability to install dependent runtime widgets.
+* **Market-ready solutions:** Blueprint Forge support template-driven approach which Enable delivery and maintenance of pre-built and market-ready industry solutions with a seamless user experience. As in initial version, we have Field Services, Predictive Maintenance and Demo Template as our pre-built market-ready solutions.
+* **Easy Customization:** Simplified customization to configure dashboard, devices, widgets and microservices.
+* **Dashboard Catalog:** User can select any pre-designed template for dashboard and ability to install dependent widgets.
 * **Installation of plugins and microservice:** Provides option to install plugins and microservices while creating an application.
 * **Provision to add essential dashboards:** Effortlessly Craft Applications Using Demo Template's Essential Dashboards and Features – Explore the Overview, Receive a Warm Welcome, Find Help and Support.
 * **Blank Template support:** The Blank Template Lets You Build Applications from Scratch, No Dashboards or Plugins Preselected.
@@ -33,9 +33,10 @@ with a seemless user experience.
 2. Go to the **Administration view** in your tenant (/apps/administration)
 3. Open the **Ecosystem** section in the navigator and click **Applications**
 4. Go to **Packages**
-5. Click **Add Package**
-6. Drop zip file or select from your system location.
-7. Click **Done**
+5. Click **Blueprint Forge**
+6. Click "Version"
+7. Drop zip file or select from your system location.
+8. Click **Done**
 
 ## QuickStart
 
