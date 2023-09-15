@@ -28,8 +28,7 @@ import { SimulationStrategiesModule } from "./simulation-strategies/simulation-s
 import { CustomWidgetsModule } from "./custom-widgets/custom-widgets.module";
 import { interval } from 'rxjs';
 import { SettingsService } from './builder/settings/settings.service';
-import { WidgetsModule } from '@c8y/ngx-components/widgets';
-import { RouterModule as ngRouterModule } from '@angular/router';
+import { cockpitWidgets } from '@c8y/ngx-components/widgets/cockpit';
 import { SetupStep } from '@c8y/ngx-components';
 import { HOOK_STEPPER, Steppers,gettext } from '@c8y/ngx-components';
 
@@ -64,7 +63,7 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
     DashboardUpgradeModule,
     BuilderModule,
     SimulationStrategiesModule,
-    WidgetsModule,
+    cockpitWidgets(),
     CustomWidgetsModule,
     NgImageSliderModule,
     IconSelectorModule,

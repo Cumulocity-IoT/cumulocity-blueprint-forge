@@ -20,7 +20,8 @@ import { Component, OnInit, Input } from '@angular/core';
 
 @Component({
   selector: 'lib-markdown-config',
-  templateUrl: './markdown-widget.config.html'
+  templateUrl: './markdown-widget.config.html',
+  styleUrls: ['./markdown-widget.config.css']
 })
 
 export class MarkdownConfigComponent implements OnInit {

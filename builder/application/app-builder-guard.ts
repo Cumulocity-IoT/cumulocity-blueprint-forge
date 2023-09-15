@@ -55,7 +55,7 @@ export class RedirectToApp implements CanActivate {
             // console.debug('Found a default application, loading it...');
             return this.router.parseUrl(`/application/${app.id}`);
         } else {
-            const appIcon: string = 'bathtub';
+            const appIcon: string = 'flash';
             const defaultAppBuilderData = {
                 applicationBuilder: {
                     version: packageJson.version,

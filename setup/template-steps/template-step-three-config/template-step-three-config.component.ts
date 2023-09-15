@@ -100,7 +100,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       tap((app: IApplication & { applicationBuilder: any }) => { 
         this.newAppName = app.name;
         this.newAppContextPath = app.contextPath;
-        this.newAppIcon = (app.applicationBuilder && app.applicationBuilder.icon ? app.applicationBuilder.icon: "bathtub");
+        this.newAppIcon = (app.applicationBuilder && app.applicationBuilder.icon ? app.applicationBuilder.icon: "flash");
       })
     );
     this.app.subscribe(app => {
