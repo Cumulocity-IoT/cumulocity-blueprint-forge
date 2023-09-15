@@ -1,6 +1,6 @@
 {
   "name": "blueprint-forge",
-  "version": "0.0.21-rc-2",
+  "version": "0.0.22-dev-2",
   "description": "Blueprint Forge enables template driven approach of integrating pre-build and market-ready industry solutions with a seemless user experience.",
   "scripts": {
     "start": "c8ycli server",

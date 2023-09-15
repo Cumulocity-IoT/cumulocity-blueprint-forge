@@ -18,6 +18,7 @@
 import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { InventoryService, IManagedObject, IResultList } from '@c8y/client';
+import { generateRegEx } from "../global-fun";
 
 @Injectable()
 export class DeviceSelectorModalService {
@@ -32,12 +33,12 @@ export class DeviceSelectorModalService {
     }
 
     queryDevices(templateType?: number, deviceName?: string): Promise<IResultList<IManagedObject>> {
-        let searchString = deviceName ? `*${deviceName}*` : '*';
+        let searchString = deviceName ? `${deviceName}` : '';
         if(templateType == 1){
-            return this.inventoryService.listQuery({ __filter: { __and: [{ __or: [{__has: 'c8y_IsDeviceGroup' }, {__has: 'c8y_IsAsset'  } ]}, { name: searchString }] } }, this.LIST_FILTER);
+            return this.inventoryService.listQuery({ __filter: { __and: [{ __or: [{__has: 'c8y_IsDeviceGroup' }, {__has: 'c8y_IsAsset'  } ]}, { name: generateRegEx(searchString) }] } , __orderby: [ {'name': 1}]}, this.LIST_FILTER);
         } else if(templateType == 2){
-            return this.inventoryService.listQuery({ __filter: { __and: [{ __or: [{__has: 'c8y_IsDevice' }, {__has: 'c8y_IsAsset'  } ]}, { type: searchString }] } }, this.LIST_FILTER);
+            return this.inventoryService.listQuery({ __filter: { __and: [{ __or: [{__has: 'c8y_IsDevice' }, {__has: 'c8y_IsAsset'  } ]}, { type: generateRegEx(searchString) }] } , __orderby: [ {'name': 1}]}, this.LIST_FILTER);
         }
-        return this.inventoryService.listQuery({ __filter: { __and: [{ __or: [{__has: 'c8y_IsDevice' }, {__has: 'c8y_IsAsset'  } ]}, { name: searchString }] } }, this.LIST_FILTER);
+        return this.inventoryService.listQuery({ __filter: { __and: [{ __or: [{__has: 'c8y_IsDevice' }, {__has: 'c8y_IsAsset'  } ]}, { name: generateRegEx(searchString) }] } , __orderby: [ {'name': 1}]}, this.LIST_FILTER);
     }
 }

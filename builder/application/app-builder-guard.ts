@@ -78,8 +78,8 @@ export class RedirectToApp implements CanActivate {
                     icon: appIcon
                 },
                 icon: {
-                  //  name: this.appIcon,
-                  //  "class": `fa fa-${this.appIcon}`
+                     name: appIcon,
+                    "class": `fa fa-${appIcon}`
                 },
             };
             await this.appService.update({

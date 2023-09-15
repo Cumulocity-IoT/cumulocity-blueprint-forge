@@ -21,6 +21,7 @@ import { InventoryService, IResultList, IManagedObject } from '@c8y/client';
 import { Observable, Observer} from 'rxjs';
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/typeahead-match.class';
 import { ControlContainer, NgForm } from '@angular/forms';
+import { generateRegEx } from "./../builder/utils/global-fun";
 
 @Component({
     selector: 'device-selector',
@@ -86,15 +87,15 @@ export class DeviceSelectorComponent implements OnInit{
         };
         if (searchName) {
             if(this.isTypeInput){
-                inventoryFilter['query'] = `$filter=(hasany(c8y_IsDevice,c8y_IsAsset) and (type eq '${this.generateRegEx(searchName)}'))`;
+                inventoryFilter['query'] = `$filter=(hasany(c8y_IsDevice,c8y_IsAsset) and (type eq '${generateRegEx(searchName)}')) $orderby=name asc`;
             }
             else if(this.isGroup) {
-                inventoryFilter['query'] = `$filter=(hasany(c8y_IsDeviceGroup,c8y_IsAsset) and (name eq '${this.generateRegEx(searchName)}'))`;
+                inventoryFilter['query'] = `$filter=(hasany(c8y_IsDeviceGroup,c8y_IsAsset) and (name eq '${generateRegEx(searchName)}')) $orderby=name asc`;
             } else {
-                inventoryFilter['query'] = `$filter=(hasany(c8y_IsDevice,c8y_IsAsset) and (name eq '${this.generateRegEx(searchName)}'))`;
+                inventoryFilter['query'] = `$filter=(hasany(c8y_IsDevice,c8y_IsAsset) and (name eq '${generateRegEx(searchName)}')) $orderby=name asc`;
             }
         } else {
-            inventoryFilter['query'] = `$filter=(hasany(c8y_IsDevice,c8y_IsAsset))`;
+            inventoryFilter['query'] = `$filter=(hasany(c8y_IsDevice,c8y_IsAsset)) $orderby=name asc`;
         }
         return this.inventoryService.list(inventoryFilter);
     
@@ -115,29 +116,6 @@ export class DeviceSelectorComponent implements OnInit{
     }
     changeTypeaheadLoading(e: boolean): void {
         this.typeaheadLoading = e;
-    }
-
-    // Regular expression for validation
-    generateRegEx(input) {
-        const name = input + '';
-        const nameLower = name.toLowerCase();
-        const nameUpper = name.toUpperCase();
-        let regex = '*';
-        const numRegex = new RegExp(/^([0-9]+)$/);
-        const splCharRegex = new RegExp(/^([,._-]+)$/);
-        for (let i = 0; i < name.length; i++) {
-          if (name.charAt(i) === ' ') {
-            regex += ' ';
-          } else if (name.charAt(i).match(numRegex)) {
-            regex += '[' + name.charAt(i) + ']';
-          } else if (name.charAt(i).match(splCharRegex)) {
-            regex += '[' + name.charAt(i) + ']';
-          } else {
-            regex += '[' + nameLower.charAt(i) + '|' + nameUpper.charAt(i) + ']';
-          }
-        }
-        regex += '*';
-        return regex;
     }
 
     typeInputChange() {
