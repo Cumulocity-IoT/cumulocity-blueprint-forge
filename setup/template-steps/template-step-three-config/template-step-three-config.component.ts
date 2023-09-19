@@ -73,7 +73,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   templateDetailsData: any;
   isFormValid = false;
   deviceFormValid: boolean;
-  assetButtonText: String = 'Device/Asset';
+  assetButtonText: String = 'Select Device';
   groupTemplateInDashboard: boolean;
 
 

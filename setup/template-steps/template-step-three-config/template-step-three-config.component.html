@@ -63,9 +63,9 @@
                                   <span class="caret"></span>
                                 </button>
                                 <ul class="dropdown-menu dropdown-menu-right" *dropdownMenu>
-                                  <li><button *ngIf="dashboard.visibility !== 'hidden'" type="button" (click)="openDeviceSelectorDialog(dashboard, 0, i)">Device/Asset</button></li>
-                                  <li><button type="button"(click)="openDeviceSelectorDialog(dashboard, 1)">Device Group</button></li>
-                                  <li><button *ngIf="!dashboard.isGroupDashboard && dashboard.visibility !== 'hidden'" type="button"(click)="openDeviceSelectorDialog(dashboard, 2)">Device/Asset Type</button></li>
+                                  <li><button *ngIf="dashboard.isSelectAsset" type="button" (click)="openDeviceSelectorDialog(dashboard, 0, i)">Device/Asset <i class="dlt-c8y-icon-question" title="Select device/asset to connect with the dashboard" placement="right"></i></button></li>
+                                  <li><button *ngIf="dashboard.isSelectGroup" type="button"(click)="openDeviceSelectorDialog(dashboard, 1)">Device Group <i class="dlt-c8y-icon-question" title="Select device group to connect group and its subassets with the dashboard" placement="right"></i></button></li>
+                                  <li><button *ngIf="!dashboard.isGroupDashboard" type="button"(click)="openDeviceSelectorDialog(dashboard, 2)">Device/Asset Type<i class="dlt-c8y-icon-question" title="Select asset type to connect with the dashboard" placement="right"></i></button></li>
                                 </ul>
                               </div>
                               <div class="col-md-3"></div>
