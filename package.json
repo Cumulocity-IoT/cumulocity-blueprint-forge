@@ -1,9 +1,9 @@
 {
   "name": "blueprint-forge",
-  "version": "0.0.21-dev-2",
+  "version": "0.0.22-dev-2",
   "description": "Blueprint Forge enables template driven approach of integrating pre-build and market-ready industry solutions with a seemless user experience.",
   "scripts": {
-    "start": "c8ycli server -u https://appbuilder.eu-latest.cumulocity.com/",
+    "start": "c8ycli server",
     "build": "c8ycli build",
     "build-dev": "c8ycli build --env.mode=development",
     "deploy": "c8ycli deploy",
@@ -81,7 +81,6 @@
       "brandingEntry": "./ui-assets/index.less",
       "tabsHorizontal": true,
       "upgrade": true,
-      "forceSetup": true,
       "rightDrawer": true,
       "contentSecurityPolicy": "base-uri 'none'; default-src 'self' 'unsafe-inline' http: https: ws: wss: blob:; connect-src 'self' *.webmethodscloud.com *.aptrinsic.com *.billwerk.com http: https: ws: wss: blob:;  script-src 'self' open.mapquestapi.com *.twitter.com *.twimg.com *.aptrinsic.com 'unsafe-inline' 'unsafe-eval' data:; style-src * 'unsafe-inline' blob:; img-src * data: blob:; font-src * data:; frame-src *; worker-src 'self' blob:;",
       "dynamicOptionsUrl": "/apps/public/public-options/options.json",
@@ -106,7 +105,7 @@
         "from": "assets/blueprint-forge.png",
         "to": "assets/blueprint-forge.png"
       }],
-      "version": "0.0.21-dev-2"
+      "version": "0.0.22-dev-2"
     },
     "cli": {}
   },

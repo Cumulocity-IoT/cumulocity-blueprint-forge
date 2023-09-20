@@ -7,7 +7,7 @@
 <div>
     <form name="searchForm" class="search-input-container">
         <div id="search" class="input-group input-group-search">
-            <input type="search" name="device-search" class="form-control" placeholder="Search…"
+            <input type="search" name="device-search" class="form-control" placeholder="Search…" autocomplete="off"
                 [(ngModel)]="searchString" (keyup.enter)="searchForDevice()" />
             <span class="input-group-addon">
                 <i c8yIcon="search" *ngIf="!searchString || searchString.length === 0"></i>
