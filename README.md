@@ -6,7 +6,7 @@ with a seemless user experience.
 ![BlueprintForge](assets/blueprint-forge.png)
 
 ## Features
-* **Market-ready solutions:** Blueprint Forge support template-driven approach which Enable delivery and maintenance of pre-built and market-ready industry solutions with a seamless user experience. As in initial version, we have Field Services, Predictive Maintenance and Demo Template as our pre-built market-ready solutions.
+* **Solution Templates:** Blueprint Forge support template-driven approach which Enable delivery and maintenance of pre-built solution templates with a seamless user experience. As in initial version, we have Field Services, Predictive Maintenance and Demo Template as our pre-built solution templates.
 * **Easy Customization:** Simplified customization to configure dashboard, devices, widgets and microservices.
 * **Dashboard Catalog:** User can select any pre-designed template for dashboard and ability to install dependent widgets.
 * **Installation of plugins and microservice:** Provides option to install plugins and microservices while creating an application.
