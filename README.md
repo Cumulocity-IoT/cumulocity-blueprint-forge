@@ -1,12 +1,11 @@
 # Cumulocity package blueprint
 
-Blueprint Forge enables template driven approach of integrating pre-build and market-ready industry solutions
-with a seemless user experience. 
+Blueprint Forge provides a simple, coding-free way to build cumulocity application using pre-built solution templates. Bluerpint Forge is an open-source tool that empowers you to initially build an application from a template and later enhance it with additional plugins, dashboards, branding and much more. It's being managed by the Software AG's open-source community but not officially supported by Software AG. You can log any issues at GitHub or ask any question on the Software AG Tech Community. Support will provided on best endeavours.
 
 ![BlueprintForge](assets/blueprint-forge.png)
 
 ## Features
-* **Solution Templates:** Blueprint Forge support template-driven approach which Enable delivery and maintenance of pre-built solution templates with a seamless user experience. As in initial version, we have Field Services, Predictive Maintenance and Demo Template as our pre-built solution templates.
+* **Solution Templates:** Blueprint Forge support template-driven approach which enable delivery and maintenance of pre-built solution templates with a seamless user experience. As in initial version, we have Field Services, Predictive Maintenance and Demo Template as our pre-built solution templates.
 * **Easy Customization:** Simplified customization to configure dashboard, devices, widgets and microservices.
 * **Dashboard Catalog:** User can select any pre-designed template for dashboard and ability to install dependent widgets.
 * **Installation of plugins and microservice:** Provides option to install plugins and microservices while creating an application.
