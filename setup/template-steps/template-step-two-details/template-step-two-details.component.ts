@@ -16,7 +16,7 @@
 * limitations under the License.
  */
 import { CdkStep } from '@angular/cdk/stepper';
-import { AfterViewInit, Component, ViewEncapsulation  } from '@angular/core';
+import { AfterViewInit, Component, ViewEncapsulation } from '@angular/core';
 import { AlertService, AppStateService, C8yStepper, SetupComponent } from '@c8y/ngx-components';
 import { TemplateSetupStep } from './../../template-setup-step';
 import { TemplateCatalogSetupService } from '../../template-catalog-setup.service';
@@ -32,7 +32,7 @@ import { SetupConfigService } from './../../setup-config.service';
   encapsulation: ViewEncapsulation.None,
   host: { class: 'd-contents' }
 })
-export class TemplateStepTwoDetailsComponent extends TemplateSetupStep implements AfterViewInit{
+export class TemplateStepTwoDetailsComponent extends TemplateSetupStep implements AfterViewInit {
   public templateDetails: TemplateBlueprintDetails;
   configDetails: any;
   images: GalleryItem[];
@@ -48,60 +48,48 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep implement
     protected setupConfigService: SetupConfigService
   ) {
     super(stepper, step, setup, appState, alert, setupConfigService);
-    
-    
-
-    this.setup.data$.subscribe(data => { 
+    this.setup.data$.subscribe(data => {
       if (data.blueprintForge && data.blueprintForge != '') {
         this.templateDetails = null;
         const templateURL = data.blueprintForge.templateURL;
         this.loadTemplateDetailsCatalog(templateURL);
       }
     });
-  
   }
 
   ngAfterViewInit() {
     this.verifyStepCompleted();
-
   }
 
   loadTemplateDetailsCatalog(dashboardURL) {
     this.templateCatalogSetupService.getTemplateDetailsCatalog(dashboardURL)
-            .pipe(catchError(err => {
-                console.log('Dashboard Catalog: Error in primary endpoint! using fallback...');
-                return this.templateCatalogSetupService.getTemplateDetailsCatalogFallBack(dashboardURL)
-            }))
-            .subscribe((catalog: TemplateBlueprintDetails) => {
-              
-                this.templateDetails = catalog;
-              
-                if(this.templateDetails  && this.templateDetails.media) {
-                  this.templateDetails.media.forEach( (media:any) => {
-                    media.image = this.templateCatalogSetupService.getGithubURL(media.image);
-                    media.thumbImage = this.templateCatalogSetupService.getGithubURL(media.thumbImage);
-                  });
-                } else {
+      .pipe(catchError(err => {
+        console.log('Dashboard Catalog: Error in primary endpoint! using fallback...');
+        return this.templateCatalogSetupService.getTemplateDetailsCatalogFallBack(dashboardURL)
+      }))
+      .subscribe((catalog: TemplateBlueprintDetails) => {
 
-                  this.templateDetails.media = [];
-                }
+        this.templateDetails = catalog;
 
-                if (this.templateDetails && this.templateDetails.microservices === undefined ) {
-                  this.templateDetails.microservices = [];
-                }
-
-                /* if (this.templateDetails && this.templateDetails.devices === undefined) {
-                  this.templateDetails.devices = [];
-                } */
-
-                if(this.templateDetails  && this.templateDetails.media) {
-                this.images = this.templateDetails.media.map(item => new ImageItem({ src: item.image }));
-                } else {
-                  this.images = [];
-                }
-                this.templateCatalogSetupService.templateData.next(this.templateDetails);
-            }, error => {
-                this.alertService.danger("There is some technical error! Please try after sometime.");
-            });
+        if (this.templateDetails && this.templateDetails.media) {
+          this.templateDetails.media.forEach((media: any) => {
+            media.image = this.templateCatalogSetupService.getGithubURL(media.image);
+            media.thumbImage = this.templateCatalogSetupService.getGithubURL(media.thumbImage);
+          });
+        } else {
+          this.templateDetails.media = [];
+        }
+        if (this.templateDetails && this.templateDetails.microservices === undefined) {
+          this.templateDetails.microservices = [];
+        }
+        if (this.templateDetails && this.templateDetails.media) {
+          this.images = this.templateDetails.media.map(item => new ImageItem({ src: item.image }));
+        } else {
+          this.images = [];
+        }
+        this.templateCatalogSetupService.templateData.next(this.templateDetails);
+      }, error => {
+        this.alertService.danger("There is some technical error! Please try after sometime.");
+      });
   }
 }

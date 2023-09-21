@@ -80,6 +80,12 @@ export interface Dashboards {
     deviceId?: string;
     isChecked?: boolean;
     dashboardWidgets: DashboardWidgets[];
+    isSelectAsset: boolean;
+    isSelectType: boolean;
+    isSelectGroup: boolean;
+    isGroupDashboard: boolean;
+    visibility: boolean;
+    isMandatory: boolean;
 }
 export interface DashboardWidgets {
     id?: string;

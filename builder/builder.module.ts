@@ -32,12 +32,12 @@ import {
     AppBuilderConfigNavigationRegistrationService,
     AppBuilderConfigNavigationService
 } from "./navigation/app-builder-config-navigation.service";
-//import { BrandingComponent } from "./branding/branding.component";
+import { BrandingComponent } from "./branding/branding.component";
 import { SimulatorConfigModule } from "./simulator-config/simulator-config.module";
 import { AppIdService } from "./app-id.service";
 import { SimulatorConfigComponent } from "./simulator-config/simulator-config.component";
 import { MarkdownModule } from "ngx-markdown";
-//import { BrandingDirtyGuardService } from "./branding/branding-dirty-guard.service";
+import { BrandingDirtyGuardService } from "./branding/branding-dirty-guard.service";
 import { fromEvent, Observable } from "rxjs";
 import { distinctUntilChanged, filter, withLatestFrom } from "rxjs/operators";
 import { TemplateCatalogModule } from "./template-catalog/template-catalog.module";
@@ -74,11 +74,11 @@ import { SettingsService } from "./settings/settings.service";
                 path: 'application/:applicationId/config',
                 component: DashboardConfigComponent
             },
-            /*  {
+             {
                 path: 'application/:applicationId/branding',
                 component: BrandingComponent,
                 canDeactivate: [BrandingDirtyGuardService]
-            }, */ {
+            }, {
                 path: 'application/:applicationId/simulator-config',
                 component: SimulatorConfigComponent
             }

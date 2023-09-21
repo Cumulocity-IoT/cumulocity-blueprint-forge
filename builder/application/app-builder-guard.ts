@@ -55,17 +55,31 @@ export class RedirectToApp implements CanActivate {
             // console.debug('Found a default application, loading it...');
             return this.router.parseUrl(`/application/${app.id}`);
         } else {
-            const appIcon: string = 'bathtub';
+            const appIcon: string = 'flash';
             const defaultAppBuilderData = {
                 applicationBuilder: {
                     version: packageJson.version,
                     dashboards: [],
                     simulators: [],
+                    selectedTheme: 'Default',
+                    branding: {
+                        colors: {
+                            primary: '#1776BF',
+                            active: '#14629F',
+                            text: '#0b385b',
+                            textOnPrimary: 'white',
+                            textOnActive: 'white',
+                            hover: '#14629F',
+                            headerBar: 'white',
+                            toolBar: 'white',
+                            tabBar: 'white'
+                        }
+                    },
                     icon: appIcon
                 },
                 icon: {
-                  //  name: this.appIcon,
-                  //  "class": `fa fa-${this.appIcon}`
+                     name: appIcon,
+                    "class": `fa fa-${appIcon}`
                 },
             };
             await this.appService.update({

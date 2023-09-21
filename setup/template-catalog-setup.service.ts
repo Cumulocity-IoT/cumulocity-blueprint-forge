@@ -27,7 +27,7 @@ import { AppBuilderExternalAssetsService } from "app-builder-external-assets";
 
 const packageJson = require('./../package.json');
 @Injectable()
-export class TemplateCatalogSetupService{
+export class TemplateCatalogSetupService {
 
     private GATEWAY_URL_GitHubAsset = '';
     private GATEWAY_URL_GitHubAPI = '';
@@ -38,30 +38,26 @@ export class TemplateCatalogSetupService{
     private preprodBranchPath = "?ref=preprod";
     pkgVersion: any;
     private isFallBackActive = false;
-
-
     public templateData = new BehaviorSubject<TemplateBlueprintDetails>(undefined);
     templateData$ = this.templateData.asObservable();
 
- 
     constructor(private http: HttpClient, private inventoryService: InventoryService,
-        private appService: ApplicationService, 
+        private appService: ApplicationService,
         private binaryService: InventoryBinaryService,
         private externalService: AppBuilderExternalAssetsService
-        ) {
+    ) {
 
-        this.GATEWAY_URL_GitHubAPI = this.externalService.getURL('GITHUB','gatewayURL_Github');
-        this.GATEWAY_URL_GitHubAsset =  this.externalService.getURL('GITHUB','gatewayURL_GitHubAsset');
-        this.GATEWAY_URL_GitHubAPI_FallBack = this.externalService.getURL('GITHUB','gatewayURL_Github_Fallback');
-        this.GATEWAY_URL_GitHubAsset_FallBack =  this.externalService.getURL('GITHUB','gatewayURL_GitHubAsset_Fallback');
+        this.GATEWAY_URL_GitHubAPI = this.externalService.getURL('GITHUB', 'gatewayURL_Github');
+        this.GATEWAY_URL_GitHubAsset = this.externalService.getURL('GITHUB', 'gatewayURL_GitHubAsset');
+        this.GATEWAY_URL_GitHubAPI_FallBack = this.externalService.getURL('GITHUB', 'gatewayURL_Github_Fallback');
+        this.GATEWAY_URL_GitHubAsset_FallBack = this.externalService.getURL('GITHUB', 'gatewayURL_GitHubAsset_Fallback');
         this.pkgVersion = packageJson.version;
-        
-    }
 
+    }
 
     getTemplateCatalog(): Observable<TemplateBlueprintEntry[]> {
         let url = `${this.GATEWAY_URL_GitHubAPI}${this.bluePrintTemplatePath}`;
-        if(this.pkgVersion.includes('dev')) {
+        if (this.pkgVersion.includes('dev')) {
             url = url + this.devBranchPath;
         } else if (this.pkgVersion.includes('rc')) {
             url = url + this.preprodBranchPath;
@@ -71,7 +67,7 @@ export class TemplateCatalogSetupService{
 
     getTemplateDetailsCatalog(dashboardurl): Observable<TemplateBlueprintDetails> {
         let url = `${this.GATEWAY_URL_GitHubAPI}${dashboardurl}`;
-        if(this.pkgVersion.includes('dev')) {
+        if (this.pkgVersion.includes('dev')) {
             url = url + this.devBranchPath;
         } else if (this.pkgVersion.includes('rc')) {
             url = url + this.preprodBranchPath;
@@ -82,7 +78,7 @@ export class TemplateCatalogSetupService{
     getTemplateDetailsCatalogFallBack(dashboardurl): Observable<TemplateBlueprintDetails> {
         let url = `${this.GATEWAY_URL_GitHubAPI_FallBack}${dashboardurl}`;
         this.isFallBackActive = true;
-        if(this.pkgVersion.includes('dev')) {
+        if (this.pkgVersion.includes('dev')) {
             url = url + this.devBranchPath;
         } else if (this.pkgVersion.includes('rc')) {
             url = url + this.preprodBranchPath;
@@ -93,7 +89,7 @@ export class TemplateCatalogSetupService{
     getTemplateCatalogFallBack(): Observable<TemplateBlueprintEntry[]> {
         let url = `${this.GATEWAY_URL_GitHubAPI_FallBack}${this.bluePrintTemplatePath}`;
         this.isFallBackActive = true;
-        if(this.pkgVersion.includes('dev')) {
+        if (this.pkgVersion.includes('dev')) {
             url = url + this.devBranchPath;
         } else if (this.pkgVersion.includes('rc')) {
             url = url + this.preprodBranchPath;
@@ -117,13 +113,11 @@ export class TemplateCatalogSetupService{
                     config: get(entry, 'config'),
                     comingSoon: get(entry, 'coming_soon')
                 } as TemplateBlueprintEntry;
-                
+
             });
-            
+
         }));
     }
-
- 
 
     private getDataForTemplateDetailsCatalog(url: string): Observable<TemplateBlueprintDetails> {
         return this.http.get(`${url}`).pipe(map(response => {
@@ -140,7 +134,7 @@ export class TemplateCatalogSetupService{
                 description: get(catalog, 'description'),
                 input: get(catalog, 'input')
             } as TemplateBlueprintDetails;
-            
+
         }));
     }
 
@@ -148,26 +142,25 @@ export class TemplateCatalogSetupService{
         return this.http.get(`${this.GATEWAY_URL_GitHubAsset}${binaryId}`, {
             responseType: 'arraybuffer'
         })
-        .pipe(catchError(err => {
-            console.log('Template Catalog: Download Binary: Error in primary endpoint! using fallback...');
-            return this.http.get(`${this.GATEWAY_URL_GitHubAsset_FallBack}${binaryId}`, {
-              responseType: 'arraybuffer'
-            })
-        }));
+            .pipe(catchError(err => {
+                console.log('Template Catalog: Download Binary: Error in primary endpoint! using fallback...');
+                return this.http.get(`${this.GATEWAY_URL_GitHubAsset_FallBack}${binaryId}`, {
+                    responseType: 'arraybuffer'
+                })
+            }));
     }
 
-    
-    getGithubURL(relativePath: string){
+    getGithubURL(relativePath: string) {
         let url = `${this.GATEWAY_URL_GitHubAPI}`;
-        if(this.isFallBackActive) {
+        if (this.isFallBackActive) {
             url = `${this.GATEWAY_URL_GitHubAPI_FallBack}`;
         }
-        if(this.pkgVersion.includes('dev')) {
+        if (this.pkgVersion.includes('dev')) {
             return url + `${relativePath}${this.devBranchPath}`;
         } else if (this.pkgVersion.includes('rc')) {
             return url + `${relativePath}${this.preprodBranchPath}`;
         }
-        return  url + `${relativePath}`;
+        return url + `${relativePath}`;
     }
 
     getCumulocityDashboardRepresentation(dashboardConfiguration, widgets): CumulocityDashboard {
@@ -180,22 +173,35 @@ export class TemplateCatalogSetupService{
         };
     }
 
+    getDashboardFields(link) {
+
+        return this.http.get(`${this.GATEWAY_URL_GitHubAsset}${link}`).pipe(map(response => {
+            let dashboardFields = response as Array<object>;
+        })).pipe(catchError(err => {
+            console.log('Template Catalog: Download Binary: Error in primary endpoint! using fallback...');
+            return this.http.get(`${this.GATEWAY_URL_GitHubAsset_FallBack}${link}`, {
+                responseType: 'json'
+            })
+        }));
+
+    }
+
     private getWidgetsAsChildren(widgets): object {
         let children = {};
         widgets.forEach(widget => {
             widget.id = this.generateId();
             children[this.generateId()] = widget;
         })
-    
+
         return children;
     }
-    
+
     private generateId(): string {
-      let id = this.generateRandomInteger(10000, 100000000);
-      return id.toString();
+        let id = this.generateRandomInteger(10000, 100000000);
+        return id.toString();
     }
-    
+
     private generateRandomInteger(min, max): number {
-      return Math.floor(Math.random() * Math.floor(max) + min);
+        return Math.floor(Math.random() * Math.floor(max) + min);
     }
 }

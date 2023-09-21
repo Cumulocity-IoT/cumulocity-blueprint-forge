@@ -16,21 +16,20 @@
 * limitations under the License.
  */
 
-import { Component, OnInit, Input } from '@angular/core';
+export function customLogo(branding: any) {
+    const customLogo = `
+    body {
+        ${branding.logoHeight != undefined ? '--navigator-platform-logo-height: ' + branding.logoHeight + 'px;' : ''}
+    }
+    .navigator .title .tenant-brand {
+        background-image: url(${CSS.escape(branding.logo || '')});
+        padding-bottom: var(--navigator-platform-logo-height,28px);
+    }
+    
+    .title .c8y-app-icon {
+        ${branding.logoHeight != undefined ? '' : 'margin-top: -16px;'}
+    }
+    `;
 
-@Component({
-  selector: 'lib-markdown-config',
-  templateUrl: './markdown-widget.config.html',
-  styleUrls: ['./markdown-widget.config.css']
-})
-
-export class MarkdownConfigComponent implements OnInit {
-
-@Input() config: any = {};
-
-  constructor() {}
-
-  ngOnInit() {
-  }
-
+    return customLogo;
 }

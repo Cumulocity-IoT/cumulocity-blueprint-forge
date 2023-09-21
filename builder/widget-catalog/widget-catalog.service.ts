@@ -235,7 +235,8 @@ export class WidgetCatalogService {
         const key = remote.contextPath + '@' + remote.version;
         (remotes[key] = remotes[key] || []).push(remote.module);
       });
-      const config = { remotes};
+      let config = (currentApp?.config ? currentApp.config :  {});
+      config.remotes = remotes;
        let updatedApp = (await this.appService.update({
         id: currentApp.id,
         config

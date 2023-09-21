@@ -28,8 +28,7 @@ import { SimulationStrategiesModule } from "./simulation-strategies/simulation-s
 import { CustomWidgetsModule } from "./custom-widgets/custom-widgets.module";
 import { interval } from 'rxjs';
 import { SettingsService } from './builder/settings/settings.service';
-import { WidgetsModule } from '@c8y/ngx-components/widgets';
-import { RouterModule as ngRouterModule } from '@angular/router';
+import { cockpitWidgets } from '@c8y/ngx-components/widgets/cockpit';
 import { SetupStep } from '@c8y/ngx-components';
 import { HOOK_STEPPER, Steppers,gettext } from '@c8y/ngx-components';
 
@@ -41,16 +40,17 @@ import { TemplateCatalogSetupService } from './setup/template-catalog-setup.serv
 import { NgImageSliderModule } from 'ng-image-slider';
 import { GalleryModule } from 'ng-gallery';
 import { LightboxModule } from  'ng-gallery/lightbox';
-import { TemplateStepFourSummaryComponent } from './setup/template-steps/template-step-four-summary/template-step-four-summary.component';
 import { IconSelectorModule } from './icon-selector/icon-selector.module';
 import { SetupConfigService } from './setup/setup-config.service';
+import { SetupWidgetConfigModalComponent } from './setup/setup-widget-config-modal/setup-widget-config-modal.component';
+import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 @NgModule({
   declarations: [
     TemplateStepOneComponent, 
     TemplateStepTwoDetailsComponent,
     TemplateStepThreeConfigComponent,
-    TemplateStepFourSummaryComponent,
-    TemplateSetupStepperButtonsComponent
+    TemplateSetupStepperButtonsComponent,
+    SetupWidgetConfigModalComponent
   ],
   imports: [
     // Upgrade module must be the first
@@ -63,14 +63,15 @@ import { SetupConfigService } from './setup/setup-config.service';
     DashboardUpgradeModule,
     BuilderModule,
     SimulationStrategiesModule,
-    WidgetsModule,
+    cockpitWidgets(),
     CustomWidgetsModule,
     NgImageSliderModule,
     IconSelectorModule,
     GalleryModule.withConfig({
         thumb: false
       }),
-    LightboxModule.withConfig({})
+    LightboxModule.withConfig({}),
+    BsDropdownModule.forRoot()
   ],
   providers: [
     TemplateCatalogSetupService,SetupConfigService,

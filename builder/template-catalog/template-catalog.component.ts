@@ -67,6 +67,10 @@ export class TemplateCatalogModalComponent implements OnInit {
 
     public dashboardPath: string = null;
 
+    public assetButtonText = "Device/Asset";
+
+    private groupTemplate = false;
+
     private appList = [];
 
     public dashboardConfiguration = {
@@ -76,7 +80,8 @@ export class TemplateCatalogModalComponent implements OnInit {
         deviceId: '',
         tabGroup: '',
         dashboardVisibility: '',
-        roles: ''
+        roles: '',
+        templateType: 0 // 0: default, 1: group, 2: type
     };
 
     public selectedDevice: IManagedObject;
@@ -174,11 +179,19 @@ export class TemplateCatalogModalComponent implements OnInit {
                 dependency.visible = true;
             } else {
                 this.verifyWidgetCompatibility(dependency);
-                this.componentService.getById(dependency.id).then(widget => {
-                    dependency.isInstalled = (widget != undefined);
-                });
+                if(dependency.ids && dependency.ids.length > 0) {
+                    Promise.all(dependency.ids.map( async id => {
+                        return ( await this.componentService.getById(id) ? true : false);
+                    })).then ((widgetStatusList: boolean[]) => {
+                        const widgetObj =  widgetStatusList.find(widget => !widget);
+                        dependency.isInstalled = (widgetObj == undefined);
+                    })
+                } else  {
+                    this.componentService.getById(dependency.id).then(widget => {
+                        dependency.isInstalled = (widget != undefined);
+                    });
+                }
             }
-
         };
     }
 
@@ -190,14 +203,41 @@ export class TemplateCatalogModalComponent implements OnInit {
         this.currentStep = TemplateCatalogStep.CATALOG;
     }
 
-    openDeviceSelectorDialog(index: number): void {
-        this.deviceSelectorModalRef = this.modalService.show(DeviceSelectorModalComponent, { class: 'c8y-wizard', initialState: {} });
-        this.deviceSelectorModalRef.content.onDeviceSelected.subscribe((selectedDevice: IManagedObject) => {
-            this.templateDetails.input.devices[index].reprensentation = {
-                id: selectedDevice.id,
-                name: selectedDevice['name']
-            };
-        })
+    openDeviceSelectorDialog(index: number, templateType: number): void {
+       
+        switch (templateType) {
+            case 1:
+                this.assetButtonText = "Device Group";
+                this.groupTemplate = true;
+                break;
+            case 2:
+                this.assetButtonText = "Device/Asset Type";
+                this.groupTemplate = true;
+                break;
+            default:
+                this.assetButtonText = "Device/Asset";
+                this.groupTemplate = false;
+                break;
+        }
+        this.dashboardConfiguration.templateType = templateType;
+
+        this.deviceSelectorModalRef = this.modalService.show(DeviceSelectorModalComponent, { class: 'c8y-wizard', initialState: {templateType} });
+        if(templateType == 2) {
+            this.deviceSelectorModalRef.content.onTypeSelected.subscribe((selectedType: string) => {
+                this.templateDetails.input.devices[index].reprensentation = {
+                    id: selectedType,
+                    name: selectedType
+                };
+    
+            });
+        } else {
+            this.deviceSelectorModalRef.content.onDeviceSelected.subscribe((selectedDevice: IManagedObject) => {
+                this.templateDetails.input.devices[index].reprensentation = {
+                    id: selectedDevice.id,
+                    name: selectedDevice['name']
+                };
+            })
+        }
     }
 
     onImageSelected(files: FileList, index: number): void {
@@ -224,7 +264,7 @@ export class TemplateCatalogModalComponent implements OnInit {
     async onSaveButtonClicked() {
         this.showProgressModalDialog('Create Dashboard ...')
         this.dashboardConfiguration.dashboardName = (this.dashboardPath ? `${this.dashboardPath}/${this.dashboardConfiguration.dashboardName}` : this.dashboardConfiguration.dashboardName);
-        await this.catalogService.createDashboard(this.app, this.dashboardConfiguration, this.selectedTemplate, this.templateDetails);
+        await this.catalogService.createDashboard(this.app, this.dashboardConfiguration, this.selectedTemplate, this.templateDetails, this.groupTemplate);
 
         this.hideProgressModalDialog();
         this.onSave.next(this.isReloadRequired);
@@ -316,14 +356,6 @@ export class TemplateCatalogModalComponent implements OnInit {
                         createdApp = null;
                         this.alertService.danger("There is some technical error! Please try after sometime.");
                         console.error(ex.message);
-                        /* // prepare translation of static message if it exists
-                        const staticErrorMessage =
-                            ERROR_MESSAGES[ex.message] && this.translateService.instant(ERROR_MESSAGES[ex.message]);
-                        // if there is no static message, use dynamic one from the exception
-                        this.errorMessage = staticErrorMessage ?? ex.message;
-                        if (!this.errorMessage && !this.uploadCanceled) {
-                            this.alertService.addServerFailure(ex);
-                        } */
                     }
                 });
             

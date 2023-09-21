@@ -32,11 +32,11 @@ import * as _ from 'lodash';
                     <td><input type="string" class="form-control" placeholder="e.g. Version 1 (required)" required [(ngModel)]="firmware.name" (ngModelChange)="changeFirmware()"></td>
                     <td><input type="string" class="form-control" placeholder="e.g. 1.0.0 (required)" required [(ngModel)]="firmware.version" (ngModelChange)="changeFirmware()"></td>
                     <td><input type="string" class="form-control" placeholder="e.g. https://firmware-repo.cumulocity.com" [(ngModel)]="firmware.url" (ngModelChange)="changeFirmware()"></td>
-                    <td><button *ngIf="config.firmwareVersions.length > 1" (click)="removeFirmware(firmware)">-</button></td>
+                    <td><button class="btn btn-primary" *ngIf="config.firmwareVersions.length > 1" (click)="removeFirmware(firmware)">-</button></td>
                 </tr>
                 <tr>
                     <td colspan="3"></td>
-                    <td><button (click)="addFirmware()">+</button></td>
+                    <td><button  class="btn btn-primary" (click)="addFirmware()">+</button></td>
                 </tr>
             </table>
         </div>

@@ -27,7 +27,7 @@
                     <div class="list-item-checkbox">
                       <label id="dashboard{{i}}" title="Select" class="c8y-checkbox">
                         <input type="checkbox" [checked]="dashboard.selected" (change)="syncDashboardFlag($event, i)"
-                        >
+                        [disabled]="dashboard.isMandatory">
                         <span></span>
                       </label>
                     </div>
@@ -38,42 +38,54 @@
                 
                     <div class="list-item-body text-left">
                       <div class="d-flex row">
-                        <span class="col-sm-4 col-xs-12">{{dashboard.title}}</span>
+                        <span class="col-sm-3 col-xs-12">{{dashboard.title}}</span>
                         <div class="col-sm-4 col-xs-12 text-muted">
                           <span translate>{{dashboard.description}}</span>
                         </div>
-                        <div *ngIf="dashboard.isDeviceRequired" class="col-sm-4 col-xs-12 text-muted">
+                        <div class="col-sm-5 col-xs-12 text-muted">
+                        <div *ngIf="dashboard.isDeviceRequired">
+                         
                           <form class="form-inline" name="deviceForm" #deviceForm="ngForm">
                             <div class="form-group" class="col-sm-12 col-md-12 col-xs-12" style="padding:0">
-                              <div class="form-group col-sm-12 col-md-9 col-xs-12" style="padding:0; margin: 0">
+                              <div class="form-group col-sm-6 col-md-6 col-xs-12" style="padding:0; margin: 0">
                                   <label class="sr-only" for="selected-device">Select Device/asset for dashboard</label>
                                   
-                                  <input *ngIf="dashboard.isDeviceRequired" name="selectedDevice" class="form-control"
+                                  <input *ngIf="dashboard.isDeviceRequired" name="selectedItem" class="form-control"
                                   [(ngModel)]="dashboard.name" required readonly style="width: 100%"
                                       id="selected-device" placeholder="Select Device/Asset" type="text"
                                      >
                               </div>
-                              <div class="col-sm-12 col-md-2 col-xs-12" style="padding-left: 0; max-width: 100%; padding-right: 2%; text-align: end">
-                                <button type="button" class="btn btn-primary"
-                                  (click)="openDeviceSelectorDialog(dashboard, i)">
-                                  <i class="dlt-c8y-icon-edit"></i>
+
+
+                              <div class="col-sm-4 col-md-4 col-xs-12 input-group-btn dropdown" style="padding-left: 0; max-width: 100%; text-align: end" dropdown>
+                                <button type="button" dropdownToggle class="btn btn-primary dropdown-toggle c8y-dropdown">
+                                  <span >{{assetButtonText}}</span>
+                                  <span class="caret"></span>
                                 </button>
-                                  
+                                <ul class="dropdown-menu dropdown-menu-right" *dropdownMenu>
+                                  <li><button *ngIf="dashboard.isSelectAsset" type="button" (click)="openDeviceSelectorDialog(dashboard, 0, i)">Device/Asset <i class="dlt-c8y-icon-question" title="Selected device/asset will be configured with one or more widgets in this dashboard" placement="right"></i></button></li>
+                                  <li><button *ngIf="dashboard.isSelectGroup" type="button"(click)="openDeviceSelectorDialog(dashboard, 1)">Device Group <i class="dlt-c8y-icon-question" title="Selected device group or devices/assets of selected device group will be configured with one or more widgets in this dashboard" placement="right"></i></button></li>
+                                  <li><button *ngIf="!dashboard.isGroupDashboard && dashboard.isSelectType" type="button"(click)="openDeviceSelectorDialog(dashboard, 2)">Device/Asset Type<i class="dlt-c8y-icon-question" title="All devices/assets of selected device/asset type will be configured with one or more widgets in this dashboard" placement="right"></i></button></li>
+                                </ul>
                               </div>
                               <div class="col-md-3"></div>
                                 </div>
+                               
                           </form>
                         </div>
                       </div>
+                        <div *ngIf="dashboard.title !== 'Instruction' && dashboard.title !== 'Welcome' && dashboard.title !== 'Help and Support' && dashboard.isConfigRequred" class="list-item-icon">
+                          <i class="dlt-c8y-icon-cogs space-top" (click)="configureBasicInput(dashboard, i)"></i>
+                        </div>
+                      </div>
                     </div>
-
-
                     
                   </div>
                   <div class="list-group-item d-flex" *ngFor="let plugin of templateDetails?.plugins; let p =index">
                     <div class="list-item-checkbox">
                       <label id="plugin{{p}}" title="select" class="c8y-checkbox" >
-                        <input type="checkbox" [checked]="plugin.selected"  (change)="syncPluginFlag($event, p)"/>
+                        <input type="checkbox" [checked]="plugin.selected"  (change)="syncPluginFlag($event, p)"
+                        [disabled]="plugin.isMandatory"/>
                         <span></span>
                       </label>
                     </div>
@@ -82,8 +94,8 @@
                     </div>
                     <div class="list-item-body text-left">
                       <div class="d-flex row">
-                        <span class="col-sm-4 col-xs-12">{{plugin.title}}</span>
-                        <div class="col-sm-8 col-xs-12 text-muted">
+                        <span class="col-sm-3 col-xs-12">{{plugin.title}}</span>
+                        <div class="col-sm-9 col-xs-12 text-muted">
                           <span translate>{{plugin.description}}</span>
                         </div>
                       </div>
@@ -92,7 +104,8 @@
                   <div class="list-group-item d-flex" *ngFor="let microservice of templateDetails?.microservices; let m =index">
                     <div class="list-item-checkbox">
                       <label id="microservice{{m}}" title="select" class="c8y-checkbox" >
-                        <input type="checkbox" [checked]="microservice.selected"  (change)="syncMicroserviceFlag($event, m)"/>
+                        <input type="checkbox" [checked]="microservice.selected"  (change)="syncMicroserviceFlag($event, m)"
+                        [disabled]="microservice.isMandatory"/>
                         <span></span>
                       </label>
                     </div>
@@ -101,8 +114,8 @@
                     </div>
                     <div class="list-item-body text-left">
                       <div class="d-flex row">
-                        <span class="col-sm-4 col-xs-12">{{microservice.title}}</span>
-                        <div class="col-sm-8 col-xs-12 text-muted">
+                        <span class="col-sm-3 col-xs-12">{{microservice.title}}</span>
+                        <div class="col-sm-9 col-xs-12 text-muted">
                           <span translate>{{microservice.description}}</span>
                         </div>
                       </div>
@@ -138,6 +151,25 @@
                         <label for="icon" [ngClass]="{'label-color': applyTheme}"><span>Icon</span></label>
                         <icon-selector id="icon" name="icon" [(value)]="newAppIcon"></icon-selector>
                     </div>
+                    <hr />
+                    <div class="card-header">
+                      <h4 translate>Themes</h4>
+                    </div>
+                    <div class="row col-md-12 col-sm-12 col-xs-12 form-group">
+                        <button class="btn"
+                        style="--brand-primary: #f9fafb; border: solid 1px #011f3d;background-color: #f9fafb;color:#011f3d; margin-bottom: 10px;margin-left: 8px;"
+                        (click)="setTheme(currentApp, '#f9fafb', '#e7ebee', '#011f3d', '#011f3d', '#512950','#058192', '#ffffff', '#ffffff', '#ffffff','Default')">Default</button>
+                        <button class="btn"
+                        style="--brand-primary: #1776bf; border: solid 1px var(--brand-light);background-color: #1776bf;color:#fff;margin-bottom: 10px;"
+                        (click)="setTheme(currentApp, '#1776bf', '#14629F', '#0b385b', '#ffffff', '#ffffff','#14629F', '#ffffff', '#ffffff', '#ffffff','Classic')">Classic</button>
+                        <button class="btn"
+                        style="--brand-primary: #011f3d; border: solid 1px var(--brand-light);background-color: #011f3d;color:#fff;margin-bottom: 10px;"
+                        (click)="setTheme(currentApp, '#011f3d', '#14629F', '#ffffff', '#ffffff', '#ffffff','#ffffff', '#012c57', '#012c57', '#012c57','Navy Blue')">Navy
+                        Blue</button>
+                        <button class="btn"
+                        style="--brand-primary: #243138; border: solid 1px var(--brand-light);background-color: #243138;color:#fff;margin-bottom: 10px;"
+                        (click)="setTheme(currentApp, '#243138', '#13202a', '#ffffff', '#ffffff', '#ffffff','#ffffff', '#334650','#334650', '#334650', 'Dark')">Dark</button>
+                     </div>
                 </form>
             </div>
           </div>
