@@ -1,7 +1,7 @@
 {
   "name": "blueprint-forge",
   "version": "1.0.0",
-  "description": "Blueprint Forge enables template driven approach of integrating pre-build and market-ready industry solutions with a seemless user experience.",
+  "description": "Blueprint Forge enables template driven approach of integrating pre-built solution templates with a seemless user experience.",
   "scripts": {
     "start": "c8ycli server",
     "build": "c8ycli build",
@@ -76,8 +76,8 @@
   "c8y": {
     "application": {
       "name": "Blueprint Forge",
-      "contextPath": "blueprint-forge",
-      "key": "blueprint-forge-application-key",
+      "contextPath": "sag-ps-pkg-blueprint-forge",
+      "key": "sag-ps-pkg-blueprint-forge-application-key",
       "brandingEntry": "./ui-assets/index.less",
       "tabsHorizontal": true,
       "upgrade": true,
@@ -104,6 +104,9 @@
       }, {
         "from": "assets/blueprint-forge.png",
         "to": "assets/blueprint-forge.png"
+      }, {
+        "from": "README.md",
+        "to": "README.md"
       }],
       "version": "1.0.0"
     },
