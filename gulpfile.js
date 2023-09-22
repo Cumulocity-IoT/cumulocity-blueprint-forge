@@ -21,7 +21,7 @@ function updateManifest() {
 
 const bundle = series(
     function createZip() {
-        return src('./dist/apps/blueprint-forge/**/*')
+        return src('./dist/apps/sag-ps-pkg-blueprint-forge/**/*')
             .pipe(zip(`${pkgJson.name}-${pkgJson.version}.zip`))
             .pipe(dest('dist/'))
     }
