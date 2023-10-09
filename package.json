@@ -1,6 +1,6 @@
 {
   "name": "blueprint-forge",
-  "version": "1.0.1",
+  "version": "1.0.1-dev-3",
   "description": "Blueprint Forge enables template driven approach of integrating pre-built solution templates with a seemless user experience.",
   "scripts": {
     "start": "c8ycli server",
@@ -111,7 +111,7 @@
         "from": "README.md",
         "to": "README.md"
       }],
-      "version": "1.0.1"
+      "version": "1.0.1-dev-3"
     },
     "cli": {}
   },

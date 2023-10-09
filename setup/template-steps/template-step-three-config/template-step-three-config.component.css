@@ -2,3 +2,6 @@
     padding-top: 30%;
     cursor: pointer;
 }
+.pad-left {
+    padding-left: 0;
+}
