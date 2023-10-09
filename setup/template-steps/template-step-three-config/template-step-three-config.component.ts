@@ -75,6 +75,9 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   deviceFormValid: boolean;
   assetButtonText: String = 'Select Device';
   groupTemplateInDashboard: boolean;
+  dashboardName: any;
+  dashboardTemplate: any;
+  templateSelected: String = 'Default Template';
 
 
   constructor(
@@ -231,7 +234,23 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       this.progressIndicatorService.setProgress(20);
       this.progressIndicatorService.setMessage(`Installing ${db.title}`);
       await new Promise(resolve => setTimeout(resolve, 1000));
-      const templateDetailsData = await (await this.loadTemplateDetails(db)).toPromise();
+
+
+      // in case of multiple templates
+
+      let templateDetailsData;
+      let  dashboardTemplates;
+      if (db.dashboardTemplates) {
+        console.log('Dashboard name value', db.dashboardTemplates, 'db value', db, 'dashboardTemplate', this.dashboardTemplate, 'templateSelected', this.templateSelected);
+         dashboardTemplates =  db.dashboardTemplates.find(dashboardTemplate => dashboardTemplate.dashboardName === this.templateSelected);
+          
+          templateDetailsData = await (await this.loadTemplateDetails(dashboardTemplates.dashboard)).toPromise();
+      } else {
+        templateDetailsData = await (await this.loadTemplateDetails(db.dashboard)).toPromise();
+      }
+
+      // const templateDetailsData = await (await this.loadTemplateDetails(db)).toPromise();
+      console.log('template details data', templateDetailsData);
 
       const dashboardConfiguration = {
         dashboardId: '12598412',
@@ -373,11 +392,21 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
     }
   }
 
-  async loadTemplateDetails(db: Dashboards): Promise<Observable<any>> {
-    return this.catalogService.getTemplateDetails(db.dashboard)
+  // async loadTemplateDetails(db: Dashboards): Promise<Observable<any>> {
+   
+  //   return this.catalogService.getTemplateDetails(db.dashboard)
+  //     .pipe(catchError(err => {
+  //       console.log('Dashboard Catalog Details: Error in primary endpoint! using fallback...');
+  //       return this.catalogService.getTemplateDetailsFallBack(db.dashboard);
+  //     }));
+  // }
+
+  async loadTemplateDetails(dbDashboard): Promise<Observable<any>> {
+   
+    return this.catalogService.getTemplateDetails(dbDashboard)
       .pipe(catchError(err => {
         console.log('Dashboard Catalog Details: Error in primary endpoint! using fallback...');
-        return this.catalogService.getTemplateDetailsFallBack(db.dashboard);
+        return this.catalogService.getTemplateDetailsFallBack(dbDashboard);
       }));
   }
 
@@ -533,5 +562,16 @@ else {
       this.renderer.addClass(this.document.body, 'body-theme');
     }
     this.brandingService.updateStyleForApp(app);
+  }
+
+
+  selectedWelcomeTemplate(event) {
+    console.log('Selected template value', event);
+  }
+
+  testDropdown(selectedTemplate, dashboardIndex, templateIndex) {
+    console.log('Test dropdown called', selectedTemplate);
+    this.templateSelected = selectedTemplate.dashboardName;
+    
   }
 }
