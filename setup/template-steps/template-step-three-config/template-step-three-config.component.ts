@@ -211,6 +211,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       this.progressIndicatorService.setOverallProgress(overallProgress);
     };
     await new Promise(resolve => setTimeout(resolve, 1000));
+    const isMSEnabled =  this.applicationBinaryService.isMicroserviceEnabled(this.appList);
     for (let ms of configDataMicroservices) {
       this.progressIndicatorService.setMessage(`Installing ${ms.title}`);
       this.progressIndicatorService.setProgress(10);

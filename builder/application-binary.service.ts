@@ -269,5 +269,12 @@ export class ApplicationBinaryService {
     isMicroservice(app: IApplication): boolean {
         return app.type === 'MICROSERVICE';
     }
+
+    isMicroserviceEnabled(appList: IApplication[]) {
+        const featureMSHosting = appList.find( app => app.contextPath == 'feature-microservice-hosting');
+        if(featureMSHosting) { return true;}
+        return false;
+            
+    }
 }
 
