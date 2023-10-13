@@ -22,7 +22,7 @@
               </div>
           </div>
           <div class="card-block" id="dashboardDiv">
-              <div class="list-group" style="min-height: 350px">
+              <div class="list-group">
                   <div class="list-group-item d-flex" *ngFor="let dashboard of templateDetails?.dashboards; let i = index">
                     <div class="list-item-checkbox">
                       <label id="dashboard{{i}}" title="Select" class="c8y-checkbox">
@@ -73,8 +73,8 @@
                                
                           </form>
                         </div>
-                        <div *ngIf="dashboard.dashboardTemplates" class="col-sm-5 col-md-5 col-xs-12 pad-left" style="width: 47%">
-                        <div class="dropdown" dropdown>
+                        <div *ngIf="dashboard.dashboardTemplates" class="col-sm-5 col-md-5 col-xs-12 pad-left">
+                        <div class="dropdown" dropdown  container="body">
                           <button
                           type="button"
                           title="dropdown-toggle"
@@ -183,17 +183,17 @@
                       <h4 translate>Themes</h4>
                     </div>
                     <div class="row col-md-12 col-sm-12 col-xs-12 form-group">
-                        <button class="btn"
+                        <button class="btn btn-xs"
                         style="--brand-primary: #f9fafb; border: solid 1px #011f3d;background-color: #f9fafb;color:#011f3d; margin-bottom: 10px;margin-left: 8px;"
                         (click)="setTheme(currentApp, '#f9fafb', '#e7ebee', '#011f3d', '#011f3d', '#512950','#058192', '#ffffff', '#ffffff', '#ffffff','Default')">Default</button>
-                        <button class="btn"
+                        <button class="btn btn-xs"
                         style="--brand-primary: #1776bf; border: solid 1px var(--brand-light);background-color: #1776bf;color:#fff;margin-bottom: 10px;"
                         (click)="setTheme(currentApp, '#1776bf', '#14629F', '#0b385b', '#ffffff', '#ffffff','#14629F', '#ffffff', '#ffffff', '#ffffff','Classic')">Classic</button>
-                        <button class="btn"
+                        <button class="btn btn-xs"
                         style="--brand-primary: #011f3d; border: solid 1px var(--brand-light);background-color: #011f3d;color:#fff;margin-bottom: 10px;"
                         (click)="setTheme(currentApp, '#011f3d', '#14629F', '#ffffff', '#ffffff', '#ffffff','#ffffff', '#012c57', '#012c57', '#012c57','Navy Blue')">Navy
                         Blue</button>
-                        <button class="btn"
+                        <button class="btn btn-xs"
                         style="--brand-primary: #243138; border: solid 1px var(--brand-light);background-color: #243138;color:#fff;margin-bottom: 10px;"
                         (click)="setTheme(currentApp, '#243138', '#13202a', '#ffffff', '#ffffff', '#ffffff','#ffffff', '#334650','#334650', '#334650', 'Dark')">Dark</button>
                      </div>
