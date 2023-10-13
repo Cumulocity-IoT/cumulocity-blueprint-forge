@@ -48,13 +48,18 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep implement
     protected setupConfigService: SetupConfigService
   ) {
     super(stepper, step, setup, appState, alert, setupConfigService);
-    this.setup.data$.subscribe(data => {
-      if (data.blueprintForge && data.blueprintForge != '') {
-        this.templateDetails = null;
-        const templateURL = data.blueprintForge.templateURL;
-        this.loadTemplateDetailsCatalog(templateURL);
-      }
-    });
+    let load = 0;
+      this.setup.data$.subscribe(data => {
+        if (data.blueprintForge && data.blueprintForge != '') {
+          if (load == 0) {
+          this.templateDetails = null;
+          const templateURL = data.blueprintForge.templateURL;
+          this.loadTemplateDetailsCatalog(templateURL);
+          load = load + 1;
+          }
+        }
+      });
+    
   }
 
   ngAfterViewInit() {

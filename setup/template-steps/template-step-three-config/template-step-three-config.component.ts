@@ -78,6 +78,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   dashboardName: any;
   dashboardTemplate: any;
   templateSelected: String = 'Default Template';
+  isMSEnabled: boolean = false;
 
 
   constructor(
@@ -112,7 +113,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   }
 
   ngOnInit() {
-    this.templateCatalogSetupService.templateData.subscribe(currentData => {
+    this.templateCatalogSetupService.templateData.subscribe(async currentData => {
       this.isFormValid = this.appConfigForm?.form.valid;
       if (currentData) {
         this.templateDetails = currentData;
@@ -123,6 +124,8 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       } else {
         this.deviceFormValid = false;
       }
+      this.appList = (await this.appService.list({ pageSize: 2000 })).data;
+      this.isMSEnabled =  this.applicationBinaryService.isMicroserviceEnabled(this.appList);
     });
   }
 
@@ -183,7 +186,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   }
 
   async configureApp(app: any) {
-    this.appList = (await this.appService.list({ pageSize: 2000 })).data;
+    
     const currentHost = window.location.host.split(':')[0];
     if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
       this.alert.warning("Installation isn't supported when running Application on localhost.");
@@ -214,16 +217,18 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       this.progressIndicatorService.setOverallProgress(overallProgress);
     };
     await new Promise(resolve => setTimeout(resolve, 1000));
-    const isMSEnabled =  this.applicationBinaryService.isMicroserviceEnabled(this.appList);
-    for (let ms of configDataMicroservices) {
-      this.progressIndicatorService.setMessage(`Installing ${ms.title}`);
-      this.progressIndicatorService.setProgress(10);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      const isInstalled = (await this.applicationBinaryService.verifyExistingMicroservices(ms.id)) as any;
-      if (!isInstalled) { await this.installMicroservice(ms); }
-      overallProgress = overallProgress + eachRemoteProgress;
-      this.progressIndicatorService.setOverallProgress(overallProgress)
-    };
+    
+    if (this.isMSEnabled) {
+      for (let ms of configDataMicroservices) {
+        this.progressIndicatorService.setMessage(`Installing ${ms.title}`);
+        this.progressIndicatorService.setProgress(10);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        const isInstalled = (await this.applicationBinaryService.verifyExistingMicroservices(ms.id)) as any;
+        if (!isInstalled) { await this.installMicroservice(ms); }
+        overallProgress = overallProgress + eachRemoteProgress;
+        this.progressIndicatorService.setOverallProgress(overallProgress)
+      };
+    }
     await new Promise(resolve => setTimeout(resolve, 1000));
     let dbClasses = {};
     if(app.applicationBuilder && app.applicationBuilder.selectedTheme) {
@@ -242,17 +247,12 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       let templateDetailsData;
       let  dashboardTemplates;
       if (db.dashboardTemplates) {
-        console.log('Dashboard name value', db.dashboardTemplates, 'db value', db, 'dashboardTemplate', this.dashboardTemplate, 'templateSelected', this.templateSelected);
          dashboardTemplates =  db.dashboardTemplates.find(dashboardTemplate => dashboardTemplate.dashboardName === this.templateSelected);
           
           templateDetailsData = await (await this.loadTemplateDetails(dashboardTemplates.dashboard)).toPromise();
       } else {
         templateDetailsData = await (await this.loadTemplateDetails(db.dashboard)).toPromise();
       }
-
-      // const templateDetailsData = await (await this.loadTemplateDetails(db)).toPromise();
-      console.log('template details data', templateDetailsData);
-
       const dashboardConfiguration = {
         dashboardId: '12598412',
         dashboardName: db.title,
@@ -392,15 +392,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
 
     }
   }
-
-  // async loadTemplateDetails(db: Dashboards): Promise<Observable<any>> {
-   
-  //   return this.catalogService.getTemplateDetails(db.dashboard)
-  //     .pipe(catchError(err => {
-  //       console.log('Dashboard Catalog Details: Error in primary endpoint! using fallback...');
-  //       return this.catalogService.getTemplateDetailsFallBack(db.dashboard);
-  //     }));
-  // }
 
   async loadTemplateDetails(dbDashboard): Promise<Observable<any>> {
    
@@ -565,13 +556,7 @@ else {
     this.brandingService.updateStyleForApp(app);
   }
 
-
-  selectedWelcomeTemplate(event) {
-    console.log('Selected template value', event);
-  }
-
-  testDropdown(selectedTemplate, dashboardIndex, templateIndex) {
-    console.log('Test dropdown called', selectedTemplate);
+  assignDashboardName(selectedTemplate) {
     this.templateSelected = selectedTemplate.dashboardName;
     
   }

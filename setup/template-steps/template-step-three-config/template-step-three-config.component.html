@@ -22,7 +22,7 @@
               </div>
           </div>
           <div class="card-block" id="dashboardDiv">
-              <div class="list-group">
+              <div class="list-group" style="min-height: 350px">
                   <div class="list-group-item d-flex" *ngFor="let dashboard of templateDetails?.dashboards; let i = index">
                     <div class="list-item-checkbox">
                       <label id="dashboard{{i}}" title="Select" class="c8y-checkbox">
@@ -38,7 +38,7 @@
                 
                     <div class="list-item-body text-left">
                       <div class="d-flex row">
-                        <span class="col-sm-3 col-xs-12">{{dashboard.title}}</span>
+                        <span class="col-sm-3 col-xs-12 title-width">{{dashboard.title}}</span>
                         <div class="col-sm-3 col-xs-12 text-muted">
                           <span translate>{{dashboard.description}}</span>
                         </div>
@@ -74,13 +74,6 @@
                           </form>
                         </div>
                         <div *ngIf="dashboard.dashboardTemplates" class="col-sm-5 col-md-5 col-xs-12 pad-left" style="width: 47%">
-                          <!-- <select [(ngModel)]="templateSelected" class="form-control" name="templateSelected"
-                          (change)="selectedWelcomeTemplate($event)">
-                            <option *ngFor="let selectedWelcomeTemplate of dashboard.dashboardTemplates; let dt = index" title="{{selectedWelcomeTemplate.description}}" [value]="selectedWelcomeTemplate.dashboardName">{{selectedWelcomeTemplate.dashboardName}}</option>
-                           
-                        </select> -->
-
-
                         <div class="dropdown" dropdown>
                           <button
                           type="button"
@@ -92,7 +85,7 @@
                         </button>
                         <ul style="max-height: 225px; overflow-y: auto" class="dropdown-menu" *dropdownMenu>
                           <li *ngFor="let selectedWelcomeTemplate of dashboard.dashboardTemplates; let st = index">
-                            <button type="button" title="{{selectedWelcomeTemplate.description}}" (click)="testDropdown(selectedWelcomeTemplate, i, st)">
+                            <button type="button" title="{{selectedWelcomeTemplate.description}}" (click)="assignDashboardName(selectedWelcomeTemplate)">
                               {{selectedWelcomeTemplate.dashboardName}}
                             </button>
                           </li>
@@ -120,7 +113,7 @@
                     </div>
                     <div class="list-item-body text-left">
                       <div class="d-flex row">
-                        <span class="col-sm-3 col-xs-12">{{plugin.title}}</span>
+                        <span class="col-sm-3 col-xs-12 title-width">{{plugin.title}}</span>
                         <div class="col-sm-3 col-xs-12 text-muted">
                           <span translate>{{plugin.description}}</span>
                         </div>
@@ -128,7 +121,7 @@
                       </div>
                     </div>
                   </div>
-                  <div class="list-group-item d-flex" *ngFor="let microservice of templateDetails?.microservices; let m =index">
+                  <div class="list-group-item d-flex" [ngStyle]="{'opacity': !isMSEnabled ? '0.65 ': ''}" *ngFor="let microservice of templateDetails?.microservices; let m =index">
                     <div class="list-item-checkbox">
                       <label id="microservice{{m}}" title="select" class="c8y-checkbox" >
                         <input type="checkbox" [checked]="microservice.selected"  (change)="syncMicroserviceFlag($event, m)"
@@ -141,7 +134,13 @@
                     </div>
                     <div class="list-item-body text-left">
                       <div class="d-flex row">
-                        <span class="col-sm-3 col-xs-12">{{microservice.title}}</span>
+                        <span class="col-sm-3 col-xs-12 title-width">{{microservice.title}}
+                          <button *ngIf="!isMSEnabled" disabled type="button" style="margin-left: 10px"
+                                class="btn btn-xs btn-icon">
+                                <i class="fa fa-warning"></i>
+                                Not supported!</button>
+                        </span>
+                        
                         <div class="col-sm-3 col-xs-12 text-muted">
                           <span translate>{{microservice.description}}</span>
                         </div>
