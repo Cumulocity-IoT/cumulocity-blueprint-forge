@@ -79,6 +79,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   dashboardTemplate: any;
   templateSelected: String = 'Default Template';
   isMSEnabled: boolean = false;
+  welcomeTemplateData: any;
 
 
   constructor(
@@ -126,6 +127,10 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       }
       this.appList = (await this.appService.list({ pageSize: 2000 })).data;
       this.isMSEnabled =  this.applicationBinaryService.isMicroserviceEnabled(this.appList);
+    });
+
+    this.templateCatalogSetupService.welcomeTemplateData.subscribe(welcomeTemplateData => {
+      this.welcomeTemplateData = welcomeTemplateData;
     });
   }
 
@@ -246,10 +251,13 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
 
       let templateDetailsData;
       let  dashboardTemplates;
-      if (db.dashboardTemplates) {
-         dashboardTemplates =  db.dashboardTemplates.find(dashboardTemplate => dashboardTemplate.dashboardName === this.templateSelected);
-          
-          templateDetailsData = await (await this.loadTemplateDetails(dashboardTemplates.dashboard)).toPromise();
+      if (db.welcomeTemplates) {
+         dashboardTemplates =  this.welcomeTemplateData.find(dashboardTemplate => dashboardTemplate.dashboardName === this.templateSelected);
+          if (dashboardTemplates && this.templateSelected === 'Default Template') {
+            templateDetailsData = await (await this.loadTemplateDetails(db.dashboard)).toPromise();
+          } else {
+            templateDetailsData = await (await this.loadTemplateDetails(dashboardTemplates.dashboard)).toPromise();
+          }
       } else {
         templateDetailsData = await (await this.loadTemplateDetails(db.dashboard)).toPromise();
       }

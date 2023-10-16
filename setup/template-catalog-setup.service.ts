@@ -22,7 +22,7 @@ import { catchError, map } from "rxjs/operators";
 import { has, get } from "lodash-es";
 import { ApplicationService, InventoryBinaryService, InventoryService } from "@c8y/ngx-components/api";
 import { CumulocityDashboard } from "builder/template-catalog/template-catalog.model";
-import { TemplateBlueprintDetails, TemplateBlueprintEntry } from "./template-setup.model";
+import { TemplateBlueprintDetails, TemplateBlueprintEntry, WelcomeTemplate } from "./template-setup.model";
 import { AppBuilderExternalAssetsService } from "app-builder-external-assets";
 
 const packageJson = require('./../package.json');
@@ -40,6 +40,9 @@ export class TemplateCatalogSetupService {
     private isFallBackActive = false;
     public templateData = new BehaviorSubject<TemplateBlueprintDetails>(undefined);
     templateData$ = this.templateData.asObservable();
+
+    public welcomeTemplateData = new BehaviorSubject<WelcomeTemplate>(undefined);
+    welcomeTemplateData$ = this.welcomeTemplateData.asObservable();
 
     constructor(private http: HttpClient, private inventoryService: InventoryService,
         private appService: ApplicationService,
@@ -97,25 +100,33 @@ export class TemplateCatalogSetupService {
         return this.getDataForTemplateCatalog(url);
     }
 
-    private getDataForTemplateCatalog(url: string): Observable<TemplateBlueprintEntry[]> {
+    private getDataForTemplateCatalog(url: string): Observable<any> {
         return this.http.get(`${url}`).pipe(map(response => {
             if (!has(response, 'template')) {
                 console.error('Failed to load catalog');
                 return undefined;
             }
-
-            let catalog = response['template'] as Array<object>;
-            return catalog.map(entry => {
+            let template = response['template'];
+            let welcomeTemplate = response['welcomeTemplate'];
+            
+            welcomeTemplate.map(entry => {
+                return {
+                    dashboardName: get(entry, 'dashboardName'),
+                dashboard: get(entry, 'dashboard'),
+                description: get(entry, 'description')
+                } as WelcomeTemplate;
+            });
+            template.map(entry => {
                 return {
                     title: get(entry, 'title'),
                     description: get(entry, 'description'),
                     thumbnail: get(entry, 'thumbnail'),
                     config: get(entry, 'config'),
-                    comingSoon: get(entry, 'coming_soon')
+                    comingSoon: get(entry, 'coming_soon'),
                 } as TemplateBlueprintEntry;
-
             });
-
+            let catalog = [template, welcomeTemplate];
+            return catalog;
         }));
     }
 

@@ -32,6 +32,12 @@ export interface TemplateBlueprintEntry {
     comingSoon: boolean;
 }
 
+export interface WelcomeTemplate {
+    dashboardName: string;
+    dashboard: string;
+    description: string;
+}
+
 export interface TemplateBlueprintDetails {
     templateId: string;
     title: string;
