@@ -72,7 +72,18 @@ export function generalBranding(app: any) {
     .ng-select.ng-select-single .ng-select-container .ng-value-container {
         color: var(--c8y-form-control-color-default) !important;
     }
-    `;
+    body:has(.dashboard-theme-branded:not(.dashboard-preview-slot)) .c8y-ui-action-bar {
+        --c8y-action-bar-border-color: inherit;
+        --c8y-action-bar-color-focus: inherit;
+        --c8y-action-bar-color-actions-hover: inherit;
+        --c8y-action-bar-color-actions: inherit;
+        --c8y-action-bar-color-text-muted: inherit;
+        --c8y-action-bar-color-default: inherit;
+        --c8y-action-bar-background-default: inherit;
+        --c8y-action-bar-icon-color: inherit;
+    }
+    `
+    ;
 
     
     
