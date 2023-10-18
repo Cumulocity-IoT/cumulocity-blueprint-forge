@@ -345,7 +345,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       const fileName = microService.link.replace(/^.*[\\\/]/, '');
       const fileOfBlob = new File([blob], fileName);
 
-      const createdApp = await this.applicationBinaryService.createAppForArchive(fileOfBlob);
+      const createdApp = await this.applicationBinaryService.createAppForMicroservice(fileOfBlob, microService);
       this.progressIndicatorService.setProgress(50);
       counter = 50;
       this.microserviceDownloadProgress$ = this.microserviceDownloadProgress.subscribe(async val => {
@@ -359,7 +359,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       this.progressIndicatorService.setProgress(80);
       await new Promise(resolve => setTimeout(resolve, 2000));
     } catch (ex) {
-      this.applicationBinaryService.cancelAppCreation(createdApp);
       createdApp = null;
       this.alert.danger("There is some technical error! Please try after sometime.");
       console.error(ex.message);
