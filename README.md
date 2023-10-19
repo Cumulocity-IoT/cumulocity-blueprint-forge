@@ -6,8 +6,8 @@ Blueprint Forge provides a simple, coding-free way to build cumulocity applicati
 
 ## What's new?
 
-* **Multiple Welcome Templates:** Now user can select his Welcome dashboard while creating the application. Different Welcome Template for various fields is available.
-* **Validation for Installing:** Microservice gets installed only if the tenant has enablement for it.
+* **Multiple Welcome Templates:** Now user can select Welcome Dashboard while creating application. Choose from a variety of Welcome Templates tailored to uour needs.
+* **Various bug fixes**
 
 ## Features
 * **Solution Templates:** Blueprint Forge support template-driven approach which enable delivery and maintenance of pre-built solution templates with a seamless user experience. As in initial version, we have Field Services, Predictive Maintenance and Demo Template as our pre-built solution templates.
