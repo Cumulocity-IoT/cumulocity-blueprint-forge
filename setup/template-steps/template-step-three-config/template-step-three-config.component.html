@@ -38,12 +38,12 @@
                 
                     <div class="list-item-body text-left">
                       <div class="d-flex row">
-                        <span class="col-sm-3 col-xs-12">{{dashboard.title}}</span>
-                        <div class="col-sm-4 col-xs-12 text-muted">
+                        <span class="col-sm-3 col-xs-12 title-width">{{dashboard.title}}</span>
+                        <div class="col-sm-3 col-xs-12 text-muted">
                           <span translate>{{dashboard.description}}</span>
                         </div>
-                        <div class="col-sm-5 col-xs-12 text-muted">
-                        <div *ngIf="dashboard.isDeviceRequired">
+                        <div class="col-sm-6 col-xs-12 text-muted">
+                        <div *ngIf="dashboard.isDeviceRequired" class="col-md-7 col-sm-7 pad-left">
                          
                           <form class="form-inline" name="deviceForm" #deviceForm="ngForm">
                             <div class="form-group" class="col-sm-12 col-md-12 col-xs-12" style="padding:0">
@@ -73,6 +73,25 @@
                                
                           </form>
                         </div>
+                        <div *ngIf="dashboard.welcomeTemplates" class="col-sm-5 col-md-5 col-xs-12 pad-left">
+                        <div class="dropdown" dropdown  container="body">
+                          <button
+                          type="button"
+                          title="dropdown-toggle"
+                          dropdownToggle
+                          class="btn btn-default dropdown-toggle c8y-dropdown"
+                        >
+                          <span>{{templateSelected}}</span> <span class="caret"></span>
+                        </button>
+                        <ul style="max-height: 225px; overflow-y: auto" class="dropdown-menu" *dropdownMenu>
+                          <li *ngFor="let selectedWelcomeTemplate of welcomeTemplateData; let st = index">
+                            <button type="button" title="{{selectedWelcomeTemplate.description}}" (click)="assignDashboardName(selectedWelcomeTemplate)">
+                              {{selectedWelcomeTemplate.dashboardName}}
+                            </button>
+                          </li>
+                        </ul>
+                        </div>
+                        </div>
                       </div>
                         <div *ngIf="dashboard.title !== 'Instruction' && dashboard.title !== 'Welcome' && dashboard.title !== 'Help and Support' && dashboard.isConfigRequred" class="list-item-icon">
                           <i class="dlt-c8y-icon-cogs space-top" (click)="configureBasicInput(dashboard, i)"></i>
@@ -94,14 +113,15 @@
                     </div>
                     <div class="list-item-body text-left">
                       <div class="d-flex row">
-                        <span class="col-sm-3 col-xs-12">{{plugin.title}}</span>
-                        <div class="col-sm-9 col-xs-12 text-muted">
+                        <span class="col-sm-3 col-xs-12 title-width">{{plugin.title}}</span>
+                        <div class="col-sm-3 col-xs-12 text-muted">
                           <span translate>{{plugin.description}}</span>
                         </div>
+                        <div class="col-sm-6 col-xs-12 text-muted"></div>
                       </div>
                     </div>
                   </div>
-                  <div class="list-group-item d-flex" *ngFor="let microservice of templateDetails?.microservices; let m =index">
+                  <div class="list-group-item d-flex" [ngStyle]="{'opacity': !isMSEnabled ? '0.65 ': ''}" *ngFor="let microservice of templateDetails?.microservices; let m =index">
                     <div class="list-item-checkbox">
                       <label id="microservice{{m}}" title="select" class="c8y-checkbox" >
                         <input type="checkbox" [checked]="microservice.selected"  (change)="syncMicroserviceFlag($event, m)"
@@ -114,10 +134,17 @@
                     </div>
                     <div class="list-item-body text-left">
                       <div class="d-flex row">
-                        <span class="col-sm-3 col-xs-12">{{microservice.title}}</span>
-                        <div class="col-sm-9 col-xs-12 text-muted">
+                        <span class="col-sm-3 col-xs-12 title-width">{{microservice.title}}
+                          <button *ngIf="!isMSEnabled" disabled type="button" style="margin-left: 10px"
+                                class="btn btn-xs btn-icon">
+                                <i class="fa fa-warning"></i>
+                                Not supported!</button>
+                        </span>
+                        
+                        <div class="col-sm-3 col-xs-12 text-muted">
                           <span translate>{{microservice.description}}</span>
                         </div>
+                        <div class="col-sm-6 col-xs-12 text-muted"></div>
                       </div>
                     </div>
                   </div>
@@ -156,17 +183,17 @@
                       <h4 translate>Themes</h4>
                     </div>
                     <div class="row col-md-12 col-sm-12 col-xs-12 form-group">
-                        <button class="btn"
+                        <button class="btn btn-xs"
                         style="--brand-primary: #f9fafb; border: solid 1px #011f3d;background-color: #f9fafb;color:#011f3d; margin-bottom: 10px;margin-left: 8px;"
                         (click)="setTheme(currentApp, '#f9fafb', '#e7ebee', '#011f3d', '#011f3d', '#512950','#058192', '#ffffff', '#ffffff', '#ffffff','Default')">Default</button>
-                        <button class="btn"
+                        <button class="btn btn-xs"
                         style="--brand-primary: #1776bf; border: solid 1px var(--brand-light);background-color: #1776bf;color:#fff;margin-bottom: 10px;"
                         (click)="setTheme(currentApp, '#1776bf', '#14629F', '#0b385b', '#ffffff', '#ffffff','#14629F', '#ffffff', '#ffffff', '#ffffff','Classic')">Classic</button>
-                        <button class="btn"
-                        style="--brand-primary: #011f3d; border: solid 1px var(--brand-light);background-color: #011f3d;color:#fff;margin-bottom: 10px;"
+                        <button class="btn btn-xs"
+                        style="--brand-primary: #000080; border: solid 1px var(--brand-light);background-color: #000080;color:#fff;margin-bottom: 10px;"
                         (click)="setTheme(currentApp, '#011f3d', '#14629F', '#ffffff', '#ffffff', '#ffffff','#ffffff', '#012c57', '#012c57', '#012c57','Navy Blue')">Navy
                         Blue</button>
-                        <button class="btn"
+                        <button class="btn btn-xs"
                         style="--brand-primary: #243138; border: solid 1px var(--brand-light);background-color: #243138;color:#fff;margin-bottom: 10px;"
                         (click)="setTheme(currentApp, '#243138', '#13202a', '#ffffff', '#ffffff', '#ffffff','#ffffff', '#334650','#334650', '#334650', 'Dark')">Dark</button>
                      </div>

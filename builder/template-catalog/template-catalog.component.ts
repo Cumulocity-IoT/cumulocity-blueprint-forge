@@ -97,6 +97,7 @@ export class TemplateCatalogModalComponent implements OnInit {
 
     private microserviceDownloadProgress = interval(3000);
     private microserviceDownloadProgress$: Subscription;
+    isMSEnabled: boolean = false;
 
     constructor(private modalService: BsModalService, private modalRef: BsModalRef, private appService: ApplicationService,
         private catalogService: TemplateCatalogService, private componentService: DynamicComponentService,
@@ -118,6 +119,8 @@ export class TemplateCatalogModalComponent implements OnInit {
         } else {
             this.loadTemplateCatalog();
         }
+        this.appList = (await this.appService.list({ pageSize: 2000 })).data;
+        this.isMSEnabled =  this.applicationBinaryService.isMicroserviceEnabled(this.appList);
     }
 
     loadTemplateCatalog(): void {
@@ -150,7 +153,7 @@ export class TemplateCatalogModalComponent implements OnInit {
 
     async loadTemplateDetails(template: TemplateCatalogEntry): Promise<void> {
         this.showLoadingIndicator();
-        this.appList = (await this.appService.list({ pageSize: 2000 })).data;
+        
         this.catalogService.getTemplateDetails(template.dashboard)
             .pipe(catchError(err => {
                 console.log('Dashboard Catalog Details: Error in primary endpoint! using fallback...');
@@ -335,7 +338,7 @@ export class TemplateCatalogModalComponent implements OnInit {
                         const fileName = dependency.link.replace(/^.*[\\\/]/, '');
                         const fileOfBlob = new File([blob], fileName);
 
-                        const createdApp = await this.applicationBinaryService.createAppForArchive(fileOfBlob);
+                        const createdApp = await this.applicationBinaryService.createAppForMicroservice(fileOfBlob, dependency);
                         this.progressIndicatorService.setProgress(50);
                         counter = 50;
                         this.microserviceDownloadProgress$ = this.microserviceDownloadProgress.subscribe(async val => {
@@ -352,7 +355,6 @@ export class TemplateCatalogModalComponent implements OnInit {
                         dependency.isInstalled = true;
                         this.isReloadRequired = true;
                     } catch (ex) {
-                        this.applicationBinaryService.cancelAppCreation(createdApp);
                         createdApp = null;
                         this.alertService.danger("There is some technical error! Please try after sometime.");
                         console.error(ex.message);

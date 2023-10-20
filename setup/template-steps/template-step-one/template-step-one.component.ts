@@ -21,7 +21,7 @@ import { AlertService, AppStateService, C8yStepper, SetupComponent } from '@c8y/
 import { TemplateSetupStep } from './../../template-setup-step';
 import { TemplateCatalogSetupService } from '../../template-catalog-setup.service';
 import { catchError } from "rxjs/operators";
-import { TemplateBlueprintDetails, TemplateBlueprintEntry } from './../../template-setup.model';
+import { TemplateBlueprintDetails, TemplateBlueprintEntry, WelcomeTemplate } from './../../template-setup.model';
 import { SetupConfigService } from './../../setup-config.service';
 
 @Component({
@@ -34,6 +34,7 @@ export class TemplateStepOneComponent extends TemplateSetupStep implements OnIni
 
 
   public templates: Array<TemplateBlueprintEntry> = [];
+  public welcomeTemplate: Array<WelcomeTemplate> = [];
 
   public filterTemplates: Array<TemplateBlueprintEntry> = [];
   templateDetails: TemplateBlueprintDetails;
@@ -64,8 +65,9 @@ export class TemplateStepOneComponent extends TemplateSetupStep implements OnIni
         console.log('Dashboard Catalog: Error in primary endpoint! using fallback...');
         return this.templateCatalogSetupService.getTemplateCatalogFallBack()
       }))
-      .subscribe((catalog: Array<TemplateBlueprintEntry>) => {
-        this.templates = catalog;
+      .subscribe((catalog: any) => {
+        this.templates = this.templates.concat(catalog[0]);
+        this.templateCatalogSetupService.welcomeTemplateData.next(catalog[1]);
         this.filterTemplates = (this.templates ? this.templates : []);
         this.filterTemplates.forEach(template => {
           if (template.thumbnail && template?.thumbnail != '') {

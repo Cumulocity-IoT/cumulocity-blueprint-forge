@@ -171,7 +171,7 @@
                 <label for="Depedencies"><span>Dependencies:</span></label>
                 <ul class="list-group">
                     <ng-container *ngFor="let dependency of templateDetails.input.dependencies; let i = index" >
-                    <li *ngIf="dependency.visible" class="list-group-item">
+                    <li *ngIf="dependency.visible && dependency.type !== 'microservice'" class="list-group-item">
                             <span *ngIf="dependency.isInstalled" class="badge badge-success">INSTALLED</span>
                             <span *ngIf="!dependency.isInstalled" class="badge badge-danger">NOT INSTALLED</span>
                             <a href="{{dependency.repository}}" target="_blank">{{dependency.title}}
@@ -181,6 +181,21 @@
                                 <i class="fa fa-cloud-download"></i>
                                 Install</button>
                             <button *ngIf="!dependency.isInstalled && !dependency.isSupported" disabled type="button" style="margin-left: 10px"
+                                class="btn btn-xs btn-icon">
+                                <i class="fa fa-warning"></i>
+                                Not supported!</button>
+                    </li>
+
+                    <li *ngIf="dependency.visible && dependency.type === 'microservice'" class="list-group-item">
+                            <span *ngIf="dependency.isInstalled" class="badge badge-success">INSTALLED</span>
+                            <span *ngIf="!dependency.isInstalled" class="badge badge-danger">NOT INSTALLED</span>
+                            <a href="{{dependency.repository}}" target="_blank">{{dependency.title}}
+                            <span *ngIf="dependency.type" class="badge badge-info">{{dependency.type}}</span></a>
+                            <button *ngIf="!dependency.isInstalled && dependency.isSupported && isMSEnabled" type="button" style="margin-left: 10px"
+                                class="btn btn-primary btn-xs btn-icon" (click)="installDependency(dependency)">
+                                <i class="fa fa-cloud-download"></i>
+                                Install</button>
+                            <button *ngIf="(!dependency.isInstalled && !dependency.isSupported) || !isMSEnabled" disabled type="button" style="margin-left: 10px"
                                 class="btn btn-xs btn-icon">
                                 <i class="fa fa-warning"></i>
                                 Not supported!</button>

@@ -75,6 +75,11 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   deviceFormValid: boolean;
   assetButtonText: String = 'Select Device';
   groupTemplateInDashboard: boolean;
+  dashboardName: any;
+  dashboardTemplate: any;
+  templateSelected: String = 'Default Template';
+  isMSEnabled: boolean = false;
+  welcomeTemplateData: any;
 
 
   constructor(
@@ -109,7 +114,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   }
 
   ngOnInit() {
-    this.templateCatalogSetupService.templateData.subscribe(currentData => {
+    this.templateCatalogSetupService.templateData.subscribe(async currentData => {
       this.isFormValid = this.appConfigForm?.form.valid;
       if (currentData) {
         this.templateDetails = currentData;
@@ -120,6 +125,12 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       } else {
         this.deviceFormValid = false;
       }
+      this.appList = (await this.appService.list({ pageSize: 2000 })).data;
+      this.isMSEnabled =  this.applicationBinaryService.isMicroserviceEnabled(this.appList);
+    });
+
+    this.templateCatalogSetupService.welcomeTemplateData.subscribe(welcomeTemplateData => {
+      this.welcomeTemplateData = welcomeTemplateData;
     });
   }
 
@@ -180,7 +191,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   }
 
   async configureApp(app: any) {
-    this.appList = (await this.appService.list({ pageSize: 2000 })).data;
+    
     const currentHost = window.location.host.split(':')[0];
     if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
       this.alert.warning("Installation isn't supported when running Application on localhost.");
@@ -211,15 +222,18 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       this.progressIndicatorService.setOverallProgress(overallProgress);
     };
     await new Promise(resolve => setTimeout(resolve, 1000));
-    for (let ms of configDataMicroservices) {
-      this.progressIndicatorService.setMessage(`Installing ${ms.title}`);
-      this.progressIndicatorService.setProgress(10);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      const isInstalled = (await this.applicationBinaryService.verifyExistingMicroservices(ms.id)) as any;
-      if (!isInstalled) { await this.installMicroservice(ms); }
-      overallProgress = overallProgress + eachRemoteProgress;
-      this.progressIndicatorService.setOverallProgress(overallProgress)
-    };
+    
+    if (this.isMSEnabled) {
+      for (let ms of configDataMicroservices) {
+        this.progressIndicatorService.setMessage(`Installing ${ms.title}`);
+        this.progressIndicatorService.setProgress(10);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        const isInstalled = (await this.applicationBinaryService.verifyExistingMicroservices(ms.id)) as any;
+        if (!isInstalled) { await this.installMicroservice(ms); }
+        overallProgress = overallProgress + eachRemoteProgress;
+        this.progressIndicatorService.setOverallProgress(overallProgress)
+      };
+    }
     await new Promise(resolve => setTimeout(resolve, 1000));
     let dbClasses = {};
     if(app.applicationBuilder && app.applicationBuilder.selectedTheme) {
@@ -231,8 +245,22 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       this.progressIndicatorService.setProgress(20);
       this.progressIndicatorService.setMessage(`Installing ${db.title}`);
       await new Promise(resolve => setTimeout(resolve, 1000));
-      const templateDetailsData = await (await this.loadTemplateDetails(db)).toPromise();
 
+
+      // in case of multiple templates
+
+      let templateDetailsData;
+      let  dashboardTemplates;
+      if (db.welcomeTemplates) {
+         dashboardTemplates =  this.welcomeTemplateData.find(dashboardTemplate => dashboardTemplate.dashboardName === this.templateSelected);
+          if (dashboardTemplates && this.templateSelected === 'Default Template') {
+            templateDetailsData = await (await this.loadTemplateDetails(db.dashboard)).toPromise();
+          } else {
+            templateDetailsData = await (await this.loadTemplateDetails(dashboardTemplates.dashboard)).toPromise();
+          }
+      } else {
+        templateDetailsData = await (await this.loadTemplateDetails(db.dashboard)).toPromise();
+      }
       const dashboardConfiguration = {
         dashboardId: '12598412',
         dashboardName: db.title,
@@ -317,7 +345,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       const fileName = microService.link.replace(/^.*[\\\/]/, '');
       const fileOfBlob = new File([blob], fileName);
 
-      const createdApp = await this.applicationBinaryService.createAppForArchive(fileOfBlob);
+      const createdApp = await this.applicationBinaryService.createAppForMicroservice(fileOfBlob, microService);
       this.progressIndicatorService.setProgress(50);
       counter = 50;
       this.microserviceDownloadProgress$ = this.microserviceDownloadProgress.subscribe(async val => {
@@ -331,7 +359,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       this.progressIndicatorService.setProgress(80);
       await new Promise(resolve => setTimeout(resolve, 2000));
     } catch (ex) {
-      this.applicationBinaryService.cancelAppCreation(createdApp);
       createdApp = null;
       this.alert.danger("There is some technical error! Please try after sometime.");
       console.error(ex.message);
@@ -373,11 +400,12 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
     }
   }
 
-  async loadTemplateDetails(db: Dashboards): Promise<Observable<any>> {
-    return this.catalogService.getTemplateDetails(db.dashboard)
+  async loadTemplateDetails(dbDashboard): Promise<Observable<any>> {
+   
+    return this.catalogService.getTemplateDetails(dbDashboard)
       .pipe(catchError(err => {
         console.log('Dashboard Catalog Details: Error in primary endpoint! using fallback...');
-        return this.catalogService.getTemplateDetailsFallBack(db.dashboard);
+        return this.catalogService.getTemplateDetailsFallBack(dbDashboard);
       }));
   }
 
@@ -533,5 +561,10 @@ else {
       this.renderer.addClass(this.document.body, 'body-theme');
     }
     this.brandingService.updateStyleForApp(app);
+  }
+
+  assignDashboardName(selectedTemplate) {
+    this.templateSelected = selectedTemplate.dashboardName;
+    
   }
 }
