@@ -6,7 +6,7 @@ Blueprint Forge provides a simple, coding-free way to build cumulocity applicati
 
 ## What's new?
 
-* **Multiple Welcome Templates:** Now user can select Welcome Dashboard while creating application. Choose from a variety of Welcome Templates tailored to uour needs.
+* **Multiple Welcome Templates:** Now user can select Welcome Dashboard while creating application. Choose from a variety of Welcome Templates tailored to your needs.
 * **Various bug fixes**
 
 ## Features
