@@ -4,6 +4,7 @@ Blueprint Forge provides a simple, coding-free way to build cumulocity applicati
 
 Discover, Learn, Excel: Access How-To Video and Demos at a Glance.
 
+
 ![BlueprintForge](assets/blueprint-forge.png)
 
 ## What's new?
