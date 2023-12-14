@@ -2,6 +2,9 @@
 
 Blueprint Forge provides a simple, coding-free way to build cumulocity application using pre-built solution templates. Blueprint Forge is an open-source Cumulocity Blueprint that empowers you to initially build an application from a template and later enhance it with additional plugins, dashboards, branding and much more. It's being managed by the Software AG's open-source community but not officially supported by Software AG. You can log any issues at GitHub or ask any question on the Software AG Tech Community. Support will be provided on best endeavours.
 
+[Discover, Learn, Excel: Access How-To Video and Demos at a Glance!](https://open-source.softwareag.com/cumulocity-blueprint-forge)
+
+
 ![BlueprintForge](assets/blueprint-forge.png)
 
 ## What's new?
