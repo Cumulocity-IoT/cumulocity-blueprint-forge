@@ -3,7 +3,7 @@
   "version": "1.1.1",
   "description": "Blueprint Forge enables template driven approach of integrating pre-built solution templates with a seemless user experience.",
   "scripts": {
-    "start": "c8ycli server -u https://appbuilder.eu-latest.cumulocity.com",
+    "start": "c8ycli server",
     "build": "c8ycli build",
     "build-dev": "c8ycli build --env.mode=development",
     "deploy": "c8ycli deploy",
