@@ -25,7 +25,7 @@ var jsonData = {
 const title = document.getElementById("title");
 title.insertAdjacentHTML("beforeend", jsonData.HeadingName);
 
-console.log(jsonData);
+// console.log(jsonData);
 const heading = document.getElementById("heading");
 heading.insertAdjacentHTML("beforeend", jsonData.HeadingName);
 
