@@ -52,13 +52,13 @@
                                   
                                   <input *ngIf="dashboard.isDeviceRequired" name="selectedItem" class="form-control"
                                   [(ngModel)]="dashboard.name" required readonly style="width: 100%"
-                                      id="selected-device" placeholder="Select Device/Asset" type="text"
+                                      id="selected-device-{{dashboard.title}}" placeholder="Select Device/Asset" type="text"
                                      >
                               </div>
 
 
                               <div class="col-sm-4 col-md-4 col-xs-12 input-group-btn dropdown" style="padding-left: 0; max-width: 100%; text-align: end" dropdown>
-                                <button type="button" dropdownToggle class="btn btn-primary dropdown-toggle c8y-dropdown">
+                                <button type="button" dropdownToggle id="select-asset-dd-{{dashboard.title}}" class="btn btn-primary dropdown-toggle c8y-dropdown">
                                   <span >{{assetButtonText}}</span>
                                   <span class="caret"></span>
                                 </button>
