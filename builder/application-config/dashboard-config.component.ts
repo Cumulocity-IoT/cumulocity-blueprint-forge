@@ -17,7 +17,7 @@
  */
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Inject, OnDestroy, OnInit, Renderer2 } from "@angular/core";
-import { ApplicationService, InventoryService, IApplication, UserService, IManifest } from "@c8y/client";
+import { ApplicationService, InventoryService, IApplication, UserService } from "@c8y/client";
 import { Observable, from, Subject, Subscription, BehaviorSubject, combineLatest } from "rxjs";
 import { debounceTime, first, map, switchMap, tap } from "rxjs/operators";
 import { AppBuilderNavigationService } from "../navigation/app-builder-navigation.service";
@@ -117,6 +117,9 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
     ) {
         this.app = combineLatest([appIdService.appIdDelayedUntilAfterLogin$, this.refreshApp]).pipe(
             map(([appId]) => appId),
+            tap(appId => {
+                this.appDataService.forceUpdate = true;
+            }),
             switchMap(appId => from(
                 this.appDataService.getAppDetails(appId)
             )),
