@@ -1,0 +1,21 @@
+.group-input {
+    padding: 3% 0 2% 3%;
+    width: 70%;
+}
+:host >>> .panel.dtdl-simulator-measurement-panel .panel-title{
+    width: 100%;
+}
+.measurement-accordion {
+    padding-bottom: 10px;
+}
+.measurement-accordion label {
+    font-size: 12px;
+}
+.measurement-accordion input, .measurement-accordion select {
+    font-size: 12px;
+    height: 24px;
+}
+:host >>> device-selector > div > input {
+    font-size: 12px !important;
+    height: 24px !important;
+}

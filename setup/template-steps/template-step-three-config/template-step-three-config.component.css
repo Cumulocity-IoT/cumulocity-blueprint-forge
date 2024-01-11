@@ -8,3 +8,6 @@
 .title-width {
     width: 26%;
 }
+.btn-group > .btn:active {
+    background-color: powderblue !important;
+}

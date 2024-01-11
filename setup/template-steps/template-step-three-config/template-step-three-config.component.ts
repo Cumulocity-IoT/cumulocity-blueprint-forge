@@ -45,6 +45,7 @@ import { SettingsService } from '../../../builder/settings/settings.service';
 import { SetupWidgetConfigModalComponent } from '../../../setup/setup-widget-config-modal/setup-widget-config-modal.component';
 import { DOCUMENT } from '@angular/common';
 import { BrandingService } from '../../../builder/branding/branding.service';
+import { LinkSimulatorDeviceModalComponent } from '../../simulator-device-modal/link-simulator-device-modal.component';
 @Component({
   selector: 'c8y-template-step-three-config',
   templateUrl: './template-step-three-config.component.html',
@@ -80,6 +81,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   templateSelected: String = 'Default Template';
   isMSEnabled: boolean = false;
   welcomeTemplateData: any;
+  simulatorSelected: boolean;
 
 
   constructor(
@@ -114,6 +116,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   }
 
   ngOnInit() {
+    this.simulatorSelected = false;
     this.templateCatalogSetupService.templateData.subscribe(async currentData => {
       this.isFormValid = this.appConfigForm?.form.valid;
       if (currentData) {
@@ -193,10 +196,10 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   async configureApp(app: any) {
     
     const currentHost = window.location.host.split(':')[0];
-    if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
-      this.alert.warning("Installation isn't supported when running Application on localhost.");
-      return;
-    }
+    // if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
+    //   this.alert.warning("Installation isn't supported when running Application on localhost.");
+    //   return;
+    // }
 
     // Filter dashboards which are selected
     let configDataDashboards = this.templateDetails.dashboards.filter(item => item.selected === true);
@@ -410,6 +413,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   }
 
   openDeviceSelectorDialog(dashboard, templateType: number, index) {
+    this.simulatorSelected = false;
     switch (templateType) {
       case 1:
         this.assetButtonText = "Device Group";
@@ -567,4 +571,8 @@ else {
     this.templateSelected = selectedTemplate.dashboardName;
     
   }
+
+  showSimulatorDeviceDialog() {
+    this.bsModalRef = this.modalService.show(LinkSimulatorDeviceModalComponent, { backdrop: 'static', class: 'c8y-wizard' });
+}
 }
