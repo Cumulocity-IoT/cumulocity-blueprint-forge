@@ -209,6 +209,34 @@
             </button>
         </div>
     </wizard-step>
+    <wizard-step stepId="select-simulator-config">
+        <div class="modal-header text-center bg-primary" style="color: var(--brand-dark, #000);">
+            <div style="font-size: 62px;">
+                <span c8yIcon="c8y-simulator"></span>
+            </div>
+            <h4 class="text-uppercase" style="margin:0; letter-spacing: 0.15em;">Add Simulator</h4>
+        </div>
+        <div class="c8y-wizard-nav">
+            <span>Select DTDL</span>
+        </div>
+        <hr style="margin:0;">
+        <div class="modal-inner-scroll" style="min-height: 250px;">
+            <form class="c8y-wizard-form" name="newSimulatorFormDevice" #newSimulatorFormDevice="ngForm">
+                <div class="form-group">
+                    <label for="deviceId"><span>Select DTDL</span></label>
+                    <device-selector id="deviceId" name="deviceId" [(value)]="deviceName"
+                        [placeHolder]="'Type your Device Name'" [required]="true"
+                        (selectedDevice)="getSelectedDevice($event)"></device-selector>
+                </div>
+            </form>
+        </div>
+        <div class="c8y-wizard-footer">
+            <button class="btn btn-default" (click)="bsModalRef.hide()">Cancel</button>
+            <button class="btn btn-primary" (click)="wizard.selectStep('device')"
+                [disabled]="!newSimulatorFormDevice.form.valid || deviceId === '' ">Next <i c8yIcon="chevron-right"></i>
+            </button>
+        </div>
+    </wizard-step>
     <wizard-step stepId="config">
         <div class="modal-header text-center bg-primary" style="color: var(--brand-dark, #000);">
             <div style="font-size: 62px;">

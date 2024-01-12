@@ -46,6 +46,7 @@ import { SetupWidgetConfigModalComponent } from '../../setup-widget-config-modal
 import { DOCUMENT } from '@angular/common';
 import { BrandingService } from '../../../builder/branding/branding.service';
 import { LinkSimulatorDeviceModalComponent } from '../../simulator-device-modal/link-simulator-device-modal.component';
+import { NewSimulatorModalComponent } from '../../../builder/simulator-config/new-simulator-modal.component';
 @Component({
   selector: 'c8y-template-step-four-connect',
   templateUrl: './template-step-four-connect.component.html',
@@ -127,9 +128,13 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
   toggleToEnableSimulator(event) {
     console.log('event', event);
     this.enableSimulator = !this.enableSimulator;
-    if (event.target.checked) {
-      this.bsModalRef = this.modalService.show(LinkSimulatorDeviceModalComponent, { backdrop: 'static', class: 'c8y-wizard' });
-    }
+
+    // Need to pass Simulator config file array of object
+    const SimultorConfigFiles = [ {
+       fileName: "wilsen",
+       fileContent:{}
+    }]
+    this.bsModalRef = this.modalService.show(NewSimulatorModalComponent, { backdrop: 'static', class: 'c8y-wizard', initialState:{appId: this.currentApp.id + "", isBlueprintSimulator: true, simulatorConfigFiles: SimultorConfigFiles}} );
   }
 
 

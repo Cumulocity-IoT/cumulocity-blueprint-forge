@@ -56,6 +56,8 @@ export class NewSimulatorModalComponent implements OnInit{
     simulatorsNameList:string[]=[];
     appSubscription:Subscription;
     isduplicateSmulatorName:boolean=false;
+    isBlueprintSimulator: boolean = false;
+    simulatorConfigFiles: any[];
     @ViewChild(WizardComponent, { static: true }) wizard: WizardComponent;
 
     @ViewChild("configWrapper", { read: ViewContainerRef, static: true }) configWrapper: ViewContainerRef;
@@ -87,7 +89,26 @@ export class NewSimulatorModalComponent implements OnInit{
     ) { }
     async ngOnInit(): Promise<void> {
         this.appDataService.forceUpdate = true;
-        await this.getAppDetails(this.appId);            
+        await this.getAppDetails(this.appId);    
+        if(this.isBlueprintSimulator) {
+            //If onlu one Simulator Config File
+          /*   const validJson = this.isValidJson(input);
+            this.isConfigFileUploading = true; */
+            /* if (validJson) {
+                this.selectedStrategyFactory = this.simulationStrategiesService.strategiesByName.get(validJson.type);
+                if (this.selectedStrategyFactory === undefined) {
+                    this.isConfigFileError = true;
+                } else {
+                    this.configFromFile = validJson.config;
+                    this.simulatorName = validJson.name;
+                    this.wizard.selectStep('device');
+                }
+            } */
+            ;
+
+            // If multiple
+            this.wizard.selectStep('select-dtdl');
+        }        
     }
     //Getting application details
     async getAppDetails(appId:string){
