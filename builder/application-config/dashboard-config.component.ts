@@ -23,7 +23,7 @@ import { debounceTime, first, map, switchMap, tap } from "rxjs/operators";
 import { AppBuilderNavigationService } from "../navigation/app-builder-navigation.service";
 import { AlertService, AppStateService } from "@c8y/ngx-components";
 import { BrandingService } from "../branding/branding.service";
-import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
+import { BsModalService, BsModalRef, ModalOptions } from 'ngx-bootstrap/modal';
 import { NewDashboardModalComponent } from "./new-dashboard-modal.component";
 import { EditDashboardModalComponent } from "./edit-dashboard-modal.component";
 import { AppIdService } from "../app-id.service";
@@ -113,8 +113,10 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
         private iconSelector: IconSelectorService, private brandingService: BrandingService,
         private modalService: BsModalService, private alertService: AlertService, private settingsService: SettingsService,
         private accessRightsService: AccessRightsService, private userService: UserService, private appDataService: AppDataService,
-        @Inject(DOCUMENT) private document: Document, private renderer: Renderer2, private cd: ChangeDetectorRef, private clipboard: Clipboard
+        @Inject(DOCUMENT) private document: Document, private renderer: Renderer2, private cd: ChangeDetectorRef, private clipboard: Clipboard,
+        
     ) {
+        
         this.app = combineLatest([appIdService.appIdDelayedUntilAfterLogin$, this.refreshApp]).pipe(
             map(([appId]) => appId),
             tap(appId => {

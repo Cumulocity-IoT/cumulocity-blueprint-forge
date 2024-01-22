@@ -115,9 +115,21 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     this.app.subscribe(app => {
       this.currentApp = app;
     });
+    this.templateCatalogSetupService.templateData.subscribe(async currentData => {
+        this.templateDetails = currentData;
+      console.log('template details in step four', this.templateDetails);
+      // In case of no device 
+      // if (!(this.templateDetails?.input) || !(this.templateDetails?.input?.devices) || !(this.templateDetails?.input?.devices?.length > 0)) {
+      //   this.deviceFormValid = true;
+      // } else {
+      //   this.deviceFormValid = false;
+      // }
+      // this.appList = (await this.appService.list({ pageSize: 2000 })).data;
+      // this.isMSEnabled =  this.applicationBinaryService.isMicroserviceEnabled(this.appList);
+    });
   }
   ngAfterViewInit(): void {
-    throw new Error('Method not implemented.');
+    // throw new Error('Method not implemented.');
   }
 
   ngOnInit() {
@@ -125,17 +137,33 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     
   }
 
-  toggleToEnableSimulator(event) {
-    console.log('event', event);
-    this.enableSimulator = !this.enableSimulator;
-
+  async toggleToEnableSimulator(event, dashboard) {
+    this.enableSimulator = event.target.checked;
+    let templateDetailsData;
+    templateDetailsData = await (await this.loadTemplateDetails(dashboard.dashboard)).toPromise();
     // Need to pass Simulator config file array of object
-    const SimultorConfigFiles = [ {
-       fileName: "wilsen",
-       fileContent:{}
-    }]
-    this.bsModalRef = this.modalService.show(NewSimulatorModalComponent, { backdrop: 'static', class: 'c8y-wizard', initialState:{appId: this.currentApp.id + "", isBlueprintSimulator: true, simulatorConfigFiles: SimultorConfigFiles}} );
+ 
+    const SimultorConfigFiles = [];
+    let currentSimulatorData;
+
+    // Not able to use forEach, as it takes callback as parameter which expects to be async
+    for (let i = 0; i < templateDetailsData.dtdl.length; i++) {
+      currentSimulatorData = await (await this.loadTemplateDetails(templateDetailsData.dtdl[i].simulatorFile)).toPromise();
+      SimultorConfigFiles.push({
+          fileName: templateDetailsData.dtdl[i].simulatorFileName,
+          fileContent: currentSimulatorData
+      });
+    }
+    this.bsModalRef = this.modalService.show(NewSimulatorModalComponent, { backdrop: 'static', class: 'c8y-wizard', initialState:{appId: this.currentApp.id + "", isBlueprintSimulator: true, enableSimulator: this.enableSimulator, simulatorConfigFiles: SimultorConfigFiles, fileLength: SimultorConfigFiles.length}} );
   }
 
+
+  async loadTemplateDetails(dbDashboard): Promise<Observable<any>> {
+    return this.catalogService.getTemplateDetails(dbDashboard)
+      .pipe(catchError(err => {
+        console.log('Dashboard Catalog Details: Error in primary endpoint! using fallback...');
+        return this.catalogService.getTemplateDetailsFallBack(dbDashboard);
+      }));
+  }
 
   }

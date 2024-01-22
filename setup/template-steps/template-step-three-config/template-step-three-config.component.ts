@@ -264,6 +264,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       } else {
         templateDetailsData = await (await this.loadTemplateDetails(db.dashboard)).toPromise();
       }
+      console.log('template details data value', templateDetailsData);
       const dashboardConfiguration = {
         dashboardId: '12598412',
         dashboardName: db.title,
