@@ -67,7 +67,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   newAppName: string;
   newAppContextPath: string;
   newAppIcon: string;
-  isChecked: boolean = true;
 
   app: Observable<any>;
   currentApp: IApplication;
@@ -150,19 +149,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
     this.templateDetails.microservices[index].selected = event.target.checked;
   }
 
-  async saveandInstall(app: any) {
-    if (this.appConfigForm.form.valid) {
-      if (this.currentApp.name !== this.newAppName ||
-        this.currentApp.contextPath !== this.newAppContextPath ||
-        (this.currentApp.applicationBuilder && this.currentApp.applicationBuilder.icon !== this.newAppIcon)) {
-        await this.saveAppChanges(app);
-      }
-      await this.configureApp(app);
-    } else {
-      this.alert.danger("Please fill required details to proceed further.");
-      return;
-    }
-  }
+  
 
   showSetupConfigModal(dashboardBasicConfig): BsModalRef {
     return this.modalService.show(SetupWidgetConfigModalComponent, { class: 'c8y-wizard', initialState: { dashboardBasicConfig } });
@@ -193,216 +180,15 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
     this.progressModal = this.modalService.show(ProgressIndicatorModalComponent, { class: 'c8y-wizard', initialState: { message } });
   }
 
-  async configureApp(app: any) {
-    
-    const currentHost = window.location.host.split(':')[0];
-    // if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
-    //   this.alert.warning("Installation isn't supported when running Application on localhost.");
-    //   return;
-    // }
-
-    // Filter dashboards which are selected
-    let configDataDashboards = this.templateDetails.dashboards.filter(item => item.selected === true);
-    let configDataPlugins = this.templateDetails.plugins.filter(item => item.selected === true);
-    let configDataMicroservices = this.templateDetails.microservices.filter(item => item.selected === true);
-
-    // create Dashboard and install dependencies
-    // Also connect with the devices selected
-    let totalRemotes = configDataPlugins.length;
-    totalRemotes = totalRemotes + configDataMicroservices.length;
-    totalRemotes = totalRemotes + configDataDashboards.length;
-
-
-    const eachRemoteProgress: number = Math.floor((totalRemotes > 1 ? (90 / totalRemotes) : 0));
-    let overallProgress = 0;
-    this.showProgressModalDialog("Verifying dependencies...")
-    
-    if (totalRemotes > 1) { this.progressIndicatorService.setOverallProgress(overallProgress) }
-    this.progressIndicatorService.setOverallProgress(5);
-    for (let plugin of configDataPlugins) {
-      await this.installPlugin(plugin);
-      overallProgress = overallProgress + eachRemoteProgress;
-      this.progressIndicatorService.setOverallProgress(overallProgress);
-    };
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    if (this.isMSEnabled) {
-      for (let ms of configDataMicroservices) {
-        this.progressIndicatorService.setMessage(`Installing ${ms.title}`);
-        this.progressIndicatorService.setProgress(10);
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        const isInstalled = (await this.applicationBinaryService.verifyExistingMicroservices(ms.id)) as any;
-        if (!isInstalled) { await this.installMicroservice(ms); }
-        overallProgress = overallProgress + eachRemoteProgress;
-        this.progressIndicatorService.setOverallProgress(overallProgress)
-      };
-    }
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    let dbClasses = {};
-    if(app.applicationBuilder && app.applicationBuilder.selectedTheme) {
-      dbClasses = {
-        "dashboard-theme-branded": true
-      };
-    }
-    for (let db of configDataDashboards) {
-      this.progressIndicatorService.setProgress(20);
-      this.progressIndicatorService.setMessage(`Installing ${db.title}`);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-
-      // in case of multiple templates
-
-      let templateDetailsData;
-      let  dashboardTemplates;
-      if (db.welcomeTemplates) {
-         dashboardTemplates =  this.welcomeTemplateData.find(dashboardTemplate => dashboardTemplate.dashboardName === this.templateSelected);
-          if (dashboardTemplates && this.templateSelected === 'Default Template') {
-            templateDetailsData = await (await this.loadTemplateDetails(db.dashboard)).toPromise();
-          } else {
-            templateDetailsData = await (await this.loadTemplateDetails(dashboardTemplates.dashboard)).toPromise();
-          }
-      } else {
-        templateDetailsData = await (await this.loadTemplateDetails(db.dashboard)).toPromise();
-      }
-      console.log('template details data value', templateDetailsData);
-      const dashboardConfiguration = {
-        dashboardId: '12598412',
-        dashboardName: db.title,
-        dashboardIcon: db.icon,
-        deviceId: '',
-        tabGroup: '',
-        dashboardVisibility: db.visibility,
-        roles: '',
-        templateType: db.templateType, // 0: default, 1: group, 2: type
-        classes: dbClasses
-      };
-
-      this.progressIndicatorService.setProgress(40);
-      templateDetailsData.input.devices = db.devices;
-      if (db.title !== 'Instruction' && db.title !== 'Welcome' && db.title !== 'Help and Support' && db.isConfigRequred) {
-        templateDetailsData.widgets.forEach(widget => {
-          const dbWidgetConfig = db.basicConfig.find(basicConfig => basicConfig.componentId == widget.componentId);
-          if (dbWidgetConfig) {
-            dbWidgetConfig.config.forEach(item => {
-
-              // Works if widget config in global presales is not nested
-              if (item.type === 'select') {
-                if (widget.config && widget.config?.hasOwnProperty(item.fieldName)) {
-                  widget.config[item.fieldName].push(item.name);
-                }
-              } else {
-                if (widget.config && widget.config?.hasOwnProperty(item.fieldName)) {
-                  widget.config[item.fieldName] = item.name;
-                }
-              }
-            })
-          }
-        });
-      }
-      
-      if (db.templateType && db.templateType === 1 && !db.isGroupDashboard) {
-        this.groupTemplate = true;
-      } else if (db.templateType && db.templateType === 2 && !db.isGroupDashboard) {
-        this.groupTemplate = true;
-      } else {
-        this.groupTemplate = false;
-      }
-
-      await this.catalogService.createDashboard(this.currentApp, dashboardConfiguration, db, templateDetailsData, this.groupTemplate);
-      this.progressIndicatorService.setProgress(90);
-      overallProgress = overallProgress + eachRemoteProgress;
-      this.progressIndicatorService.setOverallProgress(overallProgress)
-    };
-    if (window && window['aptrinsic']) {
-      window['aptrinsic']('track', 'gp_blueprint_forge_template_installed', {
-        "templateName": this.templateDetails.title,
-        "appName": this.currentApp.name,
-        "tenantId": this.settingsService.getTenantName(),
-      });
-    }
-    this.hideProgressModalDialog();
-    this.next();
-  }
+  
 
   hideProgressModalDialog() {
     this.progressModal.hide();
   }
 
-  async installMicroservice(microService: MicroserviceDetails): Promise<void> {
-    let counter = 10;
-    this.microserviceDownloadProgress$ = this.microserviceDownloadProgress.subscribe(async val => {
-      counter++;
-      if (counter <= 40) {
-        this.progressIndicatorService.setProgress(counter);
-      }
-    });
+  
 
-    const data = await this.templateCatalogSetupService.downloadBinary(microService.link).toPromise();
-    let createdApp = null;
-    this.microserviceDownloadProgress$.unsubscribe();
-    try {
-      this.progressIndicatorService.setProgress(40);
-      this.progressIndicatorService.setMessage(`Installing ${microService.title}`);
-      const blob = new Blob([data], {
-        type: 'application/zip'
-      });
-      const fileName = microService.link.replace(/^.*[\\\/]/, '');
-      const fileOfBlob = new File([blob], fileName);
-
-      const createdApp = await this.applicationBinaryService.createAppForMicroservice(fileOfBlob, microService);
-      this.progressIndicatorService.setProgress(50);
-      counter = 50;
-      this.microserviceDownloadProgress$ = this.microserviceDownloadProgress.subscribe(async val => {
-        counter++;
-        if (counter <= 80) {
-          this.progressIndicatorService.setProgress(counter);
-        }
-      });
-      await this.applicationBinaryService.uploadMicroservice(fileOfBlob, createdApp);
-      this.microserviceDownloadProgress$.unsubscribe();
-      this.progressIndicatorService.setProgress(80);
-      await new Promise(resolve => setTimeout(resolve, 2000));
-    } catch (ex) {
-      createdApp = null;
-      this.alert.danger("There is some technical error! Please try after sometime.");
-      console.error(ex.message);
-    }
-  }
-
-  async installPlugin(plugin: PluginDetails): Promise<void> {
-
-    const widgetBinaryFound = this.appList.find(app => app.manifest?.isPackage && (app.name.toLowerCase() === plugin.title?.toLowerCase() ||
-      (app.contextPath && app.contextPath?.toLowerCase() === plugin?.contextPath?.toLowerCase())));
-    this.progressIndicatorService.setMessage(`Installing ${plugin.title}`);
-    this.progressIndicatorService.setProgress(10);
-    if (widgetBinaryFound) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      this.progressIndicatorService.setProgress(30);
-      await this.widgetCatalogService.updateRemotesInCumulocityJson(widgetBinaryFound, true).then(async () => {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }, error => {
-        this.alert.danger("There is some technical error! Please try after sometime.");
-        console.error(error);
-      });
-    } else {
-      this.progressIndicatorService.setProgress(10);
-      const data = await this.templateCatalogSetupService.downloadBinary(plugin.link).toPromise();
-
-      this.progressIndicatorService.setProgress(20);
-      const blob = new Blob([data], {
-        type: 'application/zip'
-      });
-      const fileName = plugin.link.replace(/^.*[\\\/]/, '');
-      const fileOfBlob = new File([blob], fileName);
-      await this.widgetCatalogService.installPackage(fileOfBlob).then(async () => {
-        await new Promise(resolve => setTimeout(resolve, 5000));
-      }, error => {
-        this.alert.danger("There is some technical error! Please try after sometime.");
-        console.error(error);
-      });
-
-    }
-  }
+ 
 
   async loadTemplateDetails(dbDashboard): Promise<Observable<any>> {
    
@@ -413,138 +199,8 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       }));
   }
 
-  openDeviceSelectorDialog(dashboard, templateType: number, index) {
-    this.simulatorSelected = false;
-    switch (templateType) {
-      case 1:
-        this.assetButtonText = "Device Group";
-        this.groupTemplate = true;
-        break;
-      case 2:
-        this.assetButtonText = "Device/Asset Type";
-        this.groupTemplate = true;
-        break;
-      default:
-        this.assetButtonText = "Device/Asset";
-        this.groupTemplate = false;
-        break;
-}
-  this.deviceSelectorModalRef = this.modalService.show(DeviceSelectorModalComponent, { class: 'c8y-wizard', initialState: { templateType } });
  
-  if(templateType == 2) {
-    this.deviceSelectorModalRef.content.onTypeSelected.subscribe((selectedItem: IManagedObject) => {
-        dashboard.name = selectedItem;
-        dashboard.templateType = templateType;
-        dashboard.devices = [{
-          type: "Temperature Sensor",
-          placeholder: "device01",
-          reprensentation: {
-            id: selectedItem,
-            name: selectedItem
-          }
-        }]
-
-
-        let deviceFieldNotField;
-        for (let dd = 0; dd < this.templateDetails.dashboards.length; dd++) {
-          if (this.templateDetails.dashboards[dd].isDeviceRequired === false) {
-            deviceFieldNotField = true;
-
-          } else if (this.templateDetails.dashboards[dd].isDeviceRequired === true)
-            if (this.templateDetails.dashboards[dd].devices && this.templateDetails.dashboards[dd].devices[0] && this.templateDetails.dashboards[dd].devices[0]?.reprensentation.id !== null && this.templateDetails.dashboards[dd].devices[0]?.reprensentation.id !== undefined) {
-              deviceFieldNotField = true;
-            } else {
-              deviceFieldNotField = false;
-              break;
-            }
-        }
-        this.deviceFormValid = deviceFieldNotField;
-      });
-    }
-else {
-  this.deviceSelectorModalRef.content.onDeviceSelected.subscribe((selectedItem: IManagedObject) => {
-      dashboard.name = selectedItem['name'];
-      dashboard.templateType = templateType;
-      dashboard.devices = [{
-        type: "Temperature Sensor",
-          placeholder: "device01",
-          reprensentation : {
-            id: selectedItem.id,
-            name: selectedItem['name']
-          }
-      }]
-      
-      let deviceFieldNotField;
-    for (let dd = 0; dd < this.templateDetails.dashboards.length; dd++) {
-      if (this.templateDetails.dashboards[dd].isDeviceRequired === false ) {
-        deviceFieldNotField = true;
-        
-      } else if (this.templateDetails.dashboards[dd].isDeviceRequired === true ) 
-       if(this.templateDetails.dashboards[dd].devices && this.templateDetails.dashboards[dd].devices[0] && this.templateDetails.dashboards[dd].devices[0]?.reprensentation.id !== null && this.templateDetails.dashboards[dd].devices[0]?.reprensentation.id !== undefined) {
-        deviceFieldNotField = true;
-      } else {
-        deviceFieldNotField = false;
-        break;
-      }
-    }
-
-    this.deviceFormValid = deviceFieldNotField;
-  });
-}
-
- }
-  async saveAppChanges(app) {
-    const savingAlert = new UpdateableAlert(this.alertService);
-    savingAlert.update('Saving application...');
-    try {
-      app.name = this.newAppName;
-      app.applicationBuilder.icon = this.newAppIcon;
-      app.icon = {
-        name: this.newAppIcon,
-        "class": `fa fa-${this.newAppIcon}`
-      };
-
-      const update: any = {
-        id: app.id,
-        name: app.name,
-        key: app.key,
-        applicationBuilder: app.applicationBuilder,
-        icon: app.icon
-      };
-
-      let contextPathUpdated = false;
-      const currentAppContextPath = app.contextPath;
-      if (app.contextPath && app.contextPath != this.newAppContextPath) {
-        app.contextPath = this.newAppContextPath;
-        update.contextPath = this.newAppContextPath;
-        contextPathUpdated = true;
-      }
-
-      let appManifest: any = app.manifest;
-      if (appManifest) {
-        appManifest.contextPath = app.contextPath;
-        appManifest.key = update.key;
-        appManifest.icon = app.icon;
-        appManifest.name = app.name;
-        update.manifest = appManifest;
-      }
-      await this.appService.update(update);
-
-      if (contextPathUpdated && contextPathFromURL() === currentAppContextPath) {
-        savingAlert.update('Saving application...');
-        // Pause while c8y server reloads the application
-        await delay(5000);
-        window.location = `/apps/${this.newAppContextPath}/${window.location.hash}` as any;
-      }
-
-      savingAlert.update('Application saved!', 'success');
-      savingAlert.close(1500);
-    } catch (e) {
-      savingAlert.update('Unable to save!\nCheck browser console for details', 'danger');
-      throw e;
-    }
-    this.appStateService.currentUser.next(this.appStateService.currentUser.value);
-  }
+ 
 
   setTheme(app, primary, active, text, textOnPrimary, textOnActive, hover, headerBar, tabBar, toolBar, selectedTheme) {
     app.applicationBuilder.branding.enabled = true;

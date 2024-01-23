@@ -84,7 +84,6 @@ export interface Dashboards {
     selected?: boolean;
     configured?: boolean;
     deviceId?: string;
-    isChecked?: boolean;
     dashboardWidgets: DashboardWidgets[];
     isSelectAsset: boolean;
     isSelectType: boolean;
