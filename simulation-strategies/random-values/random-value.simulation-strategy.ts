@@ -82,7 +82,7 @@ export class RandomValueSimulationStrategy extends DeviceIntervalSimulator {
 
         this.measurementService.create({
             sourceId: (groupDeviceId ? groupDeviceId : this.config.deviceId),
-            time: new Date().toISOString(),
+            time: new Date(),
             [this.config.fragment]: {
                 [this.config.series]: {
                     value: measurementValue,
