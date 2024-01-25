@@ -43,7 +43,7 @@ import { AlertMessageModalComponent } from '../../builder/utils/alert-message-mo
 import { SimulatorManagerService } from '../../builder/simulator/mainthread/simulator-manager.service';
 import { switchMap} from "rxjs/operators";
 import { AppDataService } from '../app-data.service';
-import { from, of, Subscription } from "rxjs";
+import { from, of, Subscription, Subject } from "rxjs";
 @Component({
     templateUrl: './new-simulator-modal.component.html'
 })
@@ -80,7 +80,8 @@ export class NewSimulatorModalComponent implements OnInit{
     showWarning: boolean;
     fileLength: Number;
     enableSimulator: boolean;
-    selectedValue: string;
+    selectedValue: string = 'Select File';
+    public onSave: Subject<any>;
 
     constructor(
         private simSvc: SimulatorWorkerAPI, private alertService: AlertService,
@@ -92,7 +93,7 @@ export class NewSimulatorModalComponent implements OnInit{
         private simulatorManagerService: SimulatorManagerService,private appDataService: AppDataService,
         private modalOptions: ModalOptions
     ) {
-        // console.log('modalOptions', this.modalOptions.initialState);
+        this.onSave = new Subject();
      }
     async ngOnInit(): Promise<void> {
         this.appDataService.forceUpdate = true;
@@ -183,6 +184,7 @@ export class NewSimulatorModalComponent implements OnInit{
             }
 
             this.newConfig = componentRef.instance.config;//TODO: needed after merge? 
+            console.log('new config in new simulator modal', this.newConfig);
 
             if (componentRef.instance.config.modalSize) {
                 this.bsModalRef.setClass(componentRef.instance.config.modalSize);
@@ -331,7 +333,11 @@ export class NewSimulatorModalComponent implements OnInit{
         }
         // We could just wait for them to refresh, but it's nicer to instantly refresh
         await this.simSvc.checkForSimulatorConfigChanges();
-
+        let blueprintForgeDeviceDetails = {
+            deviceId: this.newConfig.deviceId,
+            deviceName: this.newConfig.deviceName
+        }
+        this.onSave.next(blueprintForgeDeviceDetails);
         this.bsModalRef.hide();
     }
     getSelectedDevice(device: any) {

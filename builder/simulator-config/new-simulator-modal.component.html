@@ -35,7 +35,7 @@
             <button class="btn btn-default" (click)="bsModalRef.hide()">Cancel</button>
         </div>
     </wizard-step>
-    <wizard-step stepId="import-config">
+    <wizard-step *ngIf="(isBlueprintSimulator && enableSimulator) || (!isBlueprintSimulator)" stepId="import-config">
         <div class="modal-header text-center bg-primary" style="color: var(--brand-dark, #000);">
             <div style="font-size: 62px;">
                 <span c8yIcon="c8y-simulator"></span>
@@ -285,7 +285,7 @@
     </wizard-step>
 
 
-    <wizard-step stepId="select-dtdl">
+    <wizard-step *ngIf="(isBlueprintSimulator && enableSimulator) || (!isBlueprintSimulator)" stepId="select-dtdl">
         <div class="modal-header text-center bg-primary" style="color: var(--brand-dark, #000);">
             <div style="font-size: 62px;">
                 <span c8yIcon="c8y-simulator"></span>
