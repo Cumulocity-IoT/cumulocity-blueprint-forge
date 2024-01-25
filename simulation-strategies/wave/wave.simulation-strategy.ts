@@ -111,7 +111,7 @@ export class WaveSimulationStrategy extends DeviceIntervalSimulator {
 
         this.measurementService.create({
             sourceId: (groupDeviceId? groupDeviceId : this.config.deviceId),
-            time: new Date(),
+            time: new Date().toISOString(),
             [this.config.fragment]: {
                 [this.config.series]: {
                     value: measurementValue,

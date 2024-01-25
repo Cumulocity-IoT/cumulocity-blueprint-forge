@@ -105,7 +105,7 @@ export class RandomWalkSimulationStrategy extends DeviceIntervalSimulator {
 
         this.measurementService.create({
             sourceId: deviceId,
-            time: new Date(),
+            time: new Date().toISOString(),
             [this.config.fragment]: {
                 [this.config.series]: {
                     value: Math.round(measurementValue * 100) / 100,
