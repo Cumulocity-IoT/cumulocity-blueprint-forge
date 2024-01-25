@@ -501,6 +501,7 @@ else {
             name: selectedItem['name']
           }
       }]
+      console.log('dasboard.devices value', dashboard.devices, 'dashboard name', dashboard.name);
       
       let deviceFieldNotField;
     for (let dd = 0; dd < this.templateDetails.dashboards.length; dd++) {
@@ -509,14 +510,15 @@ else {
         
       } else if (this.templateDetails.dashboards[dd].isDeviceRequired === true ) 
        if(this.templateDetails.dashboards[dd].devices && this.templateDetails.dashboards[dd].devices[0] && this.templateDetails.dashboards[dd].devices[0]?.reprensentation.id !== null && this.templateDetails.dashboards[dd].devices[0]?.reprensentation.id !== undefined) {
+        console.log('this.templateDetails.dashboards[dd].devices[0]', this.templateDetails.dashboards[dd].devices[0]);
         deviceFieldNotField = true;
       } else {
         deviceFieldNotField = false;
         break;
       }
     }
-
     this.deviceFormValid = deviceFieldNotField;
+    console.log('Template details after assigning device', this.templateDetails);
   });
 }
 

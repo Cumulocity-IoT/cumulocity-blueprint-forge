@@ -57,9 +57,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   templateDetails: any;
   private progressModal: BsModalRef;
   private appList = [];
-  private microserviceDownloadProgress = interval(3000);
-  private microserviceDownloadProgress$: Subscription;
-  private groupTemplate = false;
   @ViewChild("appConfigForm", { static: false }) appConfigForm: NgForm;
 
   configStepData: any;
