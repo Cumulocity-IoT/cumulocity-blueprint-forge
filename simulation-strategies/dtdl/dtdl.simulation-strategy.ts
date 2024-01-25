@@ -267,7 +267,7 @@ export class DtdlSimulationStrategy extends DeviceIntervalSimulator {
             const modelFragmentObject = Array.from(fragementmap.entries()).reduce((main, [key, value]) => ({ ...main, [key]: value }), {});
             this.measurementService.create({
                 sourceId: deviceId,
-                time: new Date(),
+                time: new Date().toISOString(),
                 [fragment]: {
                     ...modelFragmentObject
                 },
@@ -289,7 +289,7 @@ export class DtdlSimulationStrategy extends DeviceIntervalSimulator {
                 const modelFragmentObject = Array.from(fragementmap.entries()).reduce((main, [key, value]) => ({ ...main, [key]: value }), {});
                 this.measurementService.create({
                     sourceId: deviceId,
-                    time: new Date(),
+                    time: new Date().toISOString(),
                     [modelConfig.fragment]: {
                         ...modelFragmentObject
                     },
@@ -300,7 +300,7 @@ export class DtdlSimulationStrategy extends DeviceIntervalSimulator {
         } else {
             this.measurementService.create({
                 sourceId: deviceId,
-                time: new Date(),
+                time: new Date().toISOString(),
                 [modelConfig.fragment]: {
                     [modelConfig.series]: {
                         value: this.getMeasurementValue(modelConfig, deviceId),

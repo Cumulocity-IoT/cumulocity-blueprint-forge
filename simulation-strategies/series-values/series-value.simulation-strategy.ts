@@ -90,7 +90,7 @@ export class SeriesValueSimulationStrategy extends DeviceIntervalSimulator {
         this.updateConfigParam(valueSeriesConfigParam);
         this.measurementService.create({
             sourceId: deviceId,
-            time: new Date(),
+            time: new Date().toISOString(),
             [this.config.fragment]: {
                 [this.config.series]: {
                     value: measurementValue,
