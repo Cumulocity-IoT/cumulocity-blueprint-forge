@@ -83,6 +83,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
   welcomeTemplateData: any;
   simulatorSelected: boolean;
   enableSimulator: boolean;
+  simulatorModelContent: any;
 
 
   constructor(
@@ -114,46 +115,78 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     this.app.subscribe(app => {
       this.currentApp = app;
     });
-    this.templateCatalogSetupService.templateData.subscribe(async currentData => {
-        this.templateDetails = currentData;
-      console.log('template details in step four', this.templateDetails);
-      // In case of no device 
-      // if (!(this.templateDetails?.input) || !(this.templateDetails?.input?.devices) || !(this.templateDetails?.input?.devices?.length > 0)) {
-      //   this.deviceFormValid = true;
-      // } else {
-      //   this.deviceFormValid = false;
-      // }
-      // this.appList = (await this.appService.list({ pageSize: 2000 })).data;
-      // this.isMSEnabled =  this.applicationBinaryService.isMicroserviceEnabled(this.appList);
-    });
   }
   ngAfterViewInit(): void {
-    // throw new Error('Method not implemented.');
+    this.verifyStepCompleted();
   }
 
   ngOnInit() {
     this.enableSimulator = false;
+    this.templateCatalogSetupService.templateData.subscribe(async currentData => {
+      this.isFormValid = this.appConfigForm?.form.valid;
+      if (currentData) {
+        this.templateDetails = currentData;
+      }
+      // In case of no device 
+      if (!(this.templateDetails?.input) || !(this.templateDetails?.input?.devices) || !(this.templateDetails?.input?.devices?.length > 0)) {
+        this.deviceFormValid = true;
+      } else {
+        this.deviceFormValid = false;
+      }
+      this.appList = (await this.appService.list({ pageSize: 2000 })).data;
+      this.isMSEnabled =  this.applicationBinaryService.isMicroserviceEnabled(this.appList);
+    });
+    this.templateCatalogSetupService.welcomeTemplateData.subscribe(welcomeTemplateData => {
+      this.welcomeTemplateData = welcomeTemplateData;
+    });
     
   }
 
-  async toggleToEnableSimulator(event, dashboard) {
+  async toggleToEnableSimulator(event, dashboard, index) {
+    this.simulatorSelected = true;
     this.enableSimulator = event.target.checked;
     let templateDetailsData;
     templateDetailsData = await (await this.loadTemplateDetails(dashboard.dashboard)).toPromise();
+    console.log('templateDetailsData*************', templateDetailsData);
     // Need to pass Simulator config file array of object
  
     const SimultorConfigFiles = [];
     let currentSimulatorData;
 
     // Not able to use forEach, as it takes callback as parameter which expects to be async
-    for (let i = 0; i < templateDetailsData.dtdl.length; i++) {
-      currentSimulatorData = await (await this.loadTemplateDetails(templateDetailsData.dtdl[i].simulatorFile)).toPromise();
+    for (let i = 0; i < templateDetailsData.simulatorDTDL.length; i++) {
+      currentSimulatorData = await (await this.loadTemplateDetails(templateDetailsData.simulatorDTDL[i].simulatorFile)).toPromise();
       SimultorConfigFiles.push({
-          fileName: templateDetailsData.dtdl[i].simulatorFileName,
+          fileName: templateDetailsData.simulatorDTDL[i].simulatorFileName,
           fileContent: currentSimulatorData
       });
     }
     this.bsModalRef = this.modalService.show(NewSimulatorModalComponent, { backdrop: 'static', class: 'c8y-wizard', initialState:{appId: this.currentApp.id + "", isBlueprintSimulator: true, enableSimulator: this.enableSimulator, simulatorConfigFiles: SimultorConfigFiles, fileLength: SimultorConfigFiles.length}} );
+    this.bsModalRef.content.onSave.subscribe(content => this.simulatorModelContent = content);
+    dashboard.name = this.simulatorModelContent.deviceId;
+      dashboard.templateType = dashboard.templateType;
+      dashboard.devices = [{
+        type: "Temperature Sensor",
+          placeholder: "device01",
+          reprensentation : {
+            id: this.simulatorModelContent.deviceId,
+            name: this.simulatorModelContent.deviceName
+          }
+      }]
+    let deviceFieldNotField;
+    for (let dd = 0; dd < this.templateDetails.dashboards.length; dd++) {
+      if (this.templateDetails.dashboards[dd].isDeviceRequired === false ) {
+        deviceFieldNotField = true;
+      } 
+      else if (this.templateDetails.dashboards[dd].isDeviceRequired === true && this.templateDetails.dashboards[dd].linkWithDashboard === dashboard.id) {
+        this.templateDetails.dashboards[dd].devices = dashboard.devices;
+         deviceFieldNotField = true;
+     } else {
+          deviceFieldNotField = false;
+          break;
+     }
+    }
+    this.deviceFormValid = deviceFieldNotField;
   }
 
 
@@ -167,17 +200,23 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
 
 // saveandInstall and its dependent functions are moved from step three
   async saveandInstall(app: any) {
-    if (this.appConfigForm.form.valid) {
       if (this.currentApp.name !== this.newAppName ||
         this.currentApp.contextPath !== this.newAppContextPath ||
         (this.currentApp.applicationBuilder && this.currentApp.applicationBuilder.icon !== this.newAppIcon)) {
         await this.saveAppChanges(app);
       }
       await this.configureApp(app);
-    } else {
-      this.alert.danger("Please fill required details to proceed further.");
-      return;
-    }
+    // if (this.appConfigForm.form.valid) {
+    //   if (this.currentApp.name !== this.newAppName ||
+    //     this.currentApp.contextPath !== this.newAppContextPath ||
+    //     (this.currentApp.applicationBuilder && this.currentApp.applicationBuilder.icon !== this.newAppIcon)) {
+    //     await this.saveAppChanges(app);
+    //   }
+    //   await this.configureApp(app);
+    // } else {
+    //   this.alert.danger("Please fill required details to proceed further.");
+    //   return;
+    // }
   }
 
 
@@ -305,7 +344,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       } else {
         templateDetailsData = await (await this.loadTemplateDetails(db.dashboard)).toPromise();
       }
-      console.log('template details data value', templateDetailsData);
+      console.log('template details data 222222222', templateDetailsData);
       const dashboardConfiguration = {
         dashboardId: '12598412',
         dashboardName: db.title,
@@ -319,6 +358,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       };
 
       this.progressIndicatorService.setProgress(40);
+      console.log('db value', db);
       templateDetailsData.input.devices = db.devices;
       if (db.title !== 'Instruction' && db.title !== 'Welcome' && db.title !== 'Help and Support' && db.isConfigRequred) {
         templateDetailsData.widgets.forEach(widget => {
@@ -348,7 +388,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       } else {
         this.groupTemplate = false;
       }
-
+      console.log('template details data', this.templateDetails);
       await this.catalogService.createDashboard(this.currentApp, dashboardConfiguration, db, templateDetailsData, this.groupTemplate);
       this.progressIndicatorService.setProgress(90);
       overallProgress = overallProgress + eachRemoteProgress;
@@ -470,23 +510,25 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
             id: selectedItem,
             name: selectedItem
           }
-        }]
-
+        }];
 
         let deviceFieldNotField;
-        for (let dd = 0; dd < this.templateDetails.dashboards.length; dd++) {
-          if (this.templateDetails.dashboards[dd].isDeviceRequired === false) {
-            deviceFieldNotField = true;
-
-          } else if (this.templateDetails.dashboards[dd].isDeviceRequired === true)
-            if (this.templateDetails.dashboards[dd].devices && this.templateDetails.dashboards[dd].devices[0] && this.templateDetails.dashboards[dd].devices[0]?.reprensentation.id !== null && this.templateDetails.dashboards[dd].devices[0]?.reprensentation.id !== undefined) {
+        if (!this.simulatorSelected) {
+          for (let dd = 0; dd < this.templateDetails.dashboards.length; dd++) {
+            if (this.templateDetails.dashboards[dd].isDeviceRequired === false) {
               deviceFieldNotField = true;
-            } else {
-              deviceFieldNotField = false;
-              break;
-            }
+            } 
+            else if (this.templateDetails.dashboards[dd].isDeviceRequired === true && this.templateDetails.dashboards[dd].linkWithDashboard === dashboard.id) {
+              this.templateDetails.dashboards[dd].devices = dashboard.devices;
+               deviceFieldNotField = true;
+           } else {
+                deviceFieldNotField = false;
+                break;
+           }
+          }
+          this.deviceFormValid = deviceFieldNotField;
         }
-        this.deviceFormValid = deviceFieldNotField;
+       
       });
     }
 else {
@@ -501,24 +543,24 @@ else {
             name: selectedItem['name']
           }
       }]
-      console.log('dasboard.devices value', dashboard.devices, 'dashboard name', dashboard.name);
       
       let deviceFieldNotField;
-    for (let dd = 0; dd < this.templateDetails.dashboards.length; dd++) {
-      if (this.templateDetails.dashboards[dd].isDeviceRequired === false ) {
-        deviceFieldNotField = true;
-        
-      } else if (this.templateDetails.dashboards[dd].isDeviceRequired === true ) 
-       if(this.templateDetails.dashboards[dd].devices && this.templateDetails.dashboards[dd].devices[0] && this.templateDetails.dashboards[dd].devices[0]?.reprensentation.id !== null && this.templateDetails.dashboards[dd].devices[0]?.reprensentation.id !== undefined) {
-        console.log('this.templateDetails.dashboards[dd].devices[0]', this.templateDetails.dashboards[dd].devices[0]);
-        deviceFieldNotField = true;
-      } else {
-        deviceFieldNotField = false;
-        break;
+      if (!this.simulatorSelected) {
+        for (let dd = 0; dd < this.templateDetails.dashboards.length; dd++) {
+          if (this.templateDetails.dashboards[dd].isDeviceRequired === false ) {
+            deviceFieldNotField = true;
+          } 
+          else if (this.templateDetails.dashboards[dd].isDeviceRequired === true && this.templateDetails.dashboards[dd].linkWithDashboard === dashboard.id) {
+            this.templateDetails.dashboards[dd].devices = dashboard.devices;
+             deviceFieldNotField = true;
+         } else {
+              deviceFieldNotField = false;
+              break;
+         }
+        }
+        this.deviceFormValid = deviceFieldNotField;
       }
-    }
-    this.deviceFormValid = deviceFieldNotField;
-    console.log('Template details after assigning device', this.templateDetails);
+    
   });
 }
 
