@@ -20,19 +20,42 @@
     </div>
     
     <div class="col-sm-2" style="display: flex; justify-content: center;">
-        <button type="button" class="btn btn-primary" (click)="getMeasurements()" [disabled]="!this.deviceId">Generate DTDL</button>
+        <button type="button" class="btn btn-primary" (click)="getMeasurements('Generate DTDL')" [disabled]="!this.deviceId">Generate DTDL</button>
     </div>
+
+    <div class="col-sm-2" style="display: flex; justify-content: center;">
+        <button type="button" class="btn btn-primary" (click)="showDtdlSimulatorModal()" [disabled]="!this.deviceId">Generate Simulator</button>
+    </div>
+</div>
+<div *ngIf="noMeasurementsFound" class="no-meas-found">
+    <h1>NO MEASUREMENTS FOUND</h1>
 </div>
 <div class="dtdl-body-div">
         <h5 *ngIf="dtdlCreated" class="dtdl-heading">{{deviceName}}_DTDL Generated:</h5>
-        <div *ngIf="dtdlCreated" class="dtdl-response-div">
-            <textarea *ngIf="!deviceChanged;else infoText" readonly class="dtdl-textArea" #dtdlText>{{dtdlObjects | json}}</textarea>
-            <ng-template #infoText>
-                <textarea readonly class="dtdl-textArea" #dtdlText>Click on GENERATE DTDL button.</textarea>
-            </ng-template>
-            <button [disabled]="deviceChanged" type="button" class="btn btn-dot" (click)="copyInputMessage(dtdlText)" title="Copy to clipboard" style="margin-left: 5px;"><i class="c8y-icon dlt-c8y-icon-copy"></i></button>
+        <h5 *ngIf="simConfigCreated" class="dtdl-heading">{{deviceName}}_config Generated:</h5>
+        <div *ngIf="dtdlCreated || simConfigCreated" class="dtdl-response-div">
+            <div *ngIf="dtdlCreated" class="dtdl-response-div">
+                <div *ngIf="!deviceChanged;else infoText" style="width: 100%;display: flex;justify-content: center;">
+                    <textarea readonly class="dtdl-textArea" #dtdlText>{{dtdlObjects | json}}</textarea>
+                    <button type="button" class="btn btn-dot" (click)="copyInputMessage(dtdlText)" title="Copy to clipboard" style="margin-left: 5px;"><i class="c8y-icon dlt-c8y-icon-copy"></i></button>
+                </div>
+                <ng-template #infoText>
+                    <textarea readonly class="dtdl-textArea">Click on GENERATE button to perform operation.</textarea>
+                    <button [disabled]="deviceChanged" type="button" class="btn btn-dot" (click)="copyInputMessage(dtdlText)" title="Copy to clipboard" style="margin-left: 5px;"><i class="c8y-icon dlt-c8y-icon-copy"></i></button>
+                </ng-template>
+            </div>
+            <div *ngIf="simConfigCreated" class="dtdl-response-div">
+                <div *ngIf="!deviceChanged;else infoText" style="width: 100%;display: flex;justify-content: center;">
+                    <textarea readonly class="dtdl-textArea" #simConfigText>{{dtdlSimulatorConfig | json}}</textarea>
+                    <button type="button" class="btn btn-dot" (click)="copyInputMessage(simConfigText)" title="Copy to clipboard" style="margin-left: 5px;"><i class="c8y-icon dlt-c8y-icon-copy"></i></button>
+                </div>
+                <ng-template #infoText>
+                    <textarea readonly class="dtdl-textArea">Click on GENERATE button to perform operation.</textarea>
+                    <button [disabled]="deviceChanged" type="button" class="btn btn-dot" (click)="copyInputMessage(simConfigText)" title="Copy to clipboard" style="margin-left: 5px;"><i class="c8y-icon dlt-c8y-icon-copy"></i></button>
+                </ng-template>
+            </div>
         </div>
-        <div *ngIf="dtdlCreated"  class="row action-buttons">
+        <div *ngIf="dtdlCreated || simConfigCreated"  class="row action-buttons">
             <button [disabled]="deviceChanged" type="button" class="btn btn-default" title="Save to file repository" (click)="saveToFileRepository()"><i class="c8y-icon dlt-c8y-icon-save"></i> Save to File Repository</button>
             <button [disabled]="deviceChanged" type="button" class="btn btn-default" (click)="download()"><i class="c8y-icon dlt-c8y-icon-download"></i> Download</button>
         </div>

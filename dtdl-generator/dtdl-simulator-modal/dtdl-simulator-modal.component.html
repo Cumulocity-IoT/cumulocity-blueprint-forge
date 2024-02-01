@@ -1,0 +1,30 @@
+<div class="modal-header text-center bg-primary">
+    <h4 class="text-uppercase" style="margin:0; letter-spacing: 0.15em;">Simulator Configuration</h4>
+</div>
+<div class="modal-body" style="height: 50vh;">
+    <div class="row" style="display: flex; justify-content: center; padding: 5% 5% 0% 5%;">
+        <div class="col-sm-12">
+            <label for="type-selector">Select configuration type</label>
+            <div class="c8y-select-wrapper" style="width: 100%;">
+                <select id="type-selector" class="form-control" [(ngModel)]="typeSelected" (change)="typeChanged()">
+                    <option *ngFor="let option of typeOptions" [value]="option.value">{{option.name}}</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <div class="row" style="display: flex; justify-content: center; padding: 5% 5% 0% 5%;">
+        <div class="col-sm-12">
+            <label for="page-selector">Select measurement limit <span><i c8yIcon="info" title="Number of measurements for which you want to simulate"></i></span></label>
+            <div class="c8y-select-wrapper" style="width: 100%;">
+                <select id="page-selector" class="form-control" [(ngModel)]="pageSize" (change)="pageChanged()">
+                    <option *ngFor="let option of pageOptions" [value]="option.value">{{option.name}}</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-default" (click)="bsModalRef.hide()">Cancel</button>
+    <button type="button" class="btn btn-primary" [disabled]="typeSelected==0" (click)="createSimulatorClicked()">Generate</button>
+</div>

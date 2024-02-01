@@ -1,0 +1,9 @@
+
+.modal-body {
+    margin-top: 10px !important;
+    min-height: 450px !important;
+}
+
+.modal-header {
+    color: white !important;
+}

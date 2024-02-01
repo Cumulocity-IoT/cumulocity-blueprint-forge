@@ -20,6 +20,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DeviceDTDLGeneratorPluginComponent } from './gp-dtdl-generator-plugin.component';
+import { DtdlSimulatorModalComponent } from './dtdl-simulator-modal/dtdl-simulator-modal.component';
 import { hookNavigator} from '@c8y/ngx-components';
 import { RouterModule } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -31,8 +32,8 @@ import { DeviceSelectorModalService } from './device-selector.service';
 /*Router guards (canactivate:[AppIdGuard]) is used below to check 
 if the device dtdl generator plugin is being called from Application builder so as to redirect user to the application's path.*/
 @NgModule({
-  declarations: [DeviceDTDLGeneratorPluginComponent],
-entryComponents: [DeviceDTDLGeneratorPluginComponent],
+  declarations: [DeviceDTDLGeneratorPluginComponent,DtdlSimulatorModalComponent],
+entryComponents: [DeviceDTDLGeneratorPluginComponent,DtdlSimulatorModalComponent],
   imports: [CommonModule,ReactiveFormsModule/*,DeviceSelectorModule*/,CoreModule,
     RouterModule.forChild([
       {
