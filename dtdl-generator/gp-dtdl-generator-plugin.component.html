@@ -2,8 +2,8 @@
     <div class="col-sm-3">
         <form name="searchForm">
             <div id="search" class="input-group input-group-search">
-                <input type="search" name="device-search" class="form-control" placeholder="Device name, start typing" autocomplete="off"
-                    [(ngModel)]="searchString" (keyup)="searchForDevice()" />
+                <input type="search" name="device-search" class="form-control" placeholder="Device name, start typing"
+                    autocomplete="off" [(ngModel)]="searchString" (keyup)="searchForDevice()" />
                 <span class="input-group-addon">
                     <i c8yIcon="search" *ngIf="!searchString || searchString.length === 0"></i>
                     <i c8yIcon="times" class="text-muted" *ngIf="searchString && searchString.length > 0"
@@ -12,51 +12,69 @@
             </div>
         </form>
         <div class="list-group device-list" *ngIf="templateType !== 2">
-            <button *ngFor="let device of devices" type="button" [ngClass]="{'device-selected': isDeviceSelected(device)}"
-                class="list-group-item" (click)="selectDevice(device)">{{device.name}} <i c8yIcon="check"
-                *ngIf="isDeviceSelected(device)"></i>
+            <button *ngFor="let device of devices" type="button"
+                [ngClass]="{'device-selected': isDeviceSelected(device)}" class="list-group-item"
+                (click)="selectDevice(device)">{{device.name}} <i c8yIcon="check" *ngIf="isDeviceSelected(device)"></i>
             </button>
         </div>
     </div>
-    
-    <div class="col-sm-2" style="display: flex; justify-content: center;">
-        <button type="button" class="btn btn-primary" (click)="getMeasurements('Generate DTDL')" [disabled]="!this.deviceId">Generate DTDL</button>
+
+    <div class="col-sm-3 col-md-2" style="display: flex; justify-content: center;">
+        <button type="button" class="btn btn-primary" (click)="getMeasurements('Generate DTDL')"
+            [disabled]="!this.deviceId">Generate DTDL</button>
     </div>
 
-    <div class="col-sm-2" style="display: flex; justify-content: center;">
-        <button type="button" class="btn btn-primary" (click)="showDtdlSimulatorModal()" [disabled]="!this.deviceId">Generate Simulator</button>
+    <div class="col-sm-3 col-md-2" style="display: flex; justify-content: center;">
+        <button type="button" class="btn btn-default" (click)="getMeasurements('Generate simulator')"
+            [disabled]="!this.deviceId">Simulator Configurator</button>
     </div>
 </div>
-<div *ngIf="noMeasurementsFound" class="no-meas-found">
-    <h1>NO MEASUREMENTS FOUND</h1>
-</div>
 <div class="dtdl-body-div">
+    <div *ngIf="isLoading; else loadingComplete" class="loading-div">
+        <c8y-loading></c8y-loading>
+    </div>
+    <ng-template #loadingComplete>
         <h5 *ngIf="dtdlCreated" class="dtdl-heading">{{deviceName}}_DTDL Generated:</h5>
         <h5 *ngIf="simConfigCreated" class="dtdl-heading">{{deviceName}}_config Generated:</h5>
         <div *ngIf="dtdlCreated || simConfigCreated" class="dtdl-response-div">
             <div *ngIf="dtdlCreated" class="dtdl-response-div">
                 <div *ngIf="!deviceChanged;else infoText" style="width: 100%;display: flex;justify-content: center;">
                     <textarea readonly class="dtdl-textArea" #dtdlText>{{dtdlObjects | json}}</textarea>
-                    <button type="button" class="btn btn-dot" (click)="copyInputMessage(dtdlText)" title="Copy to clipboard" style="margin-left: 5px;"><i class="c8y-icon dlt-c8y-icon-copy"></i></button>
+                    <button type="button" class="btn btn-dot" (click)="copyInputMessage(dtdlText)"
+                        title="Copy to clipboard" style="margin-left: 5px;"><i
+                            class="c8y-icon dlt-c8y-icon-copy"></i></button>
                 </div>
                 <ng-template #infoText>
                     <textarea readonly class="dtdl-textArea">Click on GENERATE button to perform operation.</textarea>
-                    <button [disabled]="deviceChanged" type="button" class="btn btn-dot" (click)="copyInputMessage(dtdlText)" title="Copy to clipboard" style="margin-left: 5px;"><i class="c8y-icon dlt-c8y-icon-copy"></i></button>
+                    <button [disabled]="deviceChanged" type="button" class="btn btn-dot"
+                        (click)="copyInputMessage(dtdlText)" title="Copy to clipboard" style="margin-left: 5px;"><i
+                            class="c8y-icon dlt-c8y-icon-copy"></i></button>
                 </ng-template>
             </div>
             <div *ngIf="simConfigCreated" class="dtdl-response-div">
                 <div *ngIf="!deviceChanged;else infoText" style="width: 100%;display: flex;justify-content: center;">
                     <textarea readonly class="dtdl-textArea" #simConfigText>{{dtdlSimulatorConfig | json}}</textarea>
-                    <button type="button" class="btn btn-dot" (click)="copyInputMessage(simConfigText)" title="Copy to clipboard" style="margin-left: 5px;"><i class="c8y-icon dlt-c8y-icon-copy"></i></button>
+                    <button type="button" class="btn btn-dot" (click)="copyInputMessage(simConfigText)"
+                        title="Copy to clipboard" style="margin-left: 5px;"><i
+                            class="c8y-icon dlt-c8y-icon-copy"></i></button>
                 </div>
                 <ng-template #infoText>
                     <textarea readonly class="dtdl-textArea">Click on GENERATE button to perform operation.</textarea>
-                    <button [disabled]="deviceChanged" type="button" class="btn btn-dot" (click)="copyInputMessage(simConfigText)" title="Copy to clipboard" style="margin-left: 5px;"><i class="c8y-icon dlt-c8y-icon-copy"></i></button>
+                    <button [disabled]="deviceChanged" type="button" class="btn btn-dot"
+                        (click)="copyInputMessage(simConfigText)" title="Copy to clipboard" style="margin-left: 5px;"><i
+                            class="c8y-icon dlt-c8y-icon-copy"></i></button>
                 </ng-template>
             </div>
         </div>
-        <div *ngIf="dtdlCreated || simConfigCreated"  class="row action-buttons">
-            <button [disabled]="deviceChanged" type="button" class="btn btn-default" title="Save to file repository" (click)="saveToFileRepository()"><i class="c8y-icon dlt-c8y-icon-save"></i> Save to File Repository</button>
-            <button [disabled]="deviceChanged" type="button" class="btn btn-default" (click)="download()"><i class="c8y-icon dlt-c8y-icon-download"></i> Download</button>
+        <p *ngIf="simConfigCreated" class="dtdl-heading"><span><i c8yIcon="info"></i></span> This simulator
+            configuration
+            file is compatible with the simulators of Application Builder and Blueprint Forge</p>
+        <div *ngIf="dtdlCreated || simConfigCreated" class="row action-buttons">
+            <button [disabled]="deviceChanged" type="button" class="btn btn-default" title="Save to file repository"
+                (click)="saveToFileRepository()"><i class="c8y-icon dlt-c8y-icon-save"></i> Save to File
+                Repository</button>
+            <button [disabled]="deviceChanged" type="button" class="btn btn-default" (click)="download()"><i
+                    class="c8y-icon dlt-c8y-icon-download"></i> Download</button>
         </div>
+    </ng-template>
 </div>

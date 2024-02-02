@@ -24,17 +24,17 @@ import { DtdlSimulatorModalComponent } from './dtdl-simulator-modal/dtdl-simulat
 import { hookNavigator} from '@c8y/ngx-components';
 import { RouterModule } from '@angular/router';
 import { ReactiveFormsModule } from '@angular/forms';
-// import { DeviceSelectorModule } from './device-selector/device-selector.module';
 import { CoreModule } from '@c8y/ngx-components';
 import { AppIdGuard } from './applicationIdGuard';
 import { DeviceSelectorModalService } from './device-selector.service';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 /*Router guards (canactivate:[AppIdGuard]) is used below to check 
 if the device dtdl generator plugin is being called from Application builder so as to redirect user to the application's path.*/
 @NgModule({
   declarations: [DeviceDTDLGeneratorPluginComponent,DtdlSimulatorModalComponent],
 entryComponents: [DeviceDTDLGeneratorPluginComponent,DtdlSimulatorModalComponent],
-  imports: [CommonModule,ReactiveFormsModule/*,DeviceSelectorModule*/,CoreModule,
+  imports: [CommonModule,ReactiveFormsModule,CoreModule,NgSelectModule,
     RouterModule.forChild([
       {
         path: "DTDLGenerator", component: DeviceDTDLGeneratorPluginComponent, canActivate:[AppIdGuard]

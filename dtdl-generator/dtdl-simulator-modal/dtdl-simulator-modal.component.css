@@ -1,9 +1,15 @@
 
 .modal-body {
     margin-top: 10px !important;
-    min-height: 450px !important;
+    min-height: 65vh !important;
 }
 
 .modal-header {
     color: white !important;
+}
+
+.modal-form-fields{
+    display: flex; 
+    justify-content: center; 
+    padding: 5% 5% 0% 5%;
 }

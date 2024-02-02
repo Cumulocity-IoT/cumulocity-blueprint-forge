@@ -16,51 +16,58 @@
 * limitations under the License.
  */
 
-import {Component} from "@angular/core";
+import {Component, OnInit, ViewEncapsulation} from "@angular/core";
 import { BsModalRef } from "ngx-bootstrap/modal";
 import { Subject } from "rxjs";
-
 
 @Component({
     selector: 'dtdl-simulator-modal',
     templateUrl: './dtdl-simulator-modal.component.html',
-    styleUrls: ['./dtdl-simulator-modal.component.html']
+    styleUrls: ['./dtdl-simulator-modal.component.css','./../../node_modules/@ng-select/ng-select/themes/default.theme.css'],
+    encapsulation: ViewEncapsulation.None
 })
 
 
-export class DtdlSimulatorModalComponent {
+export class DtdlSimulatorModalComponent implements OnInit{
+    messurements:any;
+    selectedMeasurements:any[];
+    series:any[];
     typeOptions=[
-        { name:'--select type--', value:0 },
+        // { name:'--select type--', value:0 },
         { name:'DTDL Configuration', value:1 },
-        { name:'CSV Configuration', value:2 }
+        // { name:'CSV Configuration', value:2 }
     ];
     pageOptions=[
         { name:'Last 50 measurements', value:50 },
         { name:'Last 100 measurements', value:100 },
         { name:'Last 200 measurements', value:200 }
     ]
-    typeSelected=0;
+    typeSelected=1;
     pageSize=50;
     public onGenerate: Subject<any>;
+    public onCancel: Subject<boolean>;
 
     constructor(public bsModalRef: BsModalRef){
         this.onGenerate=new Subject();
+        this.onCancel=new Subject();
     };
-
-    typeChanged(){
-        console.log("Type Selected:",this.typeSelected);
-    }
-
-    pageChanged(){
-        console.log("Page Size:",this.pageSize);
+    ngOnInit(): void {
+        this.series=this.messurements.data.series;
+        this.selectedMeasurements=this.messurements.data.series;
     }
 
     createSimulatorClicked(){
         let response:any={
             pageSize:this.pageSize,
-            typeSelected:this.typeSelected
+            typeSelected:this.typeSelected,
+            selectedMeasurements:this.selectedMeasurements
         }
         this.onGenerate.next(response);
+        this.bsModalRef.hide();
+    }
+
+    cancelClicked(){
+        this.onCancel.next(true);
         this.bsModalRef.hide();
     }
 }

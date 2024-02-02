@@ -31,9 +31,9 @@ import { DtdlSimulatorModalComponent } from "./dtdl-simulator-modal/dtdl-simulat
   styleUrls: ['./gp-dtdl-generator-plugin.component.css']
 })
 export class DeviceDTDLGeneratorPluginComponent {
-  noMeasurementsFound:boolean=false;
   dtdlCreated: boolean = false;
   simConfigCreated: boolean = false;
+  isLoading:boolean=false;
   dtdlJson = '';
   simConfigJson = '';
   blob: Blob;
@@ -58,6 +58,13 @@ export class DeviceDTDLGeneratorPluginComponent {
 
   bsModalRef: BsModalRef;
   mesPageLimit: number;
+  /* 
+    configType:[
+        { name:'--select type--', value:0 },
+        { name:'DTDL Configuration', value:1 },
+        { name:'CSV Configuration', value:2 }
+    ]
+  */
   configType: number;
   _ = require("lodash");
   dtdlModelConfig: dtdlModelConfig[] = [];
@@ -88,10 +95,10 @@ export class DeviceDTDLGeneratorPluginComponent {
 
   // below function is to get measurements for the device selected and add them as contents to dtdl
   async getMeasurements(clickedOn: string) {
+    this.isLoading=true;
     this.deviceName = this.deviceSelected.name;
     this.dtdlCreated = false;
     this.simConfigCreated = false;
-    // this.contents = [];
     let sixMonthsPrior = this.addMonths(new Date(this.currDate), -6).toISOString();
     const filter: ISeriesFilter = {
       dateFrom: sixMonthsPrior,
@@ -101,20 +108,15 @@ export class DeviceDTDLGeneratorPluginComponent {
     let messurements = await this.measurementService.listSeries(filter);
     if (clickedOn == 'Generate DTDL')
       this.generateContentsForDTDL(messurements);
-    else if (clickedOn == 'Generate simulator' && this.configType == 1)
-      this.generateDTDLSimulator(messurements);
+    else if (clickedOn == 'Generate simulator')
+      this.showDtdlSimulatorModal(messurements);
   }
 
-  async generateDTDLSimulator(messurements: any) {
-    if (messurements.data && messurements.data.series && messurements.data.series.length > 0) {
-      this.noMeasurementsFound=false;
+  async generateDTDLSimulator(series) {
+    if (series && series.length > 0) {
       this.dtdlModelConfig = [];
       this.interval = [];
-      this.listMeasurement(messurements);
-    }
-    else {
-      this.noMeasurementsFound=true;
-      console.log("NO MEASUREMENTS FOUND");
+      this.listMeasurement(series);
     }
   }
 
@@ -160,25 +162,15 @@ export class DeviceDTDLGeneratorPluginComponent {
       displayName: displayName
     };
     this.dtdlObjects.push(dtdl);
+    this.dtdlJson = JSON.stringify(this.dtdlObjects, null, 2);
+    this.blob = new Blob([this.dtdlJson], { type: 'application/json' });
     this.dtdlCreated = true;
     this.deviceChanged = false;
-    // this.dtdlJson = JSON.stringify(this.dtdlObjects, null, 2);
-    // this.blob = new Blob([this.dtdlJson], { type: 'application/json' });
+    this.isLoading=false;
   }
 
-  createBlob() {
-    if (this.dtdlCreated) {
-      this.dtdlJson = JSON.stringify(this.dtdlObjects, null, 2);
-      this.blob = new Blob([this.dtdlJson], { type: 'application/json' });
-    }
-    else if (this.simConfigCreated) {
-      this.simConfigJson = JSON.stringify(this.dtdlSimulatorConfig, null, 2);
-      this.blob = new Blob([this.simConfigJson], { type: 'application/json' });
-    }
-  }
   //below function is to download dtdl file created.
   download() {
-    this.createBlob();
     const url = URL.createObjectURL(this.blob);
     const link = document.createElement('a');
     link.href = url;
@@ -193,7 +185,6 @@ export class DeviceDTDLGeneratorPluginComponent {
 
   //below function is to save generated file to File Repository
   async saveToFileRepository() {
-    this.createBlob();
     var savedId;
     if (this.dtdlCreated)
       savedId = await this.createBinary(this.blob);
@@ -261,17 +252,21 @@ export class DeviceDTDLGeneratorPluginComponent {
     return this.deviceSelected && this.deviceSelected.id === device.id;
   }
 
-  showDtdlSimulatorModal() {
-    this.bsModalRef = this.modalService.show(DtdlSimulatorModalComponent, { backdrop: 'static', class: 'modal-sm', initialState: {} });
+  showDtdlSimulatorModal(messurements) {
+    this.bsModalRef = this.modalService.show(DtdlSimulatorModalComponent, { backdrop: 'static', class: 'modal-sm', initialState: {messurements} });
     this.bsModalRef.content.onGenerate.subscribe((response) => {
       this.mesPageLimit = response.pageSize;
       this.configType = response.typeSelected;
-      this.getMeasurements('Generate simulator');
+      if(this.configType==1)
+        this.generateDTDLSimulator(response.selectedMeasurements);
     });
+    this.bsModalRef.content.onCancel.subscribe((canceled)=>{
+      this.isLoading=false;
+    })
   }
 
-  async listMeasurement(messurements) {
-    for (let series of messurements.data.series) {
+  async listMeasurement(selectedMeasurements) {
+    for (let series of selectedMeasurements) {
       let sixMonthsPrior = this.addMonths(new Date(this.currDate), -6).toISOString();
       const msmtFilter = {
         pageSize: this.mesPageLimit,
@@ -433,7 +428,10 @@ export class DeviceDTDLGeneratorPluginComponent {
       type: "DTDL",
       config: config
     }
+    this.simConfigJson = JSON.stringify(this.dtdlSimulatorConfig, null, 2);
+    this.blob = new Blob([this.simConfigJson], { type: 'application/json' });
     this.simConfigCreated = true;
     this.deviceChanged = false;
+    this.isLoading=false;
   }
 }

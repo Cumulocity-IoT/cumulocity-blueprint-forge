@@ -78,3 +78,9 @@
   height: 65vh;
   align-items: center;
 }
+
+.loading-div{
+  height: 65vh;
+  align-items: center;
+  margin-top: 20px;
+}
