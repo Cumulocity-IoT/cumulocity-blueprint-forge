@@ -1,5 +1,5 @@
-<wizard activeStepId="menu">
-    <wizard-step stepId="menu">
+<wizard  activeStepId="menu">
+    <wizard-step stepId="menu" *ngIf="!isBlueprintSimulator">
         <div class="modal-header text-center bg-primary" style="color: var(--brand-dark, #000);">
             <div style="font-size: 62px;">
                 <span c8yIcon="c8y-simulator"></span>
@@ -35,7 +35,7 @@
             <button class="btn btn-default" (click)="bsModalRef.hide()">Cancel</button>
         </div>
     </wizard-step>
-    <wizard-step stepId="import-config">
+    <wizard-step *ngIf="(isBlueprintSimulator && enableSimulator) || (!isBlueprintSimulator)" stepId="import-config">
         <div class="modal-header text-center bg-primary" style="color: var(--brand-dark, #000);">
             <div style="font-size: 62px;">
                 <span c8yIcon="c8y-simulator"></span>
@@ -62,7 +62,7 @@
         </div>
         <div class="c8y-wizard-footer">
             <button class="btn btn-default" (click)="wizard.selectStep('menu')">Back</button>
-            <button class="btn btn-default" (click)="bsModalRef.hide()">Cancel</button>
+            <button class="btn btn-default" (click)="bsModalRef.hide();">Cancel</button>
             <button class="btn btn-primary" (click)="wizard.selectStep('device')"
                 [disabled]="!isConfigFromFileUploaded()">Next <i c8yIcon="chevron-right"></i> </button>
         </div>
@@ -108,7 +108,7 @@
         </div>
         <div class="c8y-wizard-footer">
             <button class="btn btn-default"
-                (click)="configFromFile === undefined ? wizard.selectStep('menu') : wizard.selectStep('import-config')">Back</button>
+                (click)="(configFromFile === undefined) ? wizard.selectStep('menu') : (isBlueprintSimulator && enableSimulator) ? wizard.selectStep('config') : (!enableSimulator) ? '' : wizard.selectStep('import-config')">Back</button>
             <button class="btn btn-default" (click)="bsModalRef.hide()">Cancel</button>
         </div>
     </wizard-step>
@@ -281,6 +281,36 @@
             <button class="btn btn-primary"
                 [disabled]="busy || !newSimulatorForm.form.valid || (!isMSCheckSpin && !isMSExist && isCSVSimulator) || isduplicateSmulatorName"
                 (click)="saveAndClose()">Save</button>
+        </div>
+    </wizard-step>
+
+
+    <wizard-step *ngIf="(isBlueprintSimulator && enableSimulator) || (!isBlueprintSimulator)" stepId="select-dtdl">
+        <div class="modal-header text-center bg-primary" style="color: var(--brand-dark, #000);">
+            <div style="font-size: 62px;">
+                <span c8yIcon="c8y-simulator"></span>
+            </div>
+            <h4 class="text-uppercase" style="margin:0; letter-spacing: 0.15em;">Add Simulator</h4>
+        </div>
+        <div class="c8y-wizard-nav">
+            <span>Select Simulator Configuration</span>
+        </div>
+        <hr style="margin:0;">
+        <div class="modal-inner-scroll">
+            <div class="col-xs-12">
+                <div class="form-group">
+                    <label for="configFile" style="padding: 2%"><span>Select file</span></label>
+                    <select class="form-control" [(ngModel)]="selectedValue" style="border-radius:20px; padding: 2%"
+                    id="dashboardView" (ngModelChange)="updateConfigurationFile()">
+                    <option *ngFor="let simulatorConfigFile of simulatorConfigFiles" [value]="simulatorConfigFile.fileName">{{simulatorConfigFile.fileName}}</option>
+                </select>
+                </div>
+            </div>
+        </div>
+        <div class="c8y-wizard-footer">
+            <button class="btn btn-default" (click)="bsModalRef.hide();">Cancel</button>
+            <button class="btn btn-primary" (click)="wizard.selectStep('device')"
+                >Next <i c8yIcon="chevron-right"></i> </button>
         </div>
     </wizard-step>
 </wizard>

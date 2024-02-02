@@ -25,7 +25,7 @@ import {
     ViewContainerRef,
     OnInit
 } from '@angular/core';
-import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap/modal';
 import { WizardComponent } from "../../wizard/wizard.component";
 import { InventoryService, ApplicationService, IManagedObject, FetchClient } from '@c8y/client';
 import { AppIdService } from "../app-id.service";
@@ -43,7 +43,7 @@ import { AlertMessageModalComponent } from '../../builder/utils/alert-message-mo
 import { SimulatorManagerService } from '../../builder/simulator/mainthread/simulator-manager.service';
 import { switchMap} from "rxjs/operators";
 import { AppDataService } from '../app-data.service';
-import { from, of, Subscription } from "rxjs";
+import { from, of, Subscription, Subject } from "rxjs";
 @Component({
     templateUrl: './new-simulator-modal.component.html'
 })
@@ -58,6 +58,7 @@ export class NewSimulatorModalComponent implements OnInit{
     isduplicateSmulatorName:boolean=false;
     isBlueprintSimulator: boolean = false;
     simulatorConfigFiles: any[];
+    selectedFile: string;
     @ViewChild(WizardComponent, { static: true }) wizard: WizardComponent;
 
     @ViewChild("configWrapper", { read: ViewContainerRef, static: true }) configWrapper: ViewContainerRef;
@@ -77,6 +78,10 @@ export class NewSimulatorModalComponent implements OnInit{
     isMSCheckSpin: boolean = false;
     isCSVSimulator: boolean = false;
     showWarning: boolean;
+    fileLength: Number;
+    enableSimulator: boolean;
+    selectedValue: string = 'Select File';
+    public onSave: Subject<any>;
 
     constructor(
         private simSvc: SimulatorWorkerAPI, private alertService: AlertService,
@@ -85,13 +90,29 @@ export class NewSimulatorModalComponent implements OnInit{
         private appService: ApplicationService, private appIdService: AppIdService, private fetchClient: FetchClient,
         private simulatorNotificationService: SimulatorNotificationService, private fileSimulatorNotificationService: FileSimulatorNotificationService,
         private simulatorConfigService: SimulatorConfigService,private modalService: BsModalService,
-        private simulatorManagerService: SimulatorManagerService,private appDataService: AppDataService
-    ) { }
+        private simulatorManagerService: SimulatorManagerService,private appDataService: AppDataService,
+        private modalOptions: ModalOptions
+    ) {
+        this.onSave = new Subject();
+     }
     async ngOnInit(): Promise<void> {
         this.appDataService.forceUpdate = true;
         await this.getAppDetails(this.appId);    
         if(this.isBlueprintSimulator) {
-            //If onlu one Simulator Config File
+            const modalData = this.modalOptions.initialState;
+            const fileInput = JSON.stringify(this.modalOptions.initialState.simulatorConfigFiles[0].fileContent);
+            const validJson = this.isValidJson(fileInput);
+            if (modalData.fileLength ===  1) {
+                //If only one Simulator Config File
+                this.isConfigFileUploading = true;
+                if (validJson) {
+                this.processFileInput(validJson);
+                }
+            } else if (modalData.fileLength > 1) {
+                //If multiple
+                this.wizard.selectStep('select-dtdl');
+            }
+            
           /*   const validJson = this.isValidJson(input);
             this.isConfigFileUploading = true; */
             /* if (validJson) {
@@ -107,7 +128,7 @@ export class NewSimulatorModalComponent implements OnInit{
             ;
 
             // If multiple
-            this.wizard.selectStep('select-dtdl');
+            // this.wizard.selectStep('select-dtdl');
         }        
     }
     //Getting application details
@@ -163,6 +184,7 @@ export class NewSimulatorModalComponent implements OnInit{
             }
 
             this.newConfig = componentRef.instance.config;//TODO: needed after merge? 
+            console.log('new config in new simulator modal', this.newConfig);
 
             if (componentRef.instance.config.modalSize) {
                 this.bsModalRef.setClass(componentRef.instance.config.modalSize);
@@ -311,7 +333,11 @@ export class NewSimulatorModalComponent implements OnInit{
         }
         // We could just wait for them to refresh, but it's nicer to instantly refresh
         await this.simSvc.checkForSimulatorConfigChanges();
-
+        let blueprintForgeDeviceDetails = {
+            deviceId: this.newConfig.deviceId,
+            deviceName: this.newConfig.deviceName
+        }
+        this.onSave.next(blueprintForgeDeviceDetails);
         this.bsModalRef.hide();
     }
     getSelectedDevice(device: any) {
@@ -353,14 +379,7 @@ export class NewSimulatorModalComponent implements OnInit{
             input = event.target.result;
             const validJson = this.isValidJson(input);
             if (validJson) {
-                this.selectedStrategyFactory = this.simulationStrategiesService.strategiesByName.get(validJson.type);
-                if (this.selectedStrategyFactory === undefined) {
-                    this.isConfigFileError = true;
-                } else {
-                    this.configFromFile = validJson.config;
-                    this.simulatorName = validJson.name;
-                    this.wizard.selectStep('device');
-                }
+                this.processFileInput(validJson);
             } else {
                 this.isConfigFileError = true;
                 events.srcElement.value = "";
@@ -384,6 +403,7 @@ export class NewSimulatorModalComponent implements OnInit{
             if (input) {
                 const o = JSON.parse(input);
                 if (o && (o.constructor === Object || o.constructor === Array)) {
+                    console.log('o constructor value', o.constructor);
                     return o;
                 }
             }
@@ -443,5 +463,29 @@ export class NewSimulatorModalComponent implements OnInit{
                 this.newConfig.intervalInvalid = false;
             }
         });
+    }
+
+    processFileInput(validJson) {
+        this.selectedStrategyFactory = this.simulationStrategiesService.strategiesByName.get(validJson.type);
+                if (this.selectedStrategyFactory === undefined) {
+                    this.isConfigFileError = true;
+                } else {
+                    this.configFromFile = validJson.config;
+                    this.simulatorName = validJson.name;
+                    if (this.enableSimulator) {
+                        this.wizard.selectStep('device');
+                    }
+                }
+    }
+
+    updateConfigurationFile() {
+        let matchedConfigValue = JSON.parse(JSON.stringify(this.modalOptions.initialState.simulatorConfigFiles)).find(element => element.fileName === this.selectedValue);
+        const fileInput = JSON.stringify(matchedConfigValue.fileContent)
+        const validJson = this.isValidJson(fileInput);
+        this.isConfigFileUploading = true;
+                if (validJson) {
+                this.processFileInput(validJson);
+                }
+
     }
 }

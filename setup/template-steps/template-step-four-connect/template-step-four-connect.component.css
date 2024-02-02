@@ -2,3 +2,6 @@
     font-size: x-large;
     cursor: pointer;
 }
+.padd-bottom {
+    padding-bottom: 1%;
+}
