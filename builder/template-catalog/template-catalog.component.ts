@@ -17,6 +17,8 @@
  */
 
 import { Component, OnInit, ViewEncapsulation } from "@angular/core";
+import { DomSanitizer } from "@angular/platform-browser";
+import {cloneDeep} from "lodash-es";
 import { ApplicationService, IApplication, IManagedObject } from '@c8y/client';
 import { DeviceSelectorModalComponent } from "../utils/device-selector-modal/device-selector.component";
 import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
@@ -32,6 +34,7 @@ import { catchError } from "rxjs/operators";
 import { AccessRightsService } from "../../builder/access-rights.service";
 import { ProgressIndicatorService } from "../../builder/utils/progress-indicator-modal/progress-indicator.service";
 import { ApplicationBinaryService } from "../../builder/application-binary.service";
+import { AlertMessageModalComponent } from "../utils/alert-message-modal/alert-message-modal.component";
 
 
 enum TemplateCatalogStep {
@@ -73,6 +76,8 @@ export class TemplateCatalogModalComponent implements OnInit {
 
     private appList = [];
 
+    private sharedTemplates:any = [];
+
     public dashboardConfiguration = {
         dashboardId: '12598412',
         dashboardName: '',
@@ -98,11 +103,13 @@ export class TemplateCatalogModalComponent implements OnInit {
     private microserviceDownloadProgress = interval(3000);
     private microserviceDownloadProgress$: Subscription;
     isMSEnabled: boolean = false;
+    isPreviewLoading: boolean = false;
+    isThumbnailLoading: boolean = false;
 
     constructor(private modalService: BsModalService, private modalRef: BsModalRef, private appService: ApplicationService,
         private catalogService: TemplateCatalogService, private componentService: DynamicComponentService,
         private alertService: AlertService, private widgetCatalogService: WidgetCatalogService,
-        private applicationBinaryService: ApplicationBinaryService,
+        private applicationBinaryService: ApplicationBinaryService, private sanitizer: DomSanitizer,
         private accessRightsService: AccessRightsService, private progressIndicatorService: ProgressIndicatorService) {
         this.onSave = new Subject();
         this.onCancel = new Subject();
@@ -130,13 +137,32 @@ export class TemplateCatalogModalComponent implements OnInit {
                 console.log('Dashboard Catalog: Error in primary endpoint! using fallback...');
                 return this.catalogService.getTemplateCatalogFallBack()
             }))
-            .subscribe((catalog: Array<TemplateCatalogEntry>) => {
+            .subscribe(async (catalog: Array<TemplateCatalogEntry>) => {
                 this.hideLoadingIndicator();
                 this.templates = catalog;
+                this.sharedTemplates = await this.catalogService.loadSharedTemplates();
+                if(this.sharedTemplates && this.sharedTemplates.length > 0){
+                    this.sharedTemplates.forEach(shared => {
+                        this.templates.push( {
+                            ...shared.template,
+                            id: shared.id
+                        });
+                    });
+                }
                 this.filterTemplates = (this.templates ? this.templates : []);
                 this.filterTemplates.forEach(template => {
-                    if (template.thumbnail && template?.thumbnail != '') {
-                        template.thumbnail = this.catalogService.getGithubURL(template.thumbnail);
+                    if ((template.thumbnail && template?.thumbnail != '')  || (template.thumbnailBinaryId && template.thumbnailBinaryId !='')) {
+                        if(template.availability && template.availability === "SHARED"){
+                            this.isThumbnailLoading = true;
+                            this.catalogService.downloadBinaryFromFileRepo(template.thumbnailBinaryId).
+                            then(async (res: { blob: () => Promise<any>; }) => {
+                                this.isThumbnailLoading = false;
+                                const blb = await res.blob();
+                                template.thumbnail = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(blb)) as any;
+                            });
+                        } else {
+                            template.thumbnail = this.catalogService.getGithubURL(template.thumbnail);
+                        }
                     }
                 })
             }, error => {
@@ -152,9 +178,22 @@ export class TemplateCatalogModalComponent implements OnInit {
     }
 
     async loadTemplateDetails(template: TemplateCatalogEntry): Promise<void> {
-        this.showLoadingIndicator();
-        
-        this.catalogService.getTemplateDetails(template.dashboard)
+        if(template.availability && template.availability === 'SHARED') {
+            this.templateDetails = null;
+            this.templateDetails = cloneDeep(template.templateDetails);
+            if (this.templateDetails.preview || this.templateDetails.previewBinaryId) {
+                this.isPreviewLoading = true;
+                this.catalogService.downloadBinaryFromFileRepo(this.templateDetails.previewBinaryId).
+                    then(async (res: { blob: () => Promise<any>; }) => {
+                        const blb = await res.blob();
+                        this.isPreviewLoading = false;
+                        this.templateDetails.preview = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(blb)) as any;
+                    });
+            }
+            this.updateDepedencies();
+        } else {
+            this.showLoadingIndicator();
+            this.catalogService.getTemplateDetails(template.dashboard)
             .pipe(catchError(err => {
                 console.log('Dashboard Catalog Details: Error in primary endpoint! using fallback...');
                 return this.catalogService.getTemplateDetailsFallBack(template.dashboard);
@@ -167,6 +206,7 @@ export class TemplateCatalogModalComponent implements OnInit {
                 }
                 this.updateDepedencies();
             });
+        }
     }
 
     async updateDepedencies() {
@@ -206,19 +246,19 @@ export class TemplateCatalogModalComponent implements OnInit {
         this.currentStep = TemplateCatalogStep.CATALOG;
     }
 
-    openDeviceSelectorDialog(index: number, templateType: number): void {
+    openDeviceSelectorDialog(device: any, index: number, templateType: number): void {
        
         switch (templateType) {
             case 1:
-                this.assetButtonText = "Device Group";
+                device.assetButtonText = "Device Group";
                 this.groupTemplate = true;
                 break;
             case 2:
-                this.assetButtonText = "Device/Asset Type";
+                device.assetButtonText = "Device/Asset Type";
                 this.groupTemplate = true;
                 break;
             default:
-                this.assetButtonText = "Device/Asset";
+                device.assetButtonText = "Device/Asset";
                 this.groupTemplate = false;
                 break;
         }
@@ -267,6 +307,9 @@ export class TemplateCatalogModalComponent implements OnInit {
     async onSaveButtonClicked() {
         this.showProgressModalDialog('Create Dashboard ...')
         this.dashboardConfiguration.dashboardName = (this.dashboardPath ? `${this.dashboardPath}/${this.dashboardConfiguration.dashboardName}` : this.dashboardConfiguration.dashboardName);
+        if(this.templateDetails.input.devices && this.templateDetails.input.devices.length > 1){
+            this.groupTemplate = false;
+        }
         await this.catalogService.createDashboard(this.app, this.dashboardConfiguration, this.selectedTemplate, this.templateDetails, this.groupTemplate);
 
         this.hideProgressModalDialog();
@@ -433,6 +476,9 @@ export class TemplateCatalogModalComponent implements OnInit {
         return this.dashboardConfiguration.dashboardName && this.dashboardConfiguration.dashboardName.length >= 0;
     }
 
+    private alertModalDialog(message: any): BsModalRef {
+        return this.modalService.show(AlertMessageModalComponent, { class: 'c8y-wizard', initialState: { message } });
+    }
     private verifyWidgetCompatibility(dependency: DependencyDescription) {
         if (this.widgetCatalogService.isCompatiblieVersion(dependency)) {
             dependency.isSupported = true;
@@ -456,9 +502,39 @@ export class TemplateCatalogModalComponent implements OnInit {
 
     applyFilter() {
         if (this.templates && this.templates.length > 0) {
-            this.filterTemplates = this.templates.filter((template => template.title.toLowerCase().includes(this.searchTemplate.toLowerCase())));
+            this.filterTemplates = this.templates.filter((template => 
+                template.title.toLowerCase().includes(this.searchTemplate.toLowerCase()) || 
+                (template.availability && template.availability.toLowerCase().includes(this.searchTemplate.toLowerCase()))
+                ));
             this.filterTemplates = [...this.filterTemplates];
         }
 
+    }
+
+    async deleteTemplate(template: any) {
+        if(template && template.id) {
+            const alertMessage = {
+                title: 'Delete Template',
+                description: `You are about to delete this template. This operation is irreversible. Do you want to proceed?`,
+                type: 'danger',
+                alertType: 'confirm', //info|confirm,
+                confirmPrimary: true //confirm Button is primary
+            }
+            const installDemoDialogRef = this.alertModalDialog(alertMessage);
+            await installDemoDialogRef.content.event.subscribe(async data => {
+                if (data && data.isConfirm) {
+                    if(template.thumbnailBinaryId) { await this.catalogService.deleteBinary(template.thumbnailBinaryId); }
+                    if(template?.templateDetails?.preview) { await this.catalogService.deleteBinary(template.templateDetails.previewBinaryId); }
+                    this.catalogService.deleteSharedTemplate(template.id).then(() => {
+                        this.templates = [... this.templates.filter( (dbTemplate: any) => dbTemplate.id !==  template.id)];
+                        this.applyFilter();
+                        this.alertService.add({
+                            text: 'Dashboard template deleted successfuly',
+                            type: 'success'
+                          });
+                    });
+                }
+            });
+        }
     }
 }

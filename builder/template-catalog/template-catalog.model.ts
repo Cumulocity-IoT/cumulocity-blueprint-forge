@@ -26,6 +26,9 @@ export interface TemplateCatalogEntry {
     useCase: string;
     dashboard: string;
     comingSoon: boolean;
+    availability?: string;
+    templateDetails?: TemplateDetails; // For Import templates
+    thumbnailBinaryId?: any;
 }
 
 export interface TemplateDetails {
@@ -37,6 +40,7 @@ export interface TemplateDetails {
     },
     description: string;
     preview: string;
+    previewBinaryId?: any;
     widgets: Array<TemplateDashboardWidget>;
 }
 

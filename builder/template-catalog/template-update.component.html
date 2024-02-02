@@ -93,7 +93,8 @@
         <div class="col-md-6">
             <div class="template-preview">
                 <label for="Preview"><span>Preview:</span></label>
-                <img style="width: 100%;" [src]="templateDetails.preview" />
+                <div *ngIf="isPreviewLoading"><c8y-loading></c8y-loading></div>
+                <img *ngIf="!isPreviewLoading" style="width: 100%;" [src]="templateDetails.preview" />
             </div>
         </div>
     </div>

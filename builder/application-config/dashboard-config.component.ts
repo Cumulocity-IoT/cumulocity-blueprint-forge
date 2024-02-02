@@ -58,7 +58,9 @@ export interface DashboardConfig {
         name: string;
         devices?: Array<DeviceDescription>,
         binaries?: Array<BinaryDescription>,
-        staticBinaries?: Array<BinaryDescription>
+        staticBinaries?: Array<BinaryDescription>,
+        availability?: string,
+        previewBinaryId?: string
     }
 }
 
@@ -238,8 +240,9 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
         const installDemoDialogRef = this.alertModalDialog(alertMessage);
         await installDemoDialogRef.content.event.subscribe(async data => {
             if (data && data.isConfirm) {
+                let dashboardIDToDelete;
                 if (this.filteredDashboardList.length !== application.applicationBuilder.dashboards.length) {
-                    let dashboardIDToDelete;
+                    
                     this.filteredDashboardList.forEach((element, index) => {
                         if (index === i) {
                             dashboardIDToDelete = element.id;
@@ -253,9 +256,11 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
                         }
                     });
                 } else {
+                    dashboardIDToDelete = dashboards[i].id;
                     dashboards.splice(i, 1);
                     application.applicationBuilder.dashboards = [...dashboards];
                 }
+                await this.inventoryService.delete(dashboardIDToDelete);
                 this.filteredDashboardList = application.applicationBuilder.dashboards;
                 this.prepareDashboardHierarchy(application);
                 this.delayedAppUpdateSubject.next({
@@ -657,6 +662,7 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
                     id: this.appBuilderObject.id,
                     applicationBuilder: this.appBuilderObject.applicationBuilder
                 } as any);
+                await this.inventoryService.delete(dashboard.id);
                 if (this.appBuilderObject.applicationBuilder.dashboards.length === 0) {
                     this.autoLockDashboard = false;
                 }
