@@ -238,6 +238,7 @@ export class TemplateCatalogService {
                 applicationBuilder: application.applicationBuilder
             } as any);
             this.appDataService.forceUpdate = true;
+            this.appDataService.refreshAppForDashboard.next();
             this.navigation.refresh();
         });
     }
@@ -289,6 +290,7 @@ export class TemplateCatalogService {
             applicationBuilder: application.applicationBuilder
         } as any);
         this.appDataService.forceUpdate = true;
+        this.appDataService.refreshAppForDashboard.next();
         this.navigation.refresh();
     }
 
