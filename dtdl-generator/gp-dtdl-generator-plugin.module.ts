@@ -28,13 +28,14 @@ import { CoreModule } from '@c8y/ngx-components';
 import { AppIdGuard } from './applicationIdGuard';
 import { DeviceSelectorModalService } from './device-selector.service';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { PopoverModule } from 'ngx-bootstrap/popover';
 
 /*Router guards (canactivate:[AppIdGuard]) is used below to check 
 if the device dtdl generator plugin is being called from Application builder so as to redirect user to the application's path.*/
 @NgModule({
   declarations: [DeviceDTDLGeneratorPluginComponent,DtdlSimulatorModalComponent],
 entryComponents: [DeviceDTDLGeneratorPluginComponent,DtdlSimulatorModalComponent],
-  imports: [CommonModule,ReactiveFormsModule,CoreModule,NgSelectModule,
+  imports: [CommonModule,ReactiveFormsModule,CoreModule,NgSelectModule,PopoverModule.forRoot(),
     RouterModule.forChild([
       {
         path: "DTDLGenerator", component: DeviceDTDLGeneratorPluginComponent, canActivate:[AppIdGuard]

@@ -1,11 +1,10 @@
 
 .modal-body {
     margin-top: 10px !important;
-    min-height: 65vh !important;
 }
 
 .modal-header {
-    color: white !important;
+    color: var(--c8y-btn-primary-color-default) !important;
 }
 
 .modal-form-fields{

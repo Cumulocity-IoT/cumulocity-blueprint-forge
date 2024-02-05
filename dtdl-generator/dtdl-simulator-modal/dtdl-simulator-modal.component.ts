@@ -34,8 +34,8 @@ export class DtdlSimulatorModalComponent implements OnInit{
     series:any[];
     typeOptions=[
         // { name:'--select type--', value:0 },
-        { name:'DTDL Configuration', value:1 },
-        // { name:'CSV Configuration', value:2 }
+        { name:'Random value', value:1 },
+        { name:'Value series', value:2 }
     ];
     pageOptions=[
         { name:'Last 50 measurements', value:50 },

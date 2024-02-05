@@ -78,7 +78,8 @@ export interface operations{
     minValue?: number | string,
     series?: string,
     eventText?: string,
-    id?: string
+    id?: string,
+    value?: string
 }
 
 export interface alternateConfigs{

@@ -59,18 +59,36 @@ export class DeviceDTDLGeneratorPluginComponent {
   bsModalRef: BsModalRef;
   mesPageLimit: number;
   /* 
-    configType:[
+    simulatorType:[
         { name:'--select type--', value:0 },
-        { name:'DTDL Configuration', value:1 },
-        { name:'CSV Configuration', value:2 }
+        { name:'Random value', value:1 },
+        { name:'Value series', value:2 }
     ]
   */
-  configType: number;
+  simulatorType: number;
   _ = require("lodash");
   dtdlModelConfig: dtdlModelConfig[] = [];
   dtdlSimulatorConfig: dtdlSimulator;
   interval: number[] = [];
   meanInterval: number = 30;
+
+  generateSimConfigPopoverText = `
+  <p>This simulator configuration file is compatible with the simulators of Application Builder and Blueprint Forge</p>
+  <p>
+    <b>How to use:</b>
+    <ul>
+      <li>Generate simulator configuration for selected device.</li>
+      <li>Download the file generated.</li>
+      <li>Go to simulator tab in your application.</li>
+      <li>Click on add simulator, then choose <i>import existing simulator</i>.</li>
+      <li>Upload the downloaded file.</li>
+      <li>Enjoy configuring your simulator!</li>
+    </ul>    
+  </p>
+    `;
+  generateDTDLPopoverText = `
+  <p>A Digital Twins Definition Language (DTDL) file serves as the representation of the digital twin for a physical device. If your physical device is configured in device management, a DTDL file can be generated. Additionally, this DTDL file can be employed for simulating a real device.</p>
+  `;
 
   constructor(private modalService: BsModalService, private devicesService: DeviceSelectorModalService, private measurementService: MeasurementService, private inventoryBinaryService: InventoryBinaryService, private alertService: AlertService) {
     setTheme('bs4');
@@ -256,8 +274,8 @@ export class DeviceDTDLGeneratorPluginComponent {
     this.bsModalRef = this.modalService.show(DtdlSimulatorModalComponent, { backdrop: 'static', class: 'modal-sm', initialState: {messurements} });
     this.bsModalRef.content.onGenerate.subscribe((response) => {
       this.mesPageLimit = response.pageSize;
-      this.configType = response.typeSelected;
-      if(this.configType==1)
+      this.simulatorType = response.typeSelected;
+      if(this.simulatorType==1 || this.simulatorType==2)
         this.generateDTDLSimulator(response.selectedMeasurements);
     });
     this.bsModalRef.content.onCancel.subscribe((canceled)=>{
@@ -279,14 +297,16 @@ export class DeviceDTDLGeneratorPluginComponent {
       };
 
       let mesListResponse = (await (this.measurementService.list(msmtFilter)));
-
+      let unit= mesListResponse.data[0][series.type][series.name].unit;
       let times = mesListResponse.data.map((element) => element.time);
 
       //getting max and min value for the measurement
       let values = mesListResponse.data.map((element) => element[series.type][series.name].value);
+      values=values.reverse();
       let minValue = this._.min(values);
       let maxValue = this._.max(values);
-
+      let simulationType = this.simulatorType==1 ? "randomValue" : "valueSeries";
+      let value:string=values.join(',');
       this.pushToInterval(times);
 
       //getting eventText for measurement
@@ -300,8 +320,8 @@ export class DeviceDTDLGeneratorPluginComponent {
       let operations: operations = {
         schema: "double",
         isObjectType: false,
-        maxValue: maxValue,
-        simulationType: "randomValue",
+        // maxValue: maxValue,
+        simulationType: simulationType,
         alternateConfigs: {
           configIndex: 0,
           opSourceName: "",
@@ -314,12 +334,20 @@ export class DeviceDTDLGeneratorPluginComponent {
         eventType: series.name,
         measurementName: measName,
         fragment: series.type,
-        unit: mesListResponse.data[0][series.type][series.name].unit,
-        minValue: minValue,
+        unit: unit,
+        // minValue: minValue,
         series: series.name,
         matchingValue: "default",
         eventText: measName,
         id: this.baseId + this.deviceName + ':' + series.type + ';1'
+      }
+
+      if(this.simulatorType==1){
+        operations.minValue=minValue;
+        operations.maxValue=maxValue;
+      }
+      else if(this.simulatorType==2){
+        operations.value=value;
       }
 
       //generating alternateConfigs for measurement
@@ -337,12 +365,12 @@ export class DeviceDTDLGeneratorPluginComponent {
       let dtdlModelConfig: dtdlModelConfig = {
         schema: "double",
         fragment: series.type,
-        unit: mesListResponse.data[0][series.type][series.name].unit,
+        unit: unit,
         isObjectType: false,
         series: series.name,
         matchingValue: "default",
         eventText: measName,
-        simulationType: "randomValue",
+        simulationType: simulationType,
         alternateConfigs: alternateConfigs,
         id: this.baseId + this.deviceName + ':' + series.type + ';1',
         eventType: series.name,
