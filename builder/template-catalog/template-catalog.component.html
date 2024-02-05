@@ -45,7 +45,7 @@
                                 <b>{{ template?.title }} </b>
                             </h3>
                             <button class="btn-clean" *ngIf="template.availability">
-                             <span class="label label-info">{{template.availability}} </span></button>
+                             <span class="label label-info" *ngIf="template.availability == 'SHARED'">Tenant only</span></button>
                         </div>
                         <div *ngIf="template.comingSoon==true" class="flip-card-font-coming-soon">
                         </div>
@@ -55,7 +55,7 @@
                         <div *ngIf="template.comingSoon==true" class="coming-soon-tag-backside">Coming Soon</div>
                         <div class="row" *ngIf="template.availability">
                                 <button class="m-l-16 btn-clean pull-left" style="cursor: default;">
-                                    <span class="label label-info">{{template.availability}} </span></button>
+                                    <span class="label label-info" *ngIf="template.availability == 'SHARED'">Tenant only</span></button>
                                 <button class="m-r-16 btn-dot btn-dot--warning pull-right pull-right" (click)="deleteTemplate(template)" title="Delete">
                                     <i [c8yIcon]="'delete'"></i></button>
                         </div>
