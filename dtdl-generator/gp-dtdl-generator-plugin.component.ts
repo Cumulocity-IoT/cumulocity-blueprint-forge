@@ -73,16 +73,16 @@ export class DeviceDTDLGeneratorPluginComponent {
   meanInterval: number = 30;
 
   generateSimConfigPopoverText = `
-  <p>This simulator configuration file is compatible with the simulators of Application Builder and Blueprint Forge</p>
+  <p>This simulator configuration file is compatible with the simulators in Application Builder and Blueprint Forge</p>
   <p>
     <b>How to use:</b>
     <ul>
       <li>Generate simulator configuration for selected device.</li>
-      <li>Download the file generated.</li>
-      <li>Go to simulator tab in your application.</li>
+      <li>Download generated file.</li>
+      <li>Navigate to Application Builder or Blueprint Forge app</li>
+      <li>Go to simulator tab.</li>
       <li>Click on add simulator, then choose <i>import existing simulator</i>.</li>
-      <li>Upload the downloaded file.</li>
-      <li>Enjoy configuring your simulator!</li>
+      <li>Upload simulator configuration file.</li>
     </ul>    
   </p>
     `;
