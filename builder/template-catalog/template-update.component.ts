@@ -25,6 +25,8 @@ import { TemplateDetails } from "./template-catalog.model";
 import { TemplateCatalogService } from "./template-catalog.service";
 import { ProgressIndicatorModalComponent } from "../utils/progress-indicator-modal/progress-indicator-modal.component";
 import { catchError } from "rxjs/operators";
+import { DomSanitizer } from "@angular/platform-browser";
+import { Subject } from "rxjs";
 
 @Component({
     selector: 'template-update-component',
@@ -39,7 +41,17 @@ export class TemplateUpdateModalComponent implements OnInit {
 
     index: number;
 
-    templateDetails: TemplateDetails;
+    templateDetails: TemplateDetails = {
+        input: {
+            devices: [],
+            images: [],
+            dependencies: [],
+            binaries: []
+        },
+        description: "",
+        preview: "",
+        widgets: []
+    };
 
     globalRoles: any;
 
@@ -53,31 +65,56 @@ export class TemplateUpdateModalComponent implements OnInit {
 
     groupTemplate = false;
 
-    constructor(private modalService: BsModalService, private modalRef: BsModalRef, private catalogService: TemplateCatalogService) {
+    isPreviewLoading: boolean = false;
+
+    public onSave: Subject<boolean>;
+
+    constructor(private modalService: BsModalService, private modalRef: BsModalRef,
+        private sanitizer: DomSanitizer, private catalogService: TemplateCatalogService) {
+            this.onSave = new Subject();
 
     }
 
     ngOnInit(): void {
-        this.showLoadingIndicator();
         if(this.dashboardConfig?.templateType) {
             this.configureTemplateType(this.dashboardConfig?.templateType);
         }
-        this.catalogService.getTemplateDetails(this.dashboardConfig.templateDashboard.id)
-        .pipe(catchError(err => {
-            console.log('Dashboard Details: Error in primary endpoint using fallback');
-            return this.catalogService.getTemplateDetailsFallBack(this.dashboardConfig.templateDashboard.id)
-            }))
-            .subscribe(templateDetails => {
-                this.hideLoadingIndicator();
-                // TODO add some checks
-                templateDetails.input.devices = this.dashboardConfig.templateDashboard.devices ? this.dashboardConfig.templateDashboard.devices : [];
-                templateDetails.input.images = this.dashboardConfig.templateDashboard.binaries ? this.dashboardConfig.templateDashboard.binaries : [];
-                templateDetails.input.binaries = this.dashboardConfig.templateDashboard.staticBinaries ? this.dashboardConfig.templateDashboard.staticBinaries : [];
-                if(templateDetails.preview) {
-                    templateDetails.preview = this.catalogService.getGithubURL(templateDetails.preview);
-                }
-                this.templateDetails = templateDetails;
-            });
+        if(this.dashboardConfig?.templateDashboard?.availability === 'SHARED' ){
+            this.templateDetails.input.devices = this.dashboardConfig.templateDashboard.devices ? this.dashboardConfig.templateDashboard.devices : [];
+            this.templateDetails.input.images = this.dashboardConfig.templateDashboard.binaries ? this.dashboardConfig.templateDashboard.binaries : [];
+            this.templateDetails.input.binaries = this.dashboardConfig.templateDashboard.staticBinaries ? this.dashboardConfig.templateDashboard.staticBinaries : [];
+            this.templateDetails.previewBinaryId = this.dashboardConfig.templateDashboard.previewBinaryId;
+            if (this.dashboardConfig.templateDashboard.previewBinaryId) {
+                this.isPreviewLoading = true;
+                this.catalogService.downloadBinaryFromFileRepo(this.templateDetails.previewBinaryId).
+                    then(async (res: { blob: () => Promise<any>; }) => {
+                        const blb = await res.blob();
+                        this.isPreviewLoading = false;
+                        this.templateDetails.preview = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(blb)) as any;
+                    });
+            }
+        }
+        else {
+            this.showLoadingIndicator();
+            this.isPreviewLoading = true;
+            this.catalogService.getTemplateDetails(this.dashboardConfig.templateDashboard.id)
+                .pipe(catchError(err => {
+                    console.log('Dashboard Details: Error in primary endpoint using fallback');
+                    return this.catalogService.getTemplateDetailsFallBack(this.dashboardConfig.templateDashboard.id)
+                }))
+                .subscribe(templateDetails => {
+                    this.hideLoadingIndicator();
+                    templateDetails.input.devices = this.dashboardConfig.templateDashboard.devices ? this.dashboardConfig.templateDashboard.devices : [];
+                    templateDetails.input.images = this.dashboardConfig.templateDashboard.binaries ? this.dashboardConfig.templateDashboard.binaries : [];
+                    templateDetails.input.binaries = this.dashboardConfig.templateDashboard.staticBinaries ? this.dashboardConfig.templateDashboard.staticBinaries : [];
+                    this.isPreviewLoading = false;
+                    if (templateDetails.preview) {
+                        templateDetails.preview = this.catalogService.getGithubURL(templateDetails.preview);
+                    }
+                    this.templateDetails = templateDetails;
+                });
+        }
+        
     }
 
     openDeviceSelectorDialog(index: number, templateType: number): void {
@@ -143,6 +180,7 @@ export class TemplateUpdateModalComponent implements OnInit {
         this.catalogService.updateDashboard(this.app, this.dashboardConfig, this.templateDetails, this.index, this.groupTemplate)
             .then(() => {
                 this.hideProgressModalDialog();
+                this.onSave.next(true);
                 this.modalRef.hide();
             });
     }

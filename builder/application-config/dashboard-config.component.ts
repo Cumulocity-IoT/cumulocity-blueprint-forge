@@ -58,7 +58,9 @@ export interface DashboardConfig {
         name: string;
         devices?: Array<DeviceDescription>,
         binaries?: Array<BinaryDescription>,
-        staticBinaries?: Array<BinaryDescription>
+        staticBinaries?: Array<BinaryDescription>,
+        availability?: string,
+        previewBinaryId?: string
     }
 }
 
@@ -86,7 +88,6 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
     filterValueForTree = '';
 
     app: Observable<any>;
-    refreshApp = new BehaviorSubject<void>(undefined);;
 
     delayedAppUpdateSubject = new Subject<any>();
     delayedAppUpdateSubscription: Subscription;
@@ -117,7 +118,7 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
         
     ) {
         
-        this.app = combineLatest([appIdService.appIdDelayedUntilAfterLogin$, this.refreshApp]).pipe(
+        this.app = combineLatest([appIdService.appIdDelayedUntilAfterLogin$, this.appDataService.refreshAppForDashboard]).pipe(
             map(([appId]) => appId),
             tap(appId => {
                 this.appDataService.forceUpdate = true;
@@ -139,7 +140,7 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
                     this.appDataService.forceUpdate = true;
                 }
                 await this.appService.update(app);
-                this.refreshApp.next();
+                this.appDataService.refreshAppForDashboard.next();
                 this.navigation.refresh();
                 // TODO?
                 //this.tabs.refresh();
@@ -240,8 +241,9 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
         const installDemoDialogRef = this.alertModalDialog(alertMessage);
         await installDemoDialogRef.content.event.subscribe(async data => {
             if (data && data.isConfirm) {
+                let dashboardIDToDelete;
                 if (this.filteredDashboardList.length !== application.applicationBuilder.dashboards.length) {
-                    let dashboardIDToDelete;
+                    
                     this.filteredDashboardList.forEach((element, index) => {
                         if (index === i) {
                             dashboardIDToDelete = element.id;
@@ -255,9 +257,11 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
                         }
                     });
                 } else {
+                    dashboardIDToDelete = dashboards[i].id;
                     dashboards.splice(i, 1);
                     application.applicationBuilder.dashboards = [...dashboards];
                 }
+                await this.inventoryService.delete(dashboardIDToDelete);
                 this.filteredDashboardList = application.applicationBuilder.dashboards;
                 this.prepareDashboardHierarchy(application);
                 this.delayedAppUpdateSubject.next({
@@ -356,7 +360,7 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
             if (isReloadRequired) {
                 let count = 0;
                 this.autoLockDashboard = true;
-                this.refreshApp.next();
+                this.appDataService.refreshAppForDashboard.next();
                 this.prepareDashboardHierarchy(this.bsModalRef.content.app);
                 this.filteredDashboardList = [...this.bsModalRef.content.app.applicationBuilder.dashboards];
                 this.bsModalRef.content.app.applicationBuilder.dashboards.forEach(async (element) => {
@@ -423,9 +427,13 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
         this.bsModalRef.content.onSave.subscribe((isReloadRequired: boolean) => {
             if (isReloadRequired) {
                 location.reload();
+                
+            } else {
+                this.filteredDashboardList = [...this.bsModalRef.content.app.applicationBuilder.dashboards];
                 if (this.defaultListView === '1') {
                     this.prepareDashboardHierarchy(app);
                 }
+                this.cd.detectChanges();
             }
         });
     }
@@ -659,6 +667,7 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
                     id: this.appBuilderObject.id,
                     applicationBuilder: this.appBuilderObject.applicationBuilder
                 } as any);
+                await this.inventoryService.delete(dashboard.id);
                 if (this.appBuilderObject.applicationBuilder.dashboards.length === 0) {
                     this.autoLockDashboard = false;
                 }

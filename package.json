@@ -38,7 +38,6 @@
     "@ng-select/ng-select": "^9.1.0",
     "@ngx-translate/core": "14.0.0",
     "angular": "1.6.9",
-    "css-vars-ponyfill": "^2.4.8",
     "app-builder-external-assets": "file:binary/app-builder-external-assets-3.2.0.tgz",
     "crypto-js": "^4.2.0",
     "delay": "^5.0.0",
