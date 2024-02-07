@@ -34,7 +34,7 @@ export class AppIdService {
         router.events.pipe(
                 filter(event => event instanceof ActivationEnd),
                 switchMap(() => get(router.routerState.root, 'firstChild.paramMap') as Observable<ParamMap> | undefined || of(undefined)),
-                map(paramMap => paramMap != null && paramMap.get('applicationId') ? paramMap.get('applicationId') : this.gelAppId(paramMap)),
+                map(paramMap => paramMap != null && paramMap.get('applicationId') ? paramMap.get('applicationId') : this.getAppId()),
                 distinctUntilChanged()
             )
             .subscribe(this.appId$);
@@ -49,7 +49,7 @@ export class AppIdService {
     }
 
     // Required for navigator plugin
-    private gelAppId(paramMap: any) {
+    private getAppId() {
         if(this.appId$ && this.appId$.getValue()){
             return this.appId$.getValue();
         }
