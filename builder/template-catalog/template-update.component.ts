@@ -26,6 +26,7 @@ import { TemplateCatalogService } from "./template-catalog.service";
 import { ProgressIndicatorModalComponent } from "../utils/progress-indicator-modal/progress-indicator-modal.component";
 import { catchError } from "rxjs/operators";
 import { DomSanitizer } from "@angular/platform-browser";
+import { Subject } from "rxjs";
 
 @Component({
     selector: 'template-update-component',
@@ -66,8 +67,11 @@ export class TemplateUpdateModalComponent implements OnInit {
 
     isPreviewLoading: boolean = false;
 
+    public onSave: Subject<boolean>;
+
     constructor(private modalService: BsModalService, private modalRef: BsModalRef,
         private sanitizer: DomSanitizer, private catalogService: TemplateCatalogService) {
+            this.onSave = new Subject();
 
     }
 
@@ -92,6 +96,7 @@ export class TemplateUpdateModalComponent implements OnInit {
         }
         else {
             this.showLoadingIndicator();
+            this.isPreviewLoading = true;
             this.catalogService.getTemplateDetails(this.dashboardConfig.templateDashboard.id)
                 .pipe(catchError(err => {
                     console.log('Dashboard Details: Error in primary endpoint using fallback');
@@ -99,10 +104,10 @@ export class TemplateUpdateModalComponent implements OnInit {
                 }))
                 .subscribe(templateDetails => {
                     this.hideLoadingIndicator();
-                    // TODO add some checks
                     templateDetails.input.devices = this.dashboardConfig.templateDashboard.devices ? this.dashboardConfig.templateDashboard.devices : [];
                     templateDetails.input.images = this.dashboardConfig.templateDashboard.binaries ? this.dashboardConfig.templateDashboard.binaries : [];
                     templateDetails.input.binaries = this.dashboardConfig.templateDashboard.staticBinaries ? this.dashboardConfig.templateDashboard.staticBinaries : [];
+                    this.isPreviewLoading = false;
                     if (templateDetails.preview) {
                         templateDetails.preview = this.catalogService.getGithubURL(templateDetails.preview);
                     }
@@ -175,6 +180,7 @@ export class TemplateUpdateModalComponent implements OnInit {
         this.catalogService.updateDashboard(this.app, this.dashboardConfig, this.templateDetails, this.index, this.groupTemplate)
             .then(() => {
                 this.hideProgressModalDialog();
+                this.onSave.next(true);
                 this.modalRef.hide();
             });
     }

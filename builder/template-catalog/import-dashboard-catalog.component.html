@@ -29,13 +29,13 @@
                         type="button"
                       ></button>
                     <select name="availability" id="availability" [(ngModel)]="importDashboard.availability" required>
-                        <option value="SHARED">Shared</option>
-                        <option value="MARKET" disabled>Market</option>
+                        <option value="SHARED">Share within tenant</option>
+                        <option value="MARKET" disabled>Share with market</option>
                     </select>
                     
                 </div>
                 <div class="form-group">
-                    <label for="imageDBPreview">Dashboard Preview Image</label>
+                    <label for="imageDBPreview">Dashboard preview Image</label>
                     <input type="file" id="imageDBPreview" aria-describedby="helpinput" class="form-control"
                         (change)="onImageSelected($event.target.files, 'dbPreview')" />
                 </div>
@@ -43,6 +43,12 @@
                     <label for="imageThumbnail">Device Image (Thumbnail)</label>
                     <input type="file" id="imageThumbnail" aria-describedby="helpinput" class="form-control"
                         (change)="onImageSelected($event.target.files, 'thumbnail')" />
+                        <div >
+                            <label for="imageThumbnailPreivew">Device preview:</label>
+                            <div class="thumbnail-image-preview">
+                                <img  [src]="thumbnailPreviewImageURL !== '' ? thumbnailPreviewImageURL : './img/no-image.png'" />
+                            </div>
+                        </div>
                 </div>
             </form>
         </div>

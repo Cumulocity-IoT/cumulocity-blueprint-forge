@@ -88,7 +88,6 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
     filterValueForTree = '';
 
     app: Observable<any>;
-    refreshApp = new BehaviorSubject<void>(undefined);;
 
     delayedAppUpdateSubject = new Subject<any>();
     delayedAppUpdateSubscription: Subscription;
@@ -119,7 +118,7 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
         
     ) {
         
-        this.app = combineLatest([appIdService.appIdDelayedUntilAfterLogin$, this.refreshApp]).pipe(
+        this.app = combineLatest([appIdService.appIdDelayedUntilAfterLogin$, this.appDataService.refreshAppForDashboard]).pipe(
             map(([appId]) => appId),
             tap(appId => {
                 this.appDataService.forceUpdate = true;
@@ -141,7 +140,7 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
                     this.appDataService.forceUpdate = true;
                 }
                 await this.appService.update(app);
-                this.refreshApp.next();
+                this.appDataService.refreshAppForDashboard.next();
                 this.navigation.refresh();
                 // TODO?
                 //this.tabs.refresh();
@@ -361,7 +360,7 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
             if (isReloadRequired) {
                 let count = 0;
                 this.autoLockDashboard = true;
-                this.refreshApp.next();
+                this.appDataService.refreshAppForDashboard.next();
                 this.prepareDashboardHierarchy(this.bsModalRef.content.app);
                 this.filteredDashboardList = [...this.bsModalRef.content.app.applicationBuilder.dashboards];
                 this.bsModalRef.content.app.applicationBuilder.dashboards.forEach(async (element) => {
@@ -428,9 +427,13 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
         this.bsModalRef.content.onSave.subscribe((isReloadRequired: boolean) => {
             if (isReloadRequired) {
                 location.reload();
+                
+            } else {
+                this.filteredDashboardList = [...this.bsModalRef.content.app.applicationBuilder.dashboards];
                 if (this.defaultListView === '1') {
                     this.prepareDashboardHierarchy(app);
                 }
+                this.cd.detectChanges();
             }
         });
     }

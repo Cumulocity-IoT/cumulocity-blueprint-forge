@@ -39,7 +39,7 @@ entryComponents: [DeviceDTDLGeneratorPluginComponent],
         path: "DTDLGenerator", component: DeviceDTDLGeneratorPluginComponent, canActivate:[AppIdGuard]
     },
     {
-      path: "application/:appId/DTDLGenerator", component:DeviceDTDLGeneratorPluginComponent
+      path: "application/:applicationId/DTDLGenerator", component:DeviceDTDLGeneratorPluginComponent
     }
     ])
   ],

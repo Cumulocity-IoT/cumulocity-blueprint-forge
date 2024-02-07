@@ -515,7 +515,7 @@ export class TemplateCatalogModalComponent implements OnInit {
         if(template && template.id) {
             const alertMessage = {
                 title: 'Delete Template',
-                description: `You are about to delete this template. This operation is irreversible. Do you want to proceed?`,
+                description: `You are about to delete this template from your tenant. This operation is irreversible. Do you want to proceed?`,
                 type: 'danger',
                 alertType: 'confirm', //info|confirm,
                 confirmPrimary: true //confirm Button is primary
@@ -529,7 +529,7 @@ export class TemplateCatalogModalComponent implements OnInit {
                         this.templates = [... this.templates.filter( (dbTemplate: any) => dbTemplate.id !==  template.id)];
                         this.applyFilter();
                         this.alertService.add({
-                            text: 'Dashboard template deleted successfuly',
+                            text: 'Dashboard template deleted successfuly.',
                             type: 'success'
                           });
                     });

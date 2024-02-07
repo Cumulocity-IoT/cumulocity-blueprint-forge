@@ -56,9 +56,10 @@ export class ImportDashboardCatalogModalComponent implements OnInit {
         widgets: []
     }
     previewImageURL:any = "";
+    thumbnailPreviewImageURL: any = "";
     helpTemplatePopoverText = `
-    <p class="m-b-8"><b>Shared</b> availability will instantly make the dashboard visible within the tenant in the Dashboard Catalog.</p>
-    <p class="m-b-8"><b>Market</b> availability will make dashboard to visible publicly and become a permanent part of the Dashboard Catalog once approved. The approval process may take up to 5 working days. If not approved, users can seek support from the Tech Community.</p>
+    <p class="m-b-8"><b>Share within tenant</b> availability will instantly make the dashboard visible within the tenant in the Dashboard Catalog.</p>
+    <p class="m-b-8"><b>Share with market</b> availability will make dashboard to visible publicly and become a permanent part of the Dashboard Catalog once approved. The approval process may take up to 5 working days. If not approved, users can seek support from the Tech Community.</p>
     `;
     
     private previewImageFile: File;
@@ -89,6 +90,7 @@ export class ImportDashboardCatalogModalComponent implements OnInit {
             this.previewImageURL = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(this.previewImageFile));
         } else if(imageType === 'thumbnail' ) {
             this.thumbnailImageFile = files.item(0);
+            this.thumbnailPreviewImageURL = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(this.thumbnailImageFile));
         }
     }
 
@@ -175,7 +177,6 @@ export class ImportDashboardCatalogModalComponent implements OnInit {
                 }
 
                 // Processing dashboardDetails -> Input -> Dependencies
-                // TODO: Make API call to get plugin details
                 this.dashboardDetail.input.dependencies.push({
                     id: children.componentId,
                     title: children.title,
