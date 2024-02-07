@@ -3,13 +3,6 @@
   font-size: 3em;
 }
 
-.dtdl-response-div{
-  padding-top: 5px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
 .dtdl-textArea{
   width: 80%;
   height: 65vh;
@@ -19,20 +12,7 @@
   border-radius: 10px 10px 0px 10px;
 }
 
-.action-buttons{
-  margin-top: 10px;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-}
-
 .dflex-center{
-  display: flex;
-  justify-content: center;
-}
-
-.dtdl-heading{
-  padding-top: 10px;
   display: flex;
   justify-content: center;
 }
@@ -54,7 +34,6 @@
 }
 
 .dtdl-body-div{
-  width: 100%;
   z-index:1;
   position: relative;
 }
@@ -70,14 +49,6 @@
 .list-group-item:hover{
   background-color: var(--c8y-brand-50);
   color: rgb(255, 255, 255);;
-}
-
-.no-meas-found{
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  height: 65vh;
-  align-items: center;
 }
 
 .loading-div{
