@@ -108,7 +108,7 @@ export class NewSimulatorModalComponent implements OnInit{
                 if (validJson) {
                 this.processFileInput(validJson);
                 }
-            } else if (modalData.fileLength > 1) {
+            } else if (Number(modalData.fileLength) > 1) {
                 //If multiple
                 this.wizard.selectStep('select-dtdl');
             }

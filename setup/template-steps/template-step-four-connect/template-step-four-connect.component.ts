@@ -143,12 +143,11 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
   }
 
   async toggleToEnableSimulator(event, dashboard, index) {
-    console.log('event value', event, 'dashboard value', dashboard);
     this.simulatorSelected = true;
     this.enableSimulator = event.target.checked;
-    let templateDetailsData;
+    if (this.enableSimulator) {
+        let templateDetailsData;
     templateDetailsData = await (await this.loadTemplateDetails(dashboard.dashboard)).toPromise();
-    console.log('templateDetailsData*************', templateDetailsData);
     // Need to pass Simulator config file array of object
  
     const SimultorConfigFiles = [];
@@ -161,10 +160,10 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
           fileName: templateDetailsData.simulatorDTDL[i].simulatorFileName,
           fileContent: currentSimulatorData
       });
+    
     }
     this.bsModalRef = this.modalService.show(NewSimulatorModalComponent, { backdrop: 'static', class: 'c8y-wizard', initialState:{appId: this.currentApp.id + "", isBlueprintSimulator: true, enableSimulator: this.enableSimulator, simulatorConfigFiles: SimultorConfigFiles, fileLength: SimultorConfigFiles.length}} );
     this.bsModalRef.content.onSave.subscribe(content => {
-      console.log('simulator modal content', content);
       this.simulatorModelContent = content;
       dashboard.name = this.simulatorModelContent?.deviceId;
       dashboard.templateType = dashboard.templateType;
@@ -189,17 +188,31 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
           break;
      }
     }
-    console.log('this template details on simulator selected', this.templateDetails.dashboards);
     this.deviceFormValid = deviceFieldNotField;
     });
     
+    } else {
+        dashboard.devices = [{
+            type: "Temperature Sensor",
+              placeholder: "device01",
+              reprensentation : {
+                id: null,
+                name: ''
+              }
+          }];
+
+          for (let dd = 0; dd < this.templateDetails.dashboards.length; dd++) {
+            if (this.templateDetails.dashboards[dd].isDeviceRequired === true && this.templateDetails.dashboards[dd].linkWithDashboard === dashboard.id) {
+              this.templateDetails.dashboards[dd].devices = dashboard.devices;
+           } 
+          }
+    }
   }
 
 
   async loadTemplateDetails(dbDashboard): Promise<Observable<any>> {
     return this.catalogService.getTemplateDetails(dbDashboard)
       .pipe(catchError(err => {
-        console.log('Dashboard Catalog Details: Error in primary endpoint! using fallback...');
         return this.catalogService.getTemplateDetailsFallBack(dbDashboard);
       }));
   }
@@ -350,7 +363,6 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       } else {
         templateDetailsData = await (await this.loadTemplateDetails(db.dashboard)).toPromise();
       }
-      console.log('template details data 222222222', templateDetailsData);
       const dashboardConfiguration = {
         dashboardId: '12598412',
         dashboardName: db.title,
@@ -364,7 +376,6 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       };
 
       this.progressIndicatorService.setProgress(40);
-      console.log('db value', db);
       templateDetailsData.input.devices = db.devices;
       if (db.title !== 'Instruction' && db.title !== 'Welcome' && db.title !== 'Help and Support' && db.isConfigRequred) {
         templateDetailsData.widgets.forEach(widget => {
@@ -394,7 +405,6 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       } else {
         this.groupTemplate = false;
       }
-      console.log('template details data before create dashboard', this.templateDetails);
       await this.catalogService.createDashboard(this.currentApp, dashboardConfiguration, db, templateDetailsData, this.groupTemplate);
       this.progressIndicatorService.setProgress(90);
       overallProgress = overallProgress + eachRemoteProgress;
@@ -563,7 +573,6 @@ else {
               break;
          }
         }
-        console.log('this template details on device selected', this.templateDetails.dashboards);
         this.deviceFormValid = deviceFieldNotField;
       }
   });

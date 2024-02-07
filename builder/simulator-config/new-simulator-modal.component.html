@@ -35,7 +35,8 @@
             <button class="btn btn-default" (click)="bsModalRef.hide()">Cancel</button>
         </div>
     </wizard-step>
-    <wizard-step stepId="import-config">
+    <wizard-step  *ngIf="(isBlueprintSimulator && enableSimulator) || (!isBlueprintSimulator)" 
+    stepId="import-config">
         <div class="modal-header text-center bg-primary" style="color: var(--brand-dark, #000);">
             <div style="font-size: 62px;">
                 <span c8yIcon="c8y-simulator"></span>
@@ -259,7 +260,7 @@
                     <input type="text" class="form-control" [class.ng-invalid]="isduplicateSmulatorName === true" id="name" name="name"
                         placeholder="e.g. My First Simulator (required)" required autofocus [(ngModel)]="simulatorName" (keyup)="validateSimulatorName()">
                 </div>
-                <div *ngIf="isMSFCheckSpin" style="text-align: center;">
+                <div *ngIf="isMSCheckSpin" style="text-align: center;">
                     <c8y-loading></c8y-loading>
                 </div>
                 <div class="form-group" *ngIf="isMSExist && !isCSVSimulator">
@@ -287,7 +288,8 @@
     </wizard-step>
 
 
-    <wizard-step stepId="select-dtdl">
+    <wizard-step *ngIf="(isBlueprintSimulator && enableSimulator) || (!isBlueprintSimulator)"
+     stepId="select-dtdl">
         <div class="modal-header text-center bg-primary" style="color: var(--brand-dark, #000);">
             <div style="font-size: 62px;">
                 <span c8yIcon="c8y-simulator"></span>
@@ -303,7 +305,7 @@
                 <div class="form-group">
                     <label for="configFile" style="padding: 2%"><span>Select file</span></label>
                     <select class="form-control" [(ngModel)]="fileName" style="border-radius:15px;"
-                    id="dashboardView" ([ngModelChange])="updateConfigurationFile()">
+                    id="dashboardView" (ngModelChange)="updateConfigurationFile()">
                     <option *ngFor="let simulatorConfigFile of simulatorConfigFiles" [value]="simulatorConfigFile.fileName">{{simulatorConfigFile.fileName}}</option>
                 </select>
                 </div>
