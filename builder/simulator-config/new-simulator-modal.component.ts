@@ -479,7 +479,7 @@ export class NewSimulatorModalComponent implements OnInit{
     }
 
     updateConfigurationFile() {
-        let matchedConfigValue = JSON.parse(JSON.stringify(this.modalOptions.initialState.simulatorConfigFiles)).find(element => element.fileName === this.selectedValue);
+        let matchedConfigValue = JSON.parse(JSON.stringify(this.modalOptions.initialState.simulatorConfigFiles)).find(element => element.fileName === this.fileName);
         const fileInput = JSON.stringify(matchedConfigValue.fileContent)
         const validJson = this.isValidJson(fileInput);
         this.isConfigFileUploading = true;
