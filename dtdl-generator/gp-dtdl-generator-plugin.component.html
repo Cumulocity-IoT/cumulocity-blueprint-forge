@@ -47,13 +47,13 @@
             <div *ngIf="dtdlCreated" class="dtdl-response-div">
                 <div *ngIf="!deviceChanged;else infoText" class="dflex-center" style="width: 100%;">
                     <textarea readonly class="dtdl-textArea" #dtdlText>{{dtdlObjects | json}}</textarea>
-                    <button type="button" class="btn btn-dot" (click)="copyInputMessage(dtdlText)"
+                    <button type="button" class="btn btn-clean" (click)="copyInputMessage(dtdlText)"
                         title="Copy to clipboard" style="margin-left: 5px;"><i
                             class="c8y-icon dlt-c8y-icon-copy"></i></button>
                 </div>
                 <ng-template #infoText>
                     <textarea readonly class="dtdl-textArea">Click on GENERATE button to perform operation.</textarea>
-                    <button [disabled]="deviceChanged" type="button" class="btn btn-dot"
+                    <button [disabled]="deviceChanged" type="button" class="btn btn-clean"
                         (click)="copyInputMessage(dtdlText)" title="Copy to clipboard" style="margin-left: 5px;"><i
                             class="c8y-icon dlt-c8y-icon-copy"></i></button>
                 </ng-template>
@@ -61,13 +61,13 @@
             <div *ngIf="simConfigCreated" class="dtdl-response-div">
                 <div *ngIf="!deviceChanged;else infoText" class="dflex-center" style="width: 100%;">
                     <textarea readonly class="dtdl-textArea" #simConfigText>{{dtdlSimulatorConfig | json}}</textarea>
-                    <button type="button" class="btn btn-dot" (click)="copyInputMessage(simConfigText)"
+                    <button type="button" class="btn btn-clean" (click)="copyInputMessage(simConfigText)"
                         title="Copy to clipboard" style="margin-left: 5px;"><i
                             class="c8y-icon dlt-c8y-icon-copy"></i></button>
                 </div>
                 <ng-template #infoText>
                     <textarea readonly class="dtdl-textArea">Click on GENERATE button to perform operation.</textarea>
-                    <button [disabled]="deviceChanged" type="button" class="btn btn-dot"
+                    <button [disabled]="deviceChanged" type="button" class="btn btn-clean"
                         (click)="copyInputMessage(simConfigText)" title="Copy to clipboard" style="margin-left: 5px;"><i
                             class="c8y-icon dlt-c8y-icon-copy"></i></button>
                 </ng-template>

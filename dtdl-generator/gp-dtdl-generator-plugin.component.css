@@ -13,6 +13,7 @@
 .dtdl-textArea{
   width: 80%;
   height: 65vh;
+  background-color: var(--header-color,var(--c8y-main-header-background-default));
   border-color: lightgrey;
   border-width: 1px;
   border-radius: 10px 10px 0px 10px;
@@ -83,12 +84,4 @@
   height: 65vh;
   align-items: center;
   margin-top: 20px;
-}
-
-.icon{
-  color: var(--c8y-btn-default-color-default);
-  background-color: var(--c8y-btn-default-background-default);
-  margin-top: 7.5px;
-  margin-left: 5px;
-  font-size: 15px;
 }
