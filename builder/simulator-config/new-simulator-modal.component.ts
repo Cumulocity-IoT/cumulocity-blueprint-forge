@@ -80,7 +80,7 @@ export class NewSimulatorModalComponent implements OnInit{
     showWarning: boolean;
     fileLength: Number;
     enableSimulator: boolean;
-    selectedValue: string = 'Select File';
+    fileName: string = 'Select File';
     public onSave: Subject<any>;
 
     constructor(
@@ -112,23 +112,6 @@ export class NewSimulatorModalComponent implements OnInit{
                 //If multiple
                 this.wizard.selectStep('select-dtdl');
             }
-            
-          /*   const validJson = this.isValidJson(input);
-            this.isConfigFileUploading = true; */
-            /* if (validJson) {
-                this.selectedStrategyFactory = this.simulationStrategiesService.strategiesByName.get(validJson.type);
-                if (this.selectedStrategyFactory === undefined) {
-                    this.isConfigFileError = true;
-                } else {
-                    this.configFromFile = validJson.config;
-                    this.simulatorName = validJson.name;
-                    this.wizard.selectStep('device');
-                }
-            } */
-            ;
-
-            // If multiple
-            // this.wizard.selectStep('select-dtdl');
         }        
     }
     //Getting application details
@@ -157,7 +140,7 @@ export class NewSimulatorModalComponent implements OnInit{
         });
     }
     async openSimulatorConfig() {
-        this.wizard.selectStep('config');
+            this.wizard.selectStep('config');
 
         const metadata = this.selectedStrategyFactory.getSimulatorMetadata();
         if (metadata && metadata.name.includes('File (CSV/JSON)')) {
@@ -169,7 +152,7 @@ export class NewSimulatorModalComponent implements OnInit{
             this.runOnServer = true;
         } else { await this.verifySimulatorMicroServiceStatus(); }
 
-        this.configWrapper.clear();
+        this.configWrapper?.clear();
 
         if (metadata.configComponent != null) {
             const factory: ComponentFactory<any> = this.resolver.resolveComponentFactory(metadata.configComponent);
@@ -197,6 +180,7 @@ export class NewSimulatorModalComponent implements OnInit{
             });
 
         }
+        
     }
     //validating if simulator name already exists
     validateSimulatorName(){
@@ -479,7 +463,7 @@ export class NewSimulatorModalComponent implements OnInit{
     }
 
     updateConfigurationFile() {
-        let matchedConfigValue = JSON.parse(JSON.stringify(this.modalOptions.initialState.simulatorConfigFiles)).find(element => element.fileName === this.selectedValue);
+        let matchedConfigValue = JSON.parse(JSON.stringify(this.modalOptions.initialState.simulatorConfigFiles)).find(element => element.fileName === this.fileName);
         const fileInput = JSON.stringify(matchedConfigValue.fileContent)
         const validJson = this.isValidJson(fileInput);
         this.isConfigFileUploading = true;

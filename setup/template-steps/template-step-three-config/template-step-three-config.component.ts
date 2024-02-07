@@ -229,4 +229,70 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   showSimulatorDeviceDialog() {
     this.bsModalRef = this.modalService.show(LinkSimulatorDeviceModalComponent, { backdrop: 'static', class: 'c8y-wizard' });
 }
+
+async validateandNext(app) {
+    if (this.appConfigForm.form.valid) {
+      if (this.currentApp.name !== this.newAppName ||
+        this.currentApp.contextPath !== this.newAppContextPath ||
+        (this.currentApp.applicationBuilder && this.currentApp.applicationBuilder.icon !== this.newAppIcon)) {
+        await this.saveAppChanges(app);
+      }
+    } else {
+      this.alert.danger("Please fill required details to proceed further.");
+      return;
+    }
+}
+
+async saveAppChanges(app) {
+  const savingAlert = new UpdateableAlert(this.alertService);
+  savingAlert.update('Saving application...');
+  try {
+    app.name = this.newAppName;
+    app.applicationBuilder.icon = this.newAppIcon;
+    app.icon = {
+      name: this.newAppIcon,
+      "class": `fa fa-${this.newAppIcon}`
+    };
+
+    const update: any = {
+      id: app.id,
+      name: app.name,
+      key: app.key,
+      applicationBuilder: app.applicationBuilder,
+      icon: app.icon
+    };
+
+    let contextPathUpdated = false;
+    const currentAppContextPath = app.contextPath;
+    if (app.contextPath && app.contextPath != this.newAppContextPath) {
+      app.contextPath = this.newAppContextPath;
+      update.contextPath = this.newAppContextPath;
+      contextPathUpdated = true;
+    }
+
+    let appManifest: any = app.manifest;
+    if (appManifest) {
+      appManifest.contextPath = app.contextPath;
+      appManifest.key = update.key;
+      appManifest.icon = app.icon;
+      appManifest.name = app.name;
+      update.manifest = appManifest;
+    }
+    await this.appService.update(update);
+
+    if (contextPathUpdated && contextPathFromURL() === currentAppContextPath) {
+      savingAlert.update('Saving application...');
+      // Pause while c8y server reloads the application
+      await delay(5000);
+      window.location = `/apps/${this.newAppContextPath}/${window.location.hash}` as any;
+    }
+
+    savingAlert.update('Application saved!', 'success');
+    savingAlert.close(1500);
+  } catch (e) {
+    savingAlert.update('Unable to save!\nCheck browser console for details', 'danger');
+    throw e;
+  }
+  this.appStateService.currentUser.next(this.appStateService.currentUser.value);
+}
 }

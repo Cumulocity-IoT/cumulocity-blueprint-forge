@@ -46,44 +46,6 @@
                         <div *ngIf="dashboard.isDeviceRequired" class="col-md-7 col-sm-7 pad-left">
                          
                           <form class="form-inline" name="deviceForm" #deviceForm="ngForm">
-
-                            <!-- <div class="form-group" class="col-sm-12 col-md-12 col-xs-12" style="padding:0">
-                              <i [c8yIcon]="'c8y-device-connect'" class="c8y-icon-duocolor font-large" (click)="showSimulatorDeviceDialog()"></i>
-                            </div> -->
-                            <!-- <div class="form-group" class="col-sm-12 col-md-12 col-xs-12" style="padding:0">
-
-                              
-                              <div *ngIf="!simulatorSelected" class="form-group col-sm-6 col-md-6 col-xs-12" style="padding:0; margin: 0">
-                                  <label class="sr-only" for="selected-device">Select Device/asset for dashboard</label>
-                                  
-                                  <input *ngIf="dashboard.isDeviceRequired" name="selectedItem" class="form-control"
-                                  [(ngModel)]="dashboard.name" required readonly style="width: 100%"
-                                      id="selected-device-{{dashboard.title}}" placeholder="Select Device/Asset" type="text"
-                                     >
-                              </div>
-
-
-                              <div class="col-sm-4 col-md-4 col-xs-12 input-group-btn dropdown" style="padding-left: 0; max-width: 100%; text-align: end" dropdown>
-                                 <button type="button" dropdownToggle id="select-asset-dd-{{dashboard.title}}" class="btn btn-primary dropdown-toggle c8y-dropdown">
-                                  <span >{{assetButtonText}}</span>
-                                  <span class="caret"></span>
-                                </button>
-
-                                
-
-                                <ul class="dropdown-menu dropdown-menu-right" *dropdownMenu>
-                                  <li><button *ngIf="dashboard.isSelectSimulator" (click)="selectSimulator()" type="button">Simulator<i class="dlt-c8y-icon-question" title="Option to run through simulators" placement="right"></i></button></li>
-                                  <li><button *ngIf="dashboard.isSelectAsset" type="button" (click)="openDeviceSelectorDialog(dashboard, 0, i)">Device/Asset <i class="dlt-c8y-icon-question" title="Selected device/asset will be configured with one or more widgets in this dashboard" placement="right"></i></button></li>
-                                  <li><button *ngIf="dashboard.isSelectGroup" type="button"(click)="openDeviceSelectorDialog(dashboard, 1)">Device Group <i class="dlt-c8y-icon-question" title="Selected device group or devices/assets of selected device group will be configured with one or more widgets in this dashboard" placement="right"></i></button></li>
-                                  <li><button *ngIf="!dashboard.isGroupDashboard && dashboard.isSelectType" type="button"(click)="openDeviceSelectorDialog(dashboard, 2)">Device/Asset Type<i class="dlt-c8y-icon-question" title="All devices/assets of selected device/asset type will be configured with one or more widgets in this dashboard" placement="right"></i></button></li>
-                                </ul> 
-
-
-                                
-                              </div>
-                              <div class="col-md-3"></div>
-                                </div> -->
-                               
                           </form>
                         </div>
                         <div *ngIf="dashboard.welcomeTemplates" class="col-sm-5 col-md-5 col-xs-12 pad-left">
@@ -227,6 +189,7 @@
     (onNext)="next()"
     (onBack)="back()"
   >
+  <!-- validateandNext(currentApp) -->
   <!-- saveandInstall(currentApp) -->
   </c8y-template-setup-stepper-buttons>
   <div class="alerts">

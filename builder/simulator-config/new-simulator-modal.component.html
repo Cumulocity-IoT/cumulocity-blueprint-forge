@@ -35,7 +35,7 @@
             <button class="btn btn-default" (click)="bsModalRef.hide()">Cancel</button>
         </div>
     </wizard-step>
-    <wizard-step *ngIf="(isBlueprintSimulator && enableSimulator) || (!isBlueprintSimulator)" stepId="import-config">
+    <wizard-step stepId="import-config">
         <div class="modal-header text-center bg-primary" style="color: var(--brand-dark, #000);">
             <div style="font-size: 62px;">
                 <span c8yIcon="c8y-simulator"></span>
@@ -107,8 +107,10 @@
             </div>
         </div>
         <div class="c8y-wizard-footer">
-            <button class="btn btn-default"
-                (click)="(configFromFile === undefined) ? wizard.selectStep('menu') : (isBlueprintSimulator && enableSimulator) ? wizard.selectStep('config') : (!enableSimulator) ? '' : wizard.selectStep('import-config')">Back</button>
+            <button 
+            [disabled]="enableSimulator && simulatorConfigFiles.length === 1"
+            class="btn btn-default"
+                (click)="(configFromFile === undefined) ? wizard.selectStep('menu') :  (isBlueprintSimulator && enableSimulator && simulatorConfigFiles.length > 1) ? wizard.selectStep('select-dtdl') : (!enableSimulator) ? '' : wizard.selectStep('import-config')">Back</button>
             <button class="btn btn-default" (click)="bsModalRef.hide()">Cancel</button>
         </div>
     </wizard-step>
@@ -285,7 +287,7 @@
     </wizard-step>
 
 
-    <wizard-step *ngIf="(isBlueprintSimulator && enableSimulator) || (!isBlueprintSimulator)" stepId="select-dtdl">
+    <wizard-step stepId="select-dtdl">
         <div class="modal-header text-center bg-primary" style="color: var(--brand-dark, #000);">
             <div style="font-size: 62px;">
                 <span c8yIcon="c8y-simulator"></span>
@@ -300,8 +302,8 @@
             <div class="col-xs-12">
                 <div class="form-group">
                     <label for="configFile" style="padding: 2%"><span>Select file</span></label>
-                    <select class="form-control" [(ngModel)]="selectedValue" style="border-radius:20px; padding: 2%"
-                    id="dashboardView" (ngModelChange)="updateConfigurationFile()">
+                    <select class="form-control" [(ngModel)]="fileName" style="border-radius:15px;"
+                    id="dashboardView" ([ngModelChange])="updateConfigurationFile()">
                     <option *ngFor="let simulatorConfigFile of simulatorConfigFiles" [value]="simulatorConfigFile.fileName">{{simulatorConfigFile.fileName}}</option>
                 </select>
                 </div>

@@ -145,12 +145,12 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
   async toggleToEnableSimulator(event, dashboard, index) {
     this.simulatorSelected = true;
     this.enableSimulator = event.target.checked;
-    let templateDetailsData;
+    if (this.enableSimulator) {
+      let templateDetailsData;
     templateDetailsData = await (await this.loadTemplateDetails(dashboard.dashboard)).toPromise();
-    console.log('templateDetailsData*************', templateDetailsData);
     // Need to pass Simulator config file array of object
  
-    const SimultorConfigFiles = [];
+    let SimultorConfigFiles = [];
     let currentSimulatorData;
 
     // Not able to use forEach, as it takes callback as parameter which expects to be async
@@ -160,17 +160,25 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
           fileName: templateDetailsData.simulatorDTDL[i].simulatorFileName,
           fileContent: currentSimulatorData
       });
+
+      // Added for testing purpose in case of single file
+      // SimultorConfigFiles[0]  = {
+      //   fileName: templateDetailsData.simulatorDTDL[i].simulatorFileName,
+      //     fileContent: currentSimulatorData
+      // }
     }
+    
     this.bsModalRef = this.modalService.show(NewSimulatorModalComponent, { backdrop: 'static', class: 'c8y-wizard', initialState:{appId: this.currentApp.id + "", isBlueprintSimulator: true, enableSimulator: this.enableSimulator, simulatorConfigFiles: SimultorConfigFiles, fileLength: SimultorConfigFiles.length}} );
-    this.bsModalRef.content.onSave.subscribe(content => this.simulatorModelContent = content);
-    dashboard.name = this.simulatorModelContent.deviceId;
+    this.bsModalRef.content.onSave.subscribe(content => {
+      this.simulatorModelContent = content;
+      dashboard.name = this.simulatorModelContent?.deviceId;
       dashboard.templateType = dashboard.templateType;
       dashboard.devices = [{
         type: "Temperature Sensor",
           placeholder: "device01",
           reprensentation : {
-            id: this.simulatorModelContent.deviceId,
-            name: this.simulatorModelContent.deviceName
+            id: this.simulatorModelContent?.deviceId,
+            name: this.simulatorModelContent?.deviceName
           }
       }]
     let deviceFieldNotField;
@@ -187,6 +195,10 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
      }
     }
     this.deviceFormValid = deviceFieldNotField;
+    });
+    
+    }
+    
   }
 
 
@@ -198,27 +210,27 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       }));
   }
 
-// saveandInstall and its dependent functions are moved from step three
-  async saveandInstall(app: any) {
-      if (this.currentApp.name !== this.newAppName ||
-        this.currentApp.contextPath !== this.newAppContextPath ||
-        (this.currentApp.applicationBuilder && this.currentApp.applicationBuilder.icon !== this.newAppIcon)) {
-        await this.saveAppChanges(app);
-      }
-      await this.configureApp(app);
-    // if (this.appConfigForm.form.valid) {
-    //   if (this.currentApp.name !== this.newAppName ||
-    //     this.currentApp.contextPath !== this.newAppContextPath ||
-    //     (this.currentApp.applicationBuilder && this.currentApp.applicationBuilder.icon !== this.newAppIcon)) {
-    //     await this.saveAppChanges(app);
-    //   }
-    //   await this.configureApp(app);
-    // } else {
-    //   this.alert.danger("Please fill required details to proceed further.");
-    //   return;
-    // }
-  }
 
+  // saveandInstall and its dependent functions are moved from step three
+  async saveandInstall(app: any) {
+    if (this.currentApp.name !== this.newAppName ||
+      this.currentApp.contextPath !== this.newAppContextPath ||
+      (this.currentApp.applicationBuilder && this.currentApp.applicationBuilder.icon !== this.newAppIcon)) {
+      await this.saveAppChanges(app);
+    }
+    await this.configureApp(app);
+  // if (this.appConfigForm.form.valid) {
+  //   if (this.currentApp.name !== this.newAppName ||
+  //     this.currentApp.contextPath !== this.newAppContextPath ||
+  //     (this.currentApp.applicationBuilder && this.currentApp.applicationBuilder.icon !== this.newAppIcon)) {
+  //     await this.saveAppChanges(app);
+  //   }
+  //   await this.configureApp(app);
+  // } else {
+  //   this.alert.danger("Please fill required details to proceed further.");
+  //   return;
+  // }
+}
 
   async saveAppChanges(app) {
     const savingAlert = new UpdateableAlert(this.alertService);
@@ -230,7 +242,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
         name: this.newAppIcon,
         "class": `fa fa-${this.newAppIcon}`
       };
-
+  
       const update: any = {
         id: app.id,
         name: app.name,
@@ -238,7 +250,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
         applicationBuilder: app.applicationBuilder,
         icon: app.icon
       };
-
+  
       let contextPathUpdated = false;
       const currentAppContextPath = app.contextPath;
       if (app.contextPath && app.contextPath != this.newAppContextPath) {
@@ -246,7 +258,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
         update.contextPath = this.newAppContextPath;
         contextPathUpdated = true;
       }
-
+  
       let appManifest: any = app.manifest;
       if (appManifest) {
         appManifest.contextPath = app.contextPath;
@@ -256,14 +268,14 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
         update.manifest = appManifest;
       }
       await this.appService.update(update);
-
+  
       if (contextPathUpdated && contextPathFromURL() === currentAppContextPath) {
         savingAlert.update('Saving application...');
         // Pause while c8y server reloads the application
         await delay(5000);
         window.location = `/apps/${this.newAppContextPath}/${window.location.hash}` as any;
       }
-
+  
       savingAlert.update('Application saved!', 'success');
       savingAlert.close(1500);
     } catch (e) {
@@ -272,7 +284,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     }
     this.appStateService.currentUser.next(this.appStateService.currentUser.value);
   }
-
+ 
   async configureApp(app: any) {
     
     const currentHost = window.location.host.split(':')[0];
@@ -344,7 +356,6 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       } else {
         templateDetailsData = await (await this.loadTemplateDetails(db.dashboard)).toPromise();
       }
-      console.log('template details data 222222222', templateDetailsData);
       const dashboardConfiguration = {
         dashboardId: '12598412',
         dashboardName: db.title,
@@ -358,7 +369,6 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       };
 
       this.progressIndicatorService.setProgress(40);
-      console.log('db value', db);
       templateDetailsData.input.devices = db.devices;
       if (db.title !== 'Instruction' && db.title !== 'Welcome' && db.title !== 'Help and Support' && db.isConfigRequred) {
         templateDetailsData.widgets.forEach(widget => {
@@ -388,7 +398,6 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       } else {
         this.groupTemplate = false;
       }
-      console.log('template details data', this.templateDetails);
       await this.catalogService.createDashboard(this.currentApp, dashboardConfiguration, db, templateDetailsData, this.groupTemplate);
       this.progressIndicatorService.setProgress(90);
       overallProgress = overallProgress + eachRemoteProgress;
@@ -528,7 +537,6 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
           }
           this.deviceFormValid = deviceFieldNotField;
         }
-       
       });
     }
 else {
@@ -560,10 +568,8 @@ else {
         }
         this.deviceFormValid = deviceFieldNotField;
       }
-    
   });
 }
-
  }
 
   hideProgressModalDialog() {
@@ -574,4 +580,5 @@ else {
     this.progressModal = this.modalService.show(ProgressIndicatorModalComponent, { class: 'c8y-wizard', initialState: { message } });
   }
 
+  
   }
