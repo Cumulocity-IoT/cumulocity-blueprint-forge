@@ -97,7 +97,7 @@
       "exports": [{
         "name": "Device DTDL Generator plugin",
         "module": "DtdlGeneratorPluginModule",
-        "path": "./dtdl-generator/gp-dtdl-generator-plugin.module.ts",
+        "path": "./custom-plugins/dtdl-generator/gp-dtdl-generator-plugin.module.ts",
         "description": "Adds a navigation plugin to generate DTDL file for a device."
       }],
       "remotes": {

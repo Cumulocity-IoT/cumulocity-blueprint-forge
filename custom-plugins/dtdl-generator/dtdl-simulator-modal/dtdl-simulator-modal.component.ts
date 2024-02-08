@@ -23,7 +23,7 @@ import { Subject } from "rxjs";
 @Component({
     selector: 'dtdl-simulator-modal',
     templateUrl: './dtdl-simulator-modal.component.html',
-    styleUrls: ['./dtdl-simulator-modal.component.css','./../../node_modules/@ng-select/ng-select/themes/default.theme.css'],
+    styleUrls: ['./dtdl-simulator-modal.component.css','../../../node_modules/@ng-select/ng-select/themes/default.theme.css'],
     encapsulation: ViewEncapsulation.None
 })
 
