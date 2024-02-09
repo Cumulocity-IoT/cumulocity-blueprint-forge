@@ -312,7 +312,7 @@
             </div>
         </div>
         <div class="c8y-wizard-footer">
-            <button class="btn btn-default" (click)="bsModalRef.hide();">Cancel</button>
+            <button class="btn btn-default" (click)="bsModalRef.hide(); this.appDataService.disableToggleForSimulator.next('disable')">Cancel</button>
             <button class="btn btn-primary" (click)="wizard.selectStep('device')"
                 >Next <i c8yIcon="chevron-right"></i> </button>
         </div>

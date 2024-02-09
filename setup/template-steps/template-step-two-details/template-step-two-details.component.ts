@@ -93,8 +93,14 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep implement
           this.images = [];
         }
         this.templateCatalogSetupService.templateData.next(this.templateDetails);
+        
+      console.log('template details', this.templateDetails);
+      
+      
       }, error => {
         this.alertService.danger("There is some technical error! Please try after sometime.");
       });
   }
+
+ 
 }

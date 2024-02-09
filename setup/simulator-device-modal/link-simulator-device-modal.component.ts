@@ -178,9 +178,7 @@ export class LinkSimulatorDeviceModalComponent {
     }
 
     private declareConfig() {
-      console.log('config value', this.config);
         this.config.modalSize = "modal-md";
-        console.log('config value111111', this.config);
         this.config.dtdlDeviceId = "";
         this.config.dtdlModelConfig = [];
         this.configModel = [];

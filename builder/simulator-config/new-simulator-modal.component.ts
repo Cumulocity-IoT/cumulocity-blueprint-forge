@@ -94,6 +94,7 @@ export class NewSimulatorModalComponent implements OnInit{
         private modalOptions: ModalOptions
     ) {
         this.onSave = new Subject();
+        
      }
     async ngOnInit(): Promise<void> {
         this.appDataService.forceUpdate = true;
@@ -184,7 +185,6 @@ export class NewSimulatorModalComponent implements OnInit{
             }
 
             this.newConfig = componentRef.instance.config;//TODO: needed after merge? 
-            console.log('new config in new simulator modal', this.newConfig);
 
             if (componentRef.instance.config.modalSize) {
                 this.bsModalRef.setClass(componentRef.instance.config.modalSize);

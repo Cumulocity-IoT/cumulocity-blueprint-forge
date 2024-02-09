@@ -30,6 +30,7 @@ export class AppDataService {
     private lastUpdated = 0; 
     forceUpdate = false;
     refreshAppForDashboard = new BehaviorSubject<void>(undefined);
+    disableToggleForSimulator = new BehaviorSubject<string>(undefined);
 
     constructor(private appService: ApplicationService) {
     }

@@ -16,36 +16,27 @@
 * limitations under the License.
  */
 import { CdkStep } from '@angular/cdk/stepper';
-import { AfterViewInit, Component, Inject, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit, ViewChild } from '@angular/core';
 import { AlertService, AppStateService, C8yStepper, SetupComponent } from '@c8y/ngx-components';
 import { TemplateSetupStep } from '../../template-setup-step';
 import { TemplateCatalogSetupService } from '../../template-catalog-setup.service';
 import { catchError } from "rxjs/operators";
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
-import { TemplateCatalogModalComponent } from '../../../builder/template-catalog/template-catalog.component';
-import { Observable, from, Subscription, BehaviorSubject, combineLatest, interval } from 'rxjs';
-import { map, switchMap, tap } from "rxjs/operators";
-import { AppIdService } from '../../../builder/app-id.service';
+import { Observable, Subscription, interval } from 'rxjs';
+import { tap } from "rxjs/operators";
 import { ApplicationService, IApplication, IManagedObject } from '@c8y/client';
 import { AppDataService } from '../../../builder/app-data.service';
 import { ProgressIndicatorModalComponent } from '../../../builder/utils/progress-indicator-modal/progress-indicator-modal.component';
 import { ProgressIndicatorService } from '../../../builder/utils/progress-indicator-modal/progress-indicator.service';
 import { WidgetCatalogService } from '../../../builder/widget-catalog/widget-catalog.service';
-import { Dashboards, MicroserviceDetails, PluginDetails } from '../../template-setup.model';
+import { MicroserviceDetails, PluginDetails } from '../../template-setup.model';
 import { ApplicationBinaryService } from '../../../builder/application-binary.service';
 import { TemplateCatalogService } from '../../../builder/template-catalog/template-catalog.service';
 import { DeviceSelectorModalComponent } from '../../../builder/utils/device-selector-modal/device-selector.component';
-
-import * as delay from "delay";
-import { UpdateableAlert } from "../../../builder/utils/UpdateableAlert";
-import { contextPathFromURL } from "../../../builder/utils/contextPathFromURL";
 import { NgForm } from '@angular/forms';
 import { SetupConfigService } from '../../setup-config.service';
 import { SettingsService } from '../../../builder/settings/settings.service';
-import { SetupWidgetConfigModalComponent } from '../../setup-widget-config-modal/setup-widget-config-modal.component';
 import { DOCUMENT } from '@angular/common';
-import { BrandingService } from '../../../builder/branding/branding.service';
-import { LinkSimulatorDeviceModalComponent } from '../../simulator-device-modal/link-simulator-device-modal.component';
 import { NewSimulatorModalComponent } from '../../../builder/simulator-config/new-simulator-modal.component';
 @Component({
   selector: 'c8y-template-step-four-connect',
@@ -84,6 +75,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
   simulatorSelected: boolean;
   enableSimulator: boolean;
   simulatorModelContent: any;
+  disableSimulatorFromModal: string;
 
 
   constructor(
@@ -94,16 +86,15 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     protected alert: AlertService,
     private templateCatalogSetupService: TemplateCatalogSetupService,
     private modalService: BsModalService, private applicationBinaryService: ApplicationBinaryService,
-    private appIdService: AppIdService, private appService: ApplicationService,
+    private appService: ApplicationService,
     private appDataService: AppDataService, private widgetCatalogService: WidgetCatalogService,
     private progressIndicatorService: ProgressIndicatorService, private catalogService: TemplateCatalogService,
-    @Inject(DOCUMENT) private document: Document, private brandingService: BrandingService,
-    private deviceSelectorModalRef: BsModalRef, private renderer: Renderer2,
-    private alertService: AlertService, private appStateService: AppStateService,
-    protected setupConfigService: SetupConfigService, private settingsService: SettingsService,
-
+    @Inject(DOCUMENT) private document: Document, private deviceSelectorModalRef: BsModalRef, 
+    private appStateService: AppStateService, protected setupConfigService: SetupConfigService, 
+    private settingsService: SettingsService,
+    
   ) {
-
+    
     super(stepper, step, setup, appState, alert, setupConfigService);
     this.app = this.appStateService.currentApplication.pipe(
       tap((app: IApplication & { applicationBuilder: any }) => { 
@@ -121,6 +112,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
   }
 
   ngOnInit() {
+    
     this.enableSimulator = false;
     this.templateCatalogSetupService.templateData.subscribe(async currentData => {
       this.isFormValid = this.appConfigForm?.form.valid;
@@ -139,7 +131,6 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     this.templateCatalogSetupService.welcomeTemplateData.subscribe(welcomeTemplateData => {
       this.welcomeTemplateData = welcomeTemplateData;
     });
-    
   }
 
   async toggleToEnableSimulator(event, dashboard, index) {
@@ -147,7 +138,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     this.enableSimulator = event.target.checked;
     if (this.enableSimulator) {
         let templateDetailsData;
-    templateDetailsData = await (await this.loadTemplateDetails(dashboard.dashboard)).toPromise();
+         templateDetailsData = await (await this.loadTemplateDetails(dashboard.dashboard)).toPromise();
     // Need to pass Simulator config file array of object
  
     const SimultorConfigFiles = [];
@@ -163,6 +154,15 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     
     }
     this.bsModalRef = this.modalService.show(NewSimulatorModalComponent, { backdrop: 'static', class: 'c8y-wizard', initialState:{appId: this.currentApp.id + "", isBlueprintSimulator: true, enableSimulator: this.enableSimulator, simulatorConfigFiles: SimultorConfigFiles, fileLength: SimultorConfigFiles.length}} );
+    
+    this.bsModalRef.onHidden.subscribe(value => {
+        this.appDataService.disableToggleForSimulator.subscribe(value => {
+          this.disableSimulatorFromModal = value;
+          const checkBoxForDashboard = document.getElementById("dashboard-"+index);
+          // console.log('checkbox', checkBoxForDashboard.getAttribute(':checked'));
+        })
+      })
+    
     this.bsModalRef.content.onSave.subscribe(content => {
       this.simulatorModelContent = content;
       dashboard.name = this.simulatorModelContent?.deviceId;
@@ -183,6 +183,8 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       else if (this.templateDetails.dashboards[dd].isDeviceRequired === true && this.templateDetails.dashboards[dd].linkWithDashboard === dashboard.id) {
         this.templateDetails.dashboards[dd].devices = dashboard.devices;
          deviceFieldNotField = true;
+     } else if (this.templateDetails.dashboards[dd].isDeviceRequired === true && this.templateDetails.dashboards[dd].isSimulatorConfigExist) {
+        deviceFieldNotField = true;
      } else {
           deviceFieldNotField = false;
           break;
@@ -190,8 +192,8 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     }
     this.deviceFormValid = deviceFieldNotField;
     });
-    
     } else {
+      dashboard.name = null;
         dashboard.devices = [{
             type: "Temperature Sensor",
               placeholder: "device01",
@@ -200,12 +202,12 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
                 name: ''
               }
           }];
-
           for (let dd = 0; dd < this.templateDetails.dashboards.length; dd++) {
             if (this.templateDetails.dashboards[dd].isDeviceRequired === true && this.templateDetails.dashboards[dd].linkWithDashboard === dashboard.id) {
               this.templateDetails.dashboards[dd].devices = dashboard.devices;
            } 
           }
+        this.deviceFormValid = false;
     }
   }
 
@@ -215,81 +217,6 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       .pipe(catchError(err => {
         return this.catalogService.getTemplateDetailsFallBack(dbDashboard);
       }));
-  }
-
-// saveandInstall and its dependent functions are moved from step three
-  async saveandInstall(app: any) {
-      if (this.currentApp.name !== this.newAppName ||
-        this.currentApp.contextPath !== this.newAppContextPath ||
-        (this.currentApp.applicationBuilder && this.currentApp.applicationBuilder.icon !== this.newAppIcon)) {
-        await this.saveAppChanges(app);
-      }
-      await this.configureApp(app);
-    // if (this.appConfigForm.form.valid) {
-    //   if (this.currentApp.name !== this.newAppName ||
-    //     this.currentApp.contextPath !== this.newAppContextPath ||
-    //     (this.currentApp.applicationBuilder && this.currentApp.applicationBuilder.icon !== this.newAppIcon)) {
-    //     await this.saveAppChanges(app);
-    //   }
-    //   await this.configureApp(app);
-    // } else {
-    //   this.alert.danger("Please fill required details to proceed further.");
-    //   return;
-    // }
-  }
-
-
-  async saveAppChanges(app) {
-    const savingAlert = new UpdateableAlert(this.alertService);
-    savingAlert.update('Saving application...');
-    try {
-      app.name = this.newAppName;
-      app.applicationBuilder.icon = this.newAppIcon;
-      app.icon = {
-        name: this.newAppIcon,
-        "class": `fa fa-${this.newAppIcon}`
-      };
-
-      const update: any = {
-        id: app.id,
-        name: app.name,
-        key: app.key,
-        applicationBuilder: app.applicationBuilder,
-        icon: app.icon
-      };
-
-      let contextPathUpdated = false;
-      const currentAppContextPath = app.contextPath;
-      if (app.contextPath && app.contextPath != this.newAppContextPath) {
-        app.contextPath = this.newAppContextPath;
-        update.contextPath = this.newAppContextPath;
-        contextPathUpdated = true;
-      }
-
-      let appManifest: any = app.manifest;
-      if (appManifest) {
-        appManifest.contextPath = app.contextPath;
-        appManifest.key = update.key;
-        appManifest.icon = app.icon;
-        appManifest.name = app.name;
-        update.manifest = appManifest;
-      }
-      await this.appService.update(update);
-
-      if (contextPathUpdated && contextPathFromURL() === currentAppContextPath) {
-        savingAlert.update('Saving application...');
-        // Pause while c8y server reloads the application
-        await delay(5000);
-        window.location = `/apps/${this.newAppContextPath}/${window.location.hash}` as any;
-      }
-
-      savingAlert.update('Application saved!', 'success');
-      savingAlert.close(1500);
-    } catch (e) {
-      savingAlert.update('Unable to save!\nCheck browser console for details', 'danger');
-      throw e;
-    }
-    this.appStateService.currentUser.next(this.appStateService.currentUser.value);
   }
 
   async configureApp(app: any) {
@@ -568,7 +495,7 @@ else {
           else if (this.templateDetails.dashboards[dd].isDeviceRequired === true && this.templateDetails.dashboards[dd].linkWithDashboard === dashboard.id) {
             this.templateDetails.dashboards[dd].devices = dashboard.devices;
              deviceFieldNotField = true;
-         } else {
+         } else if (this.templateDetails.dashboards[dd].isDeviceRequired === true && this.templateDetails.dashboards[dd].linkWithDashboard !== dashboard.id && !dashboard.name) {
               deviceFieldNotField = false;
               break;
          }
