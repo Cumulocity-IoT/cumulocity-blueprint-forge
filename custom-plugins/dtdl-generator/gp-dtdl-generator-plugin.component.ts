@@ -163,17 +163,17 @@ export class DeviceDTDLGeneratorPluginComponent {
     this.contents = [];
     if (messurements.data && messurements.data.series && messurements.data.series.length > 0) {
       messurements.data.series.forEach((series, index) => {
-        this.type.push(series.type);
+        this.type.push(series?.type);
         let displayName: displayName = {};
-        if (series.type.indexOf('c8y_') >= 0) {
-          let disName = this.trimC8y(series.type);
+        if (series?.type.indexOf('c8y_') >= 0) {
+          let disName = this.trimC8y(series?.type);
           displayName.en = disName;
         }
         else {
-          displayName.en = series.type;
+          displayName.en = series?.type;
         }
         let content: contents = {
-          "@id": this.baseId + this.deviceName + ':' + series.type + ';1',
+          "@id": this.baseId + this.deviceName + ':' + series?.type + ';1',
           "@type": this.type,
           displayName: displayName,
           name: series.name,
@@ -235,7 +235,7 @@ export class DeviceDTDLGeneratorPluginComponent {
       const msmtFilter = {
         pageSize: this.mesPageLimit,
         valueFragmentSeries: series.name,
-        valueFragmentType: series.type,
+        valueFragmentType: series?.type,
         dateFrom: this.sixMonthsPrior,
         dateTo: this.now,
         revert: true,
@@ -243,21 +243,21 @@ export class DeviceDTDLGeneratorPluginComponent {
       };
       let mesListResponse = (await (this.measurementService.list(msmtFilter)));
       if(mesListResponse && mesListResponse.data && mesListResponse.data.length>0){
-        let unit= mesListResponse.data[0][series.type][series.name].unit;
+        let unit= mesListResponse.data[0][series?.type][series.name].unit;
         let times = mesListResponse.data.map((element) => element.time);
   
         this.pushToInterval(times);
   
         //getting eventText for measurement
-        let measName = series.type;
-        if (series.type.indexOf('c8y_') >= 0) {
-          measName= this.trimC8y(series.type);
+        let measName = series?.type;
+        if (series?.type.indexOf('c8y_') >= 0) {
+          measName= this.trimC8y(series?.type);
         }
   
         //generating dtdlModelConfig for the measurement
         let dtdlModelConfig: dtdlModelConfig = {
           schema: "double",
-          fragment: series.type,
+          fragment: series?.type,
           unit: unit,
           isObjectType: false,
           series: series.name,
@@ -265,7 +265,7 @@ export class DeviceDTDLGeneratorPluginComponent {
           eventText: measName,
           simulationType: this.getSimulationType(),
           alternateConfigs: this.getAlternateConfigs(this.getOperations(series,mesListResponse,measName,unit)),
-          id: this.baseId + this.deviceName + ':' + series.type + ';1',
+          id: this.baseId + this.deviceName + ':' + series?.type + ';1',
           eventType: series.name,
           measurementName: measName
         }
@@ -280,10 +280,7 @@ export class DeviceDTDLGeneratorPluginComponent {
   }
 
   private pushToInterval(times) {
-    let n = times.length;
-    if (n > 6) {
-      n = 6
-    }
+    let n = (times.length >6 ? 6 : times.length);
     //creating array for intervals of size 5, then getting it's mean to get final interval.
     let intervales: number[] = [];
     for (let i = 0, j = 1; j < n; i++, j++) {
@@ -310,12 +307,11 @@ export class DeviceDTDLGeneratorPluginComponent {
     if(operations){
       alternateConfigs.operations=[operations];
     }
-    console.log("alternateConfig:",alternateConfigs);
     return alternateConfigs
   }
 
   private getOperations(series,mesListResponse,measName,unit):operations{
-    let values = mesListResponse.data.map((element) => element[series.type][series.name].value);
+    let values = mesListResponse.data.map((element) => element[series?.type][series.name].value);
 
     //generating operations for measurement
     let operations: operations = {
@@ -325,12 +321,12 @@ export class DeviceDTDLGeneratorPluginComponent {
       alternateConfigs:this.getAlternateConfigs(),
       eventType: series.name,
       measurementName: measName,
-      fragment: series.type,
+      fragment: series?.type,
       unit: unit,
       series: series.name,
       matchingValue: "default",
       eventText: measName,
-      id: this.baseId + this.deviceName + ':' + series.type + ';1'
+      id: this.baseId + this.deviceName + ':' + series?.type + ';1'
     }
     if(this.simulatorType==1){
       let minValue: number = _.min(values);
