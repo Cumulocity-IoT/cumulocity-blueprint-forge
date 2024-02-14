@@ -16,7 +16,6 @@
 * limitations under the License.
  */
 import { Injectable } from "@angular/core";
-import { Observable } from "rxjs";
 import { InventoryService, IManagedObject, IResultList } from '@c8y/client';
 import { generateRegEx } from "./global-fun";
 
