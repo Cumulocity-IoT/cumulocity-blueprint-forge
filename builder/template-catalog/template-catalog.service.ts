@@ -244,6 +244,7 @@ export class TemplateCatalogService {
     }
 
     async updateDashboard(application, dashboardConfig: DashboardConfig, templateDetails: TemplateDetails, index: number, isGroupTemplate: boolean = false) {
+        console.log('application in update dashboard', application);
         templateDetails = this.updateTemplateWidgetsWithInput(templateDetails, isGroupTemplate);
         let deviceId = "";
         if(templateDetails?.input?.devices && templateDetails.input.devices.length <= 1) {

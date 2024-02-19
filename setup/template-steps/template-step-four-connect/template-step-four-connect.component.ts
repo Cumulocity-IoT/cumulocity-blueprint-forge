@@ -69,13 +69,18 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
   groupTemplateInDashboard: boolean;
   dashboardName: any;
   dashboardTemplate: any;
-  templateSelected: String = 'Default Template';
+  templateSelected: string;
   isMSEnabled: boolean = false;
   welcomeTemplateData: any;
   simulatorSelected: boolean;
   enableSimulator: boolean;
   simulatorModelContent: any;
   disableSimulatorFromModal: string;
+  blankTemplateDashboard: boolean;
+  isSpin: boolean = false;
+  fileUploadMessage: string;
+  onSaveClicked: boolean = false;
+  groupTemplateFromSimulator: boolean;
 
 
   constructor(
@@ -106,13 +111,20 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     this.app.subscribe(app => {
       this.currentApp = app;
     });
+    
+    this.templateCatalogSetupService.blankTemplate.subscribe(value => {
+      if (value) {
+        this.blankTemplateDashboard = value;
+        this.configureApp(this.currentApp);
+      }
+    });
   }
   ngAfterViewInit(): void {
+    console.log('After view init called');
     this.verifyStepCompleted();
   }
 
   ngOnInit() {
-    
     this.enableSimulator = false;
     this.templateCatalogSetupService.templateData.subscribe(async currentData => {
       this.isFormValid = this.appConfigForm?.form.valid;
@@ -137,6 +149,9 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     this.simulatorSelected = true;
     this.enableSimulator = event.target.checked;
     if (this.enableSimulator) {
+      this.fileUploadMessage = null;
+      this.onSaveClicked = false;
+      this.isSpin = true;
         let templateDetailsData;
          templateDetailsData = await (await this.loadTemplateDetails(dashboard.dashboard)).toPromise();
     // Need to pass Simulator config file array of object
@@ -153,17 +168,21 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       });
     
     }
-    this.bsModalRef = this.modalService.show(NewSimulatorModalComponent, { backdrop: 'static', class: 'c8y-wizard', initialState:{appId: this.currentApp.id + "", isBlueprintSimulator: true, enableSimulator: this.enableSimulator, simulatorConfigFiles: SimultorConfigFiles, fileLength: SimultorConfigFiles.length}} );
     
-    this.bsModalRef.onHidden.subscribe(value => {
+    this.bsModalRef = this.modalService.show(NewSimulatorModalComponent, { backdrop: 'static', class: 'c8y-wizard', initialState:{appId: this.currentApp.id + "", isBlueprintSimulator: true, enableSimulator: this.enableSimulator, simulatorConfigFiles: SimultorConfigFiles, fileLength: SimultorConfigFiles.length}} );
+    this.isSpin = false;
+    this.bsModalRef.onHidden.subscribe( value => {
+      
         this.appDataService.disableToggleForSimulator.subscribe(value => {
           this.disableSimulatorFromModal = value;
-          const checkBoxForDashboard = document.getElementById("dashboard-"+index);
-          // console.log('checkbox', checkBoxForDashboard.getAttribute(':checked'));
+          const checkBoxForDashboard = <HTMLInputElement>document.getElementById("dashboard-"+index);
+          if (!this.onSaveClicked)        checkBoxForDashboard.checked = false;
         })
       })
     
-    this.bsModalRef.content.onSave.subscribe(content => {
+    this.bsModalRef.content.onSave.subscribe( content => {
+      this.onSaveClicked = true;
+      this.currentApp.applicationBuilder.simulators= content.simulators;
       this.simulatorModelContent = content;
       dashboard.name = this.simulatorModelContent?.deviceId;
       dashboard.templateType = dashboard.templateType;
@@ -172,7 +191,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
           placeholder: "device01",
           reprensentation : {
             id: this.simulatorModelContent?.deviceId,
-            name: this.simulatorModelContent?.deviceName
+            name: this.simulatorModelContent?.deviceName,
           }
       }]
     let deviceFieldNotField;
@@ -190,9 +209,12 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
           break;
      }
     }
+    this.fileUploadMessage = "Your file for "+content?.deviceName+' is successfully uploaded';
+
     this.deviceFormValid = deviceFieldNotField;
     });
     } else {
+      this.fileUploadMessage = null;
       dashboard.name = null;
         dashboard.devices = [{
             type: "Temperature Sensor",
@@ -207,6 +229,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
               this.templateDetails.dashboards[dd].devices = dashboard.devices;
            } 
           }
+          
         this.deviceFormValid = false;
     }
   }
@@ -220,12 +243,16 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
   }
 
   async configureApp(app: any) {
-    
-    const currentHost = window.location.host.split(':')[0];
-    // if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
-    //   this.alert.warning("Installation isn't supported when running Application on localhost.");
-    //   return;
-    // }
+    const isAnyStepPending = this.setup.steps.some((step, index) => (index !== this.setup.steps.length-1) && (step.completed === false));
+    if(!isAnyStepPending) {
+      this.next();
+      return;
+    } 
+      const currentHost = window.location.host.split(':')[0];
+    if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
+      this.alert.warning("Installation isn't supported when running Application on localhost.");
+      return;
+    }
 
     // Filter dashboards which are selected
     let configDataDashboards = this.templateDetails.dashboards.filter(item => item.selected === true);
@@ -281,6 +308,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       let templateDetailsData;
       let  dashboardTemplates;
       if (db.welcomeTemplates) {
+        this.templateCatalogSetupService.welcomeTemplateSelected.subscribe(value => this.templateSelected = value);
          dashboardTemplates =  this.welcomeTemplateData.find(dashboardTemplate => dashboardTemplate.dashboardName === this.templateSelected);
           if (dashboardTemplates && this.templateSelected === 'Default Template') {
             templateDetailsData = await (await this.loadTemplateDetails(db.dashboard)).toPromise();
@@ -324,14 +352,16 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
           }
         });
       }
-      
-      if (db.templateType && db.templateType === 1 && !db.isGroupDashboard) {
+      this.appDataService.isGroupDashboardFromSimulator.subscribe(value => this.groupTemplateFromSimulator = value);
+
+      if ((db.templateType && db.templateType === 1 && !db.isGroupDashboard) || (this.groupTemplateFromSimulator &&  !db.isGroupDashboard)) {
         this.groupTemplate = true;
-      } else if (db.templateType && db.templateType === 2 && !db.isGroupDashboard) {
+      } else if ((db.templateType && db.templateType === 2 && !db.isGroupDashboard) || (this.groupTemplateFromSimulator && !db.isGroupDashboard)) {
         this.groupTemplate = true;
       } else {
         this.groupTemplate = false;
       }
+      
       await this.catalogService.createDashboard(this.currentApp, dashboardConfiguration, db, templateDetailsData, this.groupTemplate);
       this.progressIndicatorService.setProgress(90);
       overallProgress = overallProgress + eachRemoteProgress;
@@ -345,7 +375,22 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       });
     }
     this.hideProgressModalDialog();
-    this.next();
+    if (this.blankTemplateDashboard) {
+      this.setup.steps[2].completed = true;
+      this.setup.stepCompleted(2);
+      this.next();
+      this.showProgressModalDialog("Establishing Basic Dashboards for Blank Template")
+      this.progressIndicatorService.setOverallProgress(5);
+      this.setup.steps[3].completed = true;
+      this.setup.stepCompleted(3);
+      this.next();
+      await new Promise(resolve => setTimeout(resolve, 5000));
+      this.hideProgressModalDialog();
+    } else {
+      this.next();
+    
+    }
+    
   }
 
   async installMicroservice(microService: MicroserviceDetails): Promise<void> {

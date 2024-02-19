@@ -116,7 +116,7 @@ import { WizardModule } from './wizard/wizard.module';
           priority: 30
         }
       ] as SetupStep[]),
-      { provide: HOOK_SIMULATION_STRATEGY_FACTORY, useClass: DtdlSimulationStrategyFactory, multi: true },
+    //   { provide: HOOK_SIMULATION_STRATEGY_FACTORY, useClass: DtdlSimulationStrategyFactory, multi: true },
   ],
   entryComponents: [LinkSimulatorDeviceModalComponent],
   exports: [LinkSimulatorDeviceModalComponent]

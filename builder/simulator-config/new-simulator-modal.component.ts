@@ -90,7 +90,7 @@ export class NewSimulatorModalComponent implements OnInit{
         private appService: ApplicationService, private appIdService: AppIdService, private fetchClient: FetchClient,
         private simulatorNotificationService: SimulatorNotificationService, private fileSimulatorNotificationService: FileSimulatorNotificationService,
         private simulatorConfigService: SimulatorConfigService,private modalService: BsModalService,
-        private simulatorManagerService: SimulatorManagerService,private appDataService: AppDataService,
+        private simulatorManagerService: SimulatorManagerService,public appDataService: AppDataService,
         private modalOptions: ModalOptions
     ) {
         this.onSave = new Subject();
@@ -300,8 +300,13 @@ export class NewSimulatorModalComponent implements OnInit{
             type: metadata.name,
             config: this.newConfig,
             lastUpdated: new Date().toISOString(),
-            serverSide: (runOnServer ? true : false)
+            serverSide: (runOnServer ? true : false),
+            started : null
         };
+        if (this.isBlueprintSimulator) {
+            newSimulatorObject.started = true;
+        } 
+        
         simulators.push(newSimulatorObject);
         appServiceData.applicationBuilder.simulators = simulators;
 
@@ -335,7 +340,8 @@ export class NewSimulatorModalComponent implements OnInit{
         await this.simSvc.checkForSimulatorConfigChanges();
         let blueprintForgeDeviceDetails = {
             deviceId: this.newConfig.deviceId,
-            deviceName: this.newConfig.deviceName
+            deviceName: this.newConfig.deviceName,
+            simulators: simulators
         }
         this.onSave.next(blueprintForgeDeviceDetails);
         this.bsModalRef.hide();

@@ -44,6 +44,12 @@ export class TemplateCatalogSetupService {
     public welcomeTemplateData = new BehaviorSubject<WelcomeTemplate>(undefined);
     welcomeTemplateData$ = this.welcomeTemplateData.asObservable();
 
+    public blankTemplate = new BehaviorSubject(false);
+    blankTemplate$ = this.blankTemplate.asObservable();
+
+    public welcomeTemplateSelected = new BehaviorSubject("Default Template");
+    welcomeTemplateSelected$ = this.welcomeTemplateSelected.asObservable();
+
     constructor(private http: HttpClient, private inventoryService: InventoryService,
         private appService: ApplicationService,
         private binaryService: InventoryBinaryService,

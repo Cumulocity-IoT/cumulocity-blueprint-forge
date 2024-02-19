@@ -34,12 +34,20 @@
                         <div class="col-sm-3 col-xs-12 text-muted">
                           Please choose Device/Group or Simulator
                         </div>
+                        
                         <div *ngIf="dashboard.isSimulatorConfigExist && dashboard.linkWithDashboard === ''" class="col-sm-2 col-xs-12 text-muted">
                           <label class="c8y-switch">
                             <input type="checkbox" id="dashboard-{{i}}" (change)="toggleToEnableSimulator($event, dashboard, i)"/>
                             <span></span>Simulator
                             </label>
+                            <c8y-loading *ngIf="isSpin"></c8y-loading>
                         </div>
+                        
+                        <div *ngIf="fileUploadMessage" class="col-sm-4 col-xs-12 text-muted">
+                          {{fileUploadMessage}}
+                        </div>
+                        
+                        
                         <div class="col-sm-5 col-xs-12 text-muted" >
                         <div class="col-md-12 col-sm-12 pad-left">
                          

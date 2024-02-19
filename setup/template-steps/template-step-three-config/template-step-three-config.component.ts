@@ -20,28 +20,20 @@ import { AfterViewInit, Component, Inject, OnInit, Renderer2, ViewChild } from '
 import { AlertService, AppStateService, C8yStepper, SetupComponent } from '@c8y/ngx-components';
 import { TemplateSetupStep } from './../../template-setup-step';
 import { TemplateCatalogSetupService } from '../../template-catalog-setup.service';
-import { catchError } from "rxjs/operators";
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { TemplateCatalogModalComponent } from '../../../builder/template-catalog/template-catalog.component';
-import { Observable, from, Subscription, BehaviorSubject, combineLatest, interval } from 'rxjs';
-import { map, switchMap, tap } from "rxjs/operators";
-import { AppIdService } from '../../../builder/app-id.service';
-import { ApplicationService, IApplication, IManagedObject } from '@c8y/client';
-import { AppDataService } from '../../../builder/app-data.service';
+import { Observable, from, Subscription, interval } from 'rxjs';
+import { tap } from "rxjs/operators";
+import { ApplicationService, IApplication } from '@c8y/client';
 import { ProgressIndicatorModalComponent } from '../../../builder/utils/progress-indicator-modal/progress-indicator-modal.component';
-import { ProgressIndicatorService } from '../../../builder/utils/progress-indicator-modal/progress-indicator.service';
-import { WidgetCatalogService } from '../../../builder/widget-catalog/widget-catalog.service';
-import { Dashboards, MicroserviceDetails, PluginDetails } from './../../template-setup.model';
+import { Dashboards } from './../../template-setup.model';
 import { ApplicationBinaryService } from '../../../builder/application-binary.service';
 import { TemplateCatalogService } from '../../../builder/template-catalog/template-catalog.service';
-import { DeviceSelectorModalComponent } from './../../../builder/utils/device-selector-modal/device-selector.component';
-
 import * as delay from "delay";
 import { UpdateableAlert } from "../../../builder/utils/UpdateableAlert";
 import { contextPathFromURL } from "../../../builder/utils/contextPathFromURL";
 import { NgForm } from '@angular/forms';
 import { SetupConfigService } from './../../setup-config.service';
-import { SettingsService } from '../../../builder/settings/settings.service';
 import { SetupWidgetConfigModalComponent } from '../../../setup/setup-widget-config-modal/setup-widget-config-modal.component';
 import { DOCUMENT } from '@angular/common';
 import { BrandingService } from '../../../builder/branding/branding.service';
@@ -73,14 +65,11 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   groupTemplateInDashboard: boolean;
   dashboardName: any;
   dashboardTemplate: any;
-  templateSelected: String = 'Default Template';
+  templateSelected: string = 'Default Template';
   isMSEnabled: boolean = false;
   simulatorSelected: boolean;
-  private groupTemplate = false;
-  private microserviceDownloadProgress = interval(3000);
-  private microserviceDownloadProgress$: Subscription;
-  welcomeTemplateData: any;
   blankTemplateDashboard: boolean;
+  welcomeTemplateData: import("c:/Democenter/cumulocity-blueprint-forge/setup/template-setup.model").WelcomeTemplate;
 
 
   constructor(
@@ -91,13 +80,10 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
     protected alert: AlertService,
     private templateCatalogSetupService: TemplateCatalogSetupService,
     private modalService: BsModalService, private applicationBinaryService: ApplicationBinaryService,
-    private appService: ApplicationService, private catalogService: TemplateCatalogService,
+    private appService: ApplicationService,
     @Inject(DOCUMENT) private document: Document, private brandingService: BrandingService,
     private renderer: Renderer2, private alertService: AlertService, 
     private appStateService: AppStateService, protected setupConfigService: SetupConfigService,
-    private progressIndicatorService: ProgressIndicatorService,
-    private settingsService: SettingsService,
-    private widgetCatalogService: WidgetCatalogService,
   ) {
 
     super(stepper, step, setup, appState, alert, setupConfigService);
@@ -155,18 +141,16 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       await this.saveAppChanges(app);
     } 
     this.blankTemplateDashboard = true;
-      for (let d = 0; d < this.templateDetails.dashboards.length; d++) {
-        if ((this.templateDetails.dashboards[d].title !== 'Welcome') && 
-        (this.templateDetails.dashboards[d].title !== 'Help and Support') && 
-        (this.templateDetails.dashboards[d].title !== 'Instruction'))  {
+    this.templateDetails.dashboards.forEach(dashboardItem => {
+      if (dashboardItem.title !== 'Welcome' &&
+        dashboardItem.title !== 'Help and Support' &&
+        dashboardItem.title !== 'Instruction') {
           this.blankTemplateDashboard = false;
-          break;
+          return false;
         }
-      }
+    })
       if (this.blankTemplateDashboard) {
-        this.setup.steps[3].completed = true;
-        this.setup.stepCompleted(3);
-        this.configureApp(app);
+       this.templateCatalogSetupService.blankTemplate.next(true);
       } else {
         this.next();
       }
@@ -224,6 +208,7 @@ async saveAppChanges(app) {
     throw e;
   }
   this.appStateService.currentUser.next(this.appStateService.currentUser.value);
+  
 }
 
   showSetupConfigModal(dashboardBasicConfig): BsModalRef {
@@ -284,230 +269,11 @@ async saveAppChanges(app) {
     this.brandingService.updateStyleForApp(app);
   }
 
-  assignDashboardName(selectedTemplate) {
+  assignDashboardName(selectedTemplate, dashboardIndex) {
     this.templateSelected = selectedTemplate.dashboardName;
+    this.templateCatalogSetupService.welcomeTemplateSelected.next(this.templateSelected);
+    console.log('this.welcome template data', this.welcomeTemplateData, 'dashboard index', dashboardIndex, this.templateSelected);
     
-  }
-
-
-
-  async loadTemplateDetails(dbDashboard): Promise<Observable<any>> {
-    return this.catalogService.getTemplateDetails(dbDashboard)
-      .pipe(catchError(err => {
-        return this.catalogService.getTemplateDetailsFallBack(dbDashboard);
-      }));
-  }
-
-  async configureApp(app: any) {
-    
-    const currentHost = window.location.host.split(':')[0];
-    // if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
-    //   this.alert.warning("Installation isn't supported when running Application on localhost.");
-    //   return;
-    // }
-
-    // Filter dashboards which are selected
-    let configDataDashboards = this.templateDetails.dashboards.filter(item => item.selected === true);
-    let configDataPlugins = this.templateDetails.plugins.filter(item => item.selected === true);
-    let configDataMicroservices = this.templateDetails.microservices.filter(item => item.selected === true);
-
-    // create Dashboard and install dependencies
-    // Also connect with the devices selected
-    let totalRemotes = configDataPlugins.length;
-    totalRemotes = totalRemotes + configDataMicroservices.length;
-    totalRemotes = totalRemotes + configDataDashboards.length;
-
-
-    const eachRemoteProgress: number = Math.floor((totalRemotes > 1 ? (90 / totalRemotes) : 0));
-    let overallProgress = 0;
-    this.showProgressModalDialog("Verifying dependencies...")
-    
-    if (totalRemotes > 1) { this.progressIndicatorService.setOverallProgress(overallProgress) }
-    this.progressIndicatorService.setOverallProgress(5);
-    for (let plugin of configDataPlugins) {
-      await this.installPlugin(plugin);
-      overallProgress = overallProgress + eachRemoteProgress;
-      this.progressIndicatorService.setOverallProgress(overallProgress);
-    };
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    if (this.isMSEnabled) {
-      for (let ms of configDataMicroservices) {
-        this.progressIndicatorService.setMessage(`Installing ${ms.title}`);
-        this.progressIndicatorService.setProgress(10);
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        const isInstalled = (await this.applicationBinaryService.verifyExistingMicroservices(ms.id)) as any;
-        if (!isInstalled) { await this.installMicroservice(ms); }
-        overallProgress = overallProgress + eachRemoteProgress;
-        this.progressIndicatorService.setOverallProgress(overallProgress)
-      };
-    }
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    let dbClasses = {};
-    if(app.applicationBuilder && app.applicationBuilder.selectedTheme) {
-      dbClasses = {
-        "dashboard-theme-branded": true
-      };
-    }
-    for (let db of configDataDashboards) {
-      this.progressIndicatorService.setProgress(20);
-      this.progressIndicatorService.setMessage(`Installing ${db.title}`);
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-
-      // in case of multiple templates
-
-      let templateDetailsData;
-      let  dashboardTemplates;
-      if (db.welcomeTemplates) {
-         dashboardTemplates =  this.welcomeTemplateData.find(dashboardTemplate => dashboardTemplate.dashboardName === this.templateSelected);
-          if (dashboardTemplates && this.templateSelected === 'Default Template') {
-            templateDetailsData = await (await this.loadTemplateDetails(db.dashboard)).toPromise();
-          } else {
-            templateDetailsData = await (await this.loadTemplateDetails(dashboardTemplates.dashboard)).toPromise();
-          }
-      } else {
-        templateDetailsData = await (await this.loadTemplateDetails(db.dashboard)).toPromise();
-      }
-      const dashboardConfiguration = {
-        dashboardId: '12598412',
-        dashboardName: db.title,
-        dashboardIcon: db.icon,
-        deviceId: '',
-        tabGroup: '',
-        dashboardVisibility: db.visibility,
-        roles: '',
-        templateType: db.templateType, // 0: default, 1: group, 2: type
-        classes: dbClasses
-      };
-
-      this.progressIndicatorService.setProgress(40);
-      templateDetailsData.input.devices = db.devices;
-      if (db.title !== 'Instruction' && db.title !== 'Welcome' && db.title !== 'Help and Support' && db.isConfigRequred) {
-        templateDetailsData.widgets.forEach(widget => {
-          const dbWidgetConfig = db.basicConfig.find(basicConfig => basicConfig.componentId == widget.componentId);
-          if (dbWidgetConfig) {
-            dbWidgetConfig.config.forEach(item => {
-
-              // Works if widget config in global presales is not nested
-              if (item.type === 'select') {
-                if (widget.config && widget.config?.hasOwnProperty(item.fieldName)) {
-                  widget.config[item.fieldName].push(item.name);
-                }
-              } else {
-                if (widget.config && widget.config?.hasOwnProperty(item.fieldName)) {
-                  widget.config[item.fieldName] = item.name;
-                }
-              }
-            })
-          }
-        });
-      }
-      
-      if (db.templateType && db.templateType === 1 && !db.isGroupDashboard) {
-        this.groupTemplate = true;
-      } else if (db.templateType && db.templateType === 2 && !db.isGroupDashboard) {
-        this.groupTemplate = true;
-      } else {
-        this.groupTemplate = false;
-      }
-      await this.catalogService.createDashboard(this.currentApp, dashboardConfiguration, db, templateDetailsData, this.groupTemplate);
-      this.progressIndicatorService.setProgress(90);
-      overallProgress = overallProgress + eachRemoteProgress;
-      this.progressIndicatorService.setOverallProgress(overallProgress)
-    };
-    if (window && window['aptrinsic']) {
-      window['aptrinsic']('track', 'gp_blueprint_forge_template_installed', {
-        "templateName": this.templateDetails.title,
-        "appName": this.currentApp.name,
-        "tenantId": this.settingsService.getTenantName(),
-      });
-    }
-    this.hideProgressModalDialog();
-    if (this.blankTemplateDashboard) {
-      
-       this.next(2);
-       this.next(3);
-    } else {
-        this.next();
-    }
-    
-  }
-
-  async installMicroservice(microService: MicroserviceDetails): Promise<void> {
-    let counter = 10;
-    this.microserviceDownloadProgress$ = this.microserviceDownloadProgress.subscribe(async val => {
-      counter++;
-      if (counter <= 40) {
-        this.progressIndicatorService.setProgress(counter);
-      }
-    });
-
-    const data = await this.templateCatalogSetupService.downloadBinary(microService.link).toPromise();
-    let createdApp = null;
-    this.microserviceDownloadProgress$.unsubscribe();
-    try {
-      this.progressIndicatorService.setProgress(40);
-      this.progressIndicatorService.setMessage(`Installing ${microService.title}`);
-      const blob = new Blob([data], {
-        type: 'application/zip'
-      });
-      const fileName = microService.link.replace(/^.*[\\\/]/, '');
-      const fileOfBlob = new File([blob], fileName);
-
-      const createdApp = await this.applicationBinaryService.createAppForMicroservice(fileOfBlob, microService);
-      this.progressIndicatorService.setProgress(50);
-      counter = 50;
-      this.microserviceDownloadProgress$ = this.microserviceDownloadProgress.subscribe(async val => {
-        counter++;
-        if (counter <= 80) {
-          this.progressIndicatorService.setProgress(counter);
-        }
-      });
-      await this.applicationBinaryService.uploadMicroservice(fileOfBlob, createdApp);
-      this.microserviceDownloadProgress$.unsubscribe();
-      this.progressIndicatorService.setProgress(80);
-      await new Promise(resolve => setTimeout(resolve, 2000));
-    } catch (ex) {
-      createdApp = null;
-      this.alert.danger("There is some technical error! Please try after sometime.");
-      console.error(ex.message);
-    }
-  }
-
-  async installPlugin(plugin: PluginDetails): Promise<void> {
-
-    const widgetBinaryFound = this.appList.find(app => app.manifest?.isPackage && (app.name.toLowerCase() === plugin.title?.toLowerCase() ||
-      (app.contextPath && app.contextPath?.toLowerCase() === plugin?.contextPath?.toLowerCase())));
-    this.progressIndicatorService.setMessage(`Installing ${plugin.title}`);
-    this.progressIndicatorService.setProgress(10);
-    if (widgetBinaryFound) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      this.progressIndicatorService.setProgress(30);
-      await this.widgetCatalogService.updateRemotesInCumulocityJson(widgetBinaryFound, true).then(async () => {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-      }, error => {
-        this.alert.danger("There is some technical error! Please try after sometime.");
-        console.error(error);
-      });
-    } else {
-      this.progressIndicatorService.setProgress(10);
-      const data = await this.templateCatalogSetupService.downloadBinary(plugin.link).toPromise();
-
-      this.progressIndicatorService.setProgress(20);
-      const blob = new Blob([data], {
-        type: 'application/zip'
-      });
-      const fileName = plugin.link.replace(/^.*[\\\/]/, '');
-      const fileOfBlob = new File([blob], fileName);
-      await this.widgetCatalogService.installPackage(fileOfBlob).then(async () => {
-        await new Promise(resolve => setTimeout(resolve, 5000));
-      }, error => {
-        this.alert.danger("There is some technical error! Please try after sometime.");
-        console.error(error);
-      });
-
-    }
   }
 
 

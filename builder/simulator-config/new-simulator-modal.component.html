@@ -93,13 +93,13 @@
                     </span>
                     <span>Existing Device</span>
                 </a>
-                <a class="list-group-item clickable" (click)="isGroup = true; wizard.selectStep('add-group')">
+                <a class="list-group-item clickable" (click)="isGroup = true; appDataService.isGroupDashboardFromSimulator.next(true); wizard.selectStep('add-group')">
                     <span class="list-group-icon">
                         <i c8yIcon="plus-square"></i>
                     </span>
                     <span>New Group</span>
                 </a>
-                <a class="list-group-item clickable" (click)="isGroup = true; wizard.selectStep('select-group')">
+                <a class="list-group-item clickable" (click)="isGroup = true; appDataService.isGroupDashboardFromSimulator.next(true); wizard.selectStep('select-group')">
                     <span class="list-group-icon">
                         <i c8yIcon="object-group"></i>
                     </span>
