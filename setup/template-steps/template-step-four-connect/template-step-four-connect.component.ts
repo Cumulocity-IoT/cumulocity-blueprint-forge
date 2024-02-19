@@ -354,13 +354,17 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       }
       this.appDataService.isGroupDashboardFromSimulator.subscribe(value => this.groupTemplateFromSimulator = value);
 
-      if ((db.templateType && db.templateType === 1 && !db.isGroupDashboard) || (this.groupTemplateFromSimulator &&  !db.isGroupDashboard)) {
+      if ((db.templateType && db.templateType === 1 && !db.isGroupDashboard)) {
         this.groupTemplate = true;
-      } else if ((db.templateType && db.templateType === 2 && !db.isGroupDashboard) || (this.groupTemplateFromSimulator && !db.isGroupDashboard)) {
+      } else if ((db.templateType && db.templateType === 2 && !db.isGroupDashboard)) {
         this.groupTemplate = true;
       } else {
         this.groupTemplate = false;
       }
+
+     if (db?.isGroupDashboardForSimulator) {
+      this.groupTemplate = false;
+     }
       
       await this.catalogService.createDashboard(this.currentApp, dashboardConfiguration, db, templateDetailsData, this.groupTemplate);
       this.progressIndicatorService.setProgress(90);
