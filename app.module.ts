@@ -46,7 +46,6 @@ import { SetupConfigService } from './setup/setup-config.service';
 import { SetupWidgetConfigModalComponent } from './setup/setup-widget-config-modal/setup-widget-config-modal.component';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { TemplateStepFourConnectComponent } from './setup/template-steps/template-step-four-connect/template-step-four-connect.component';
-import { LinkSimulatorDeviceModalComponent } from './setup/simulator-device-modal/link-simulator-device-modal.component';
 import { WizardModule } from './wizard/wizard.module';
 @NgModule({
   declarations: [
@@ -56,7 +55,6 @@ import { WizardModule } from './wizard/wizard.module';
     TemplateStepFourConnectComponent,
     TemplateSetupStepperButtonsComponent,
     SetupWidgetConfigModalComponent,
-    LinkSimulatorDeviceModalComponent,
   ],
   imports: [
     // Upgrade module must be the first
@@ -118,8 +116,6 @@ import { WizardModule } from './wizard/wizard.module';
       ] as SetupStep[]),
     //   { provide: HOOK_SIMULATION_STRATEGY_FACTORY, useClass: DtdlSimulationStrategyFactory, multi: true },
   ],
-  entryComponents: [LinkSimulatorDeviceModalComponent],
-  exports: [LinkSimulatorDeviceModalComponent]
 })
 export class AppModule extends HybridAppModule {
     constructor(protected upgrade: NgUpgradeModule, appStateService: AppStateService, private router: Router, 

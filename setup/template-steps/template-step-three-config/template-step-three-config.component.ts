@@ -67,7 +67,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   dashboardTemplate: any;
   templateSelected: string = 'Default Template';
   isMSEnabled: boolean = false;
-  simulatorSelected: boolean;
   blankTemplateDashboard: boolean;
   welcomeTemplateData: import("c:/Democenter/cumulocity-blueprint-forge/setup/template-setup.model").WelcomeTemplate;
 
@@ -101,7 +100,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   }
 
   ngOnInit() {
-    this.simulatorSelected = false;
     this.templateCatalogSetupService.templateData.subscribe(async currentData => {
       this.isFormValid = this.appConfigForm?.form.valid;
       if (currentData) {

@@ -75,7 +75,6 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
   simulatorSelected: boolean;
   enableSimulator: boolean;
   simulatorModelContent: any;
-  disableSimulatorFromModal: string;
   blankTemplateDashboard: boolean;
   isSpin: boolean = false;
   fileUploadMessage: string;
@@ -125,6 +124,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
   }
 
   ngOnInit() {
+    this.simulatorSelected = false;
     this.enableSimulator = false;
     this.templateCatalogSetupService.templateData.subscribe(async currentData => {
       this.isFormValid = this.appConfigForm?.form.valid;
@@ -174,9 +174,11 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     this.bsModalRef.onHidden.subscribe( value => {
       
         this.appDataService.disableToggleForSimulator.subscribe(value => {
-          this.disableSimulatorFromModal = value;
           const checkBoxForDashboard = <HTMLInputElement>document.getElementById("dashboard-"+index);
-          if (!this.onSaveClicked)        checkBoxForDashboard.checked = false;
+          if (!this.onSaveClicked)        {
+            checkBoxForDashboard.checked = false;
+            this.enableSimulator = false;
+          }
         })
       })
     
@@ -354,17 +356,15 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       }
       this.appDataService.isGroupDashboardFromSimulator.subscribe(value => this.groupTemplateFromSimulator = value);
 
-      if ((db.templateType && db.templateType === 1 && !db.isGroupDashboard)) {
-        this.groupTemplate = true;
-      } else if ((db.templateType && db.templateType === 2 && !db.isGroupDashboard)) {
+
+      // 1. normal dashboard : isGroupDashboard: false
+      // 2. normal but device or group without folder: isGroupDashboard: false
+      // 3. group template -with folder - > isGroupDashboard : true
+      if(db.isGroupDashboard || db.templateType && db.templateType === 2) {
         this.groupTemplate = true;
       } else {
-        this.groupTemplate = false;
+        this. groupTemplate = false;
       }
-
-     if (db?.isGroupDashboardForSimulator) {
-      this.groupTemplate = false;
-     }
       
       await this.catalogService.createDashboard(this.currentApp, dashboardConfiguration, db, templateDetailsData, this.groupTemplate);
       this.progressIndicatorService.setProgress(90);
@@ -392,9 +392,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       this.hideProgressModalDialog();
     } else {
       this.next();
-    
     }
-    
   }
 
   async installMicroservice(microService: MicroserviceDetails): Promise<void> {
@@ -513,7 +511,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
             else if (this.templateDetails.dashboards[dd].isDeviceRequired === true && this.templateDetails.dashboards[dd].linkWithDashboard === dashboard.id) {
               this.templateDetails.dashboards[dd].devices = dashboard.devices;
                deviceFieldNotField = true;
-           } else {
+           }  else if (this.templateDetails.dashboards[dd].isDeviceRequired === true && this.templateDetails.dashboards[dd].linkWithDashboard !== dashboard.id && !dashboard.name) {
                 deviceFieldNotField = false;
                 break;
            }
