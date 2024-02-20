@@ -60,7 +60,7 @@
                         </button>
                         <ul style="max-height: 225px; overflow-y: auto" class="dropdown-menu" *dropdownMenu>
                           <li *ngFor="let selectedWelcomeTemplate of welcomeTemplateData; let st = index">
-                            <button type="button" title="{{selectedWelcomeTemplate.description}}" (click)="assignDashboardName(selectedWelcomeTemplate, i)">
+                            <button type="button" title="{{selectedWelcomeTemplate.description}}" (click)="assignDashboardName(selectedWelcomeTemplate)">
                               {{selectedWelcomeTemplate.dashboardName}}
                             </button>
                           </li>

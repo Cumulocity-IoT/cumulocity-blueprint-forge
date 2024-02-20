@@ -267,11 +267,9 @@ async saveAppChanges(app) {
     this.brandingService.updateStyleForApp(app);
   }
 
-  assignDashboardName(selectedTemplate, dashboardIndex) {
+  assignDashboardName(selectedTemplate) {
     this.templateSelected = selectedTemplate.dashboardName;
     this.templateCatalogSetupService.welcomeTemplateSelected.next(this.templateSelected);
-    console.log('this.welcome template data', this.welcomeTemplateData, 'dashboard index', dashboardIndex, this.templateSelected);
-    
   }
 
 
