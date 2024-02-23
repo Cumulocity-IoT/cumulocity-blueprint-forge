@@ -29,7 +29,7 @@ import { AppDataService } from '../../../builder/app-data.service';
 import { ProgressIndicatorModalComponent } from '../../../builder/utils/progress-indicator-modal/progress-indicator-modal.component';
 import { ProgressIndicatorService } from '../../../builder/utils/progress-indicator-modal/progress-indicator.service';
 import { WidgetCatalogService } from '../../../builder/widget-catalog/widget-catalog.service';
-import { MicroserviceDetails, PluginDetails } from '../../template-setup.model';
+import { MicroserviceDetails, PluginDetails, TemplateBlueprintDetails } from '../../template-setup.model';
 import { ApplicationBinaryService } from '../../../builder/application-binary.service';
 import { TemplateCatalogService } from '../../../builder/template-catalog/template-catalog.service';
 import { DeviceSelectorModalComponent } from '../../../builder/utils/device-selector-modal/device-selector.component';
@@ -46,7 +46,7 @@ import { NewSimulatorModalComponent } from '../../../builder/simulator-config/ne
 })
 export class TemplateStepFourConnectComponent extends TemplateSetupStep implements OnInit {
 
-  templateDetails: any;
+  templateDetails: TemplateBlueprintDetails;
   private progressModal: BsModalRef;
   private appList = [];
   private microserviceDownloadProgress = interval(3000);
@@ -312,7 +312,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
 
       let templateDetailsData;
       let  dashboardTemplates;
-      if (db.welcomeTemplates) {
+      if (db.dashboardTemplate) {
         this.templateCatalogSetupService.welcomeTemplateSelected.subscribe(value => this.templateSelected = value);
          dashboardTemplates =  this.welcomeTemplateData.find(dashboardTemplate => dashboardTemplate.dashboardName === this.templateSelected);
           if (dashboardTemplates && this.templateSelected === 'Default Template') {
@@ -489,6 +489,10 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       });
 
     }
+  }
+
+  private processDashboardLinks() {
+
   }
 
   openDeviceSelectorDialog(dashboard, templateType: number, index) {

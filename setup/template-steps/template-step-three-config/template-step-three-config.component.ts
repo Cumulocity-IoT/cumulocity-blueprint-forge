@@ -44,6 +44,7 @@ import { WidgetCatalogService } from '../../../builder/widget-catalog/widget-cat
 import { DependencyDescription } from '../../../builder/template-catalog/template-catalog.model';
 import { ProgressIndicatorService } from '../../../builder/utils/progress-indicator-modal/progress-indicator.service';
 
+import { TemplateCatalogEntry } from '../../../builder/template-catalog/template-catalog.model';
 @Component({
   selector: 'c8y-template-step-three-config',
   templateUrl: './template-step-three-config.component.html',
@@ -75,7 +76,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   templateSelected: string = 'Default Template';
   isMSEnabled: boolean = false;
   blankTemplateDashboard: boolean;
-  welcomeTemplateData: import("c:/Democenter/cumulocity-blueprint-forge/setup/template-setup.model").WelcomeTemplate;
+  welcomeTemplateData: TemplateCatalogEntry;
   templatesFromDC: any;
   filterNames: any[];
   selectedDashboardName: any;
@@ -142,9 +143,11 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   ngAfterViewInit() {
     this.verifyStepCompleted();
   }
+
   syncDashboardFlag(event, index) {
     this.templateDetails.dashboards[index].selected = event.target.checked;
   }
+  
   syncPluginFlag(event, index) {
     this.templateDetails.plugins[index].selected = event.target.checked;
   }
