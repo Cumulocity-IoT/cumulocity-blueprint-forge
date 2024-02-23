@@ -80,6 +80,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
   fileUploadMessage: string;
   onSaveClicked: boolean = false;
   groupTemplateFromSimulator: boolean;
+  indexOfDashboardUpdatedFromDC: any;
 
 
   constructor(
@@ -146,6 +147,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
   }
 
   async toggleToEnableSimulator(event, dashboard, index) {
+    this.indexOfDashboardUpdatedFromDC = index;
     this.simulatorSelected = true;
     this.enableSimulator = event.target.checked;
     if (this.enableSimulator) {
@@ -251,10 +253,10 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       return;
     } 
       const currentHost = window.location.host.split(':')[0];
-    if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
-      this.alert.warning("Installation isn't supported when running Application on localhost.");
-      return;
-    }
+    // if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
+    //   this.alert.warning("Installation isn't supported when running Application on localhost.");
+    //   return;
+    // }
 
     // Filter dashboards which are selected
     let configDataDashboards = this.templateDetails.dashboards.filter(item => item.selected === true);
@@ -299,7 +301,8 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
         "dashboard-theme-branded": true
       };
     }
-    for (let db of configDataDashboards) {
+    for (let [index, db] of configDataDashboards.entries()) {
+      console.log('index', index, 'db value', db);
       this.progressIndicatorService.setProgress(20);
       this.progressIndicatorService.setMessage(`Installing ${db.title}`);
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -365,7 +368,24 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       } else {
         this. groupTemplate = false;
       }
+
+      if (index === this.indexOfDashboardUpdatedFromDC) {
+        this.templateCatalogSetupService.dynamicDashboardTemplate.subscribe(value => {
+          console.log('value of template', value, 'db', db);
+          db.dashboard = value.dashboard;
+          console.log('db after assigning', db);
+        });
+        this.templateCatalogSetupService.dynamicDashboardTemplateDetails.subscribe(value => {
+          console.log('value of template details', value, 'template details data', templateDetailsData);
+          templateDetailsData.input.dependencies = JSON.parse(JSON.stringify(value.input.dependencies));
+          templateDetailsData.input.images = JSON.parse(JSON.stringify(value.input.images));
+          templateDetailsData.widgets = JSON.parse(JSON.stringify(value.widgets));
+          // templateDetailsData = JSON.parse(JSON.stringify(value));
+          // console.log('template details data after assigining', templateDetailsData);
+        })
+      }
       
+      // console.log('this.templateDetails in step four', this.templateDetails, 'templateDetailsData', templateDetailsData, 'db', db);
       await this.catalogService.createDashboard(this.currentApp, dashboardConfiguration, db, templateDetailsData, this.groupTemplate);
       this.progressIndicatorService.setProgress(90);
       overallProgress = overallProgress + eachRemoteProgress;
@@ -472,6 +492,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
   }
 
   openDeviceSelectorDialog(dashboard, templateType: number, index) {
+    this.indexOfDashboardUpdatedFromDC = index;
     this.simulatorSelected = false;
     switch (templateType) {
       case 1:
