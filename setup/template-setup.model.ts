@@ -128,10 +128,11 @@ export interface DashboardWidgets {
 } 
 
 export interface DashboardLink {
-    dashboardId: string;
+    dashboardName: string;
     updatableProperty?: string;
-    targetDashboardId: string;
+    targetDashboardName: string;
     targetProperty?: string;
+    widgetComponentId?: string;
 }
 
 export interface WidgetDetail {
