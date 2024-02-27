@@ -24,12 +24,12 @@ import { catchError } from "rxjs/operators";
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Observable, Subscription, interval } from 'rxjs';
 import { tap } from "rxjs/operators";
-import { ApplicationService, IApplication, IManagedObject } from '@c8y/client';
+import { ApplicationService, IApplication, IManagedObject, InventoryService } from '@c8y/client';
 import { AppDataService } from '../../../builder/app-data.service';
 import { ProgressIndicatorModalComponent } from '../../../builder/utils/progress-indicator-modal/progress-indicator-modal.component';
 import { ProgressIndicatorService } from '../../../builder/utils/progress-indicator-modal/progress-indicator.service';
 import { WidgetCatalogService } from '../../../builder/widget-catalog/widget-catalog.service';
-import { MicroserviceDetails, PluginDetails, TemplateBlueprintDetails } from '../../template-setup.model';
+import { Dashboards, MicroserviceDetails, PluginDetails, TemplateBlueprintDetails } from '../../template-setup.model';
 import { ApplicationBinaryService } from '../../../builder/application-binary.service';
 import { TemplateCatalogService } from '../../../builder/template-catalog/template-catalog.service';
 import { DeviceSelectorModalComponent } from '../../../builder/utils/device-selector-modal/device-selector.component';
@@ -38,6 +38,7 @@ import { SetupConfigService } from '../../setup-config.service';
 import { SettingsService } from '../../../builder/settings/settings.service';
 import { DOCUMENT } from '@angular/common';
 import { NewSimulatorModalComponent } from '../../../builder/simulator-config/new-simulator-modal.component';
+import * as _ from 'lodash';
 @Component({
   selector: 'c8y-template-step-four-connect',
   templateUrl: './template-step-four-connect.component.html',
@@ -89,7 +90,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     protected setup: SetupComponent,
     protected appState: AppStateService,
     protected alert: AlertService,
-    private templateCatalogSetupService: TemplateCatalogSetupService,
+    private templateCatalogSetupService: TemplateCatalogSetupService, private invService: InventoryService,
     private modalService: BsModalService, private applicationBinaryService: ApplicationBinaryService,
     private appService: ApplicationService,
     private appDataService: AppDataService, private widgetCatalogService: WidgetCatalogService,
@@ -404,6 +405,10 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       overallProgress = overallProgress + eachRemoteProgress;
       this.progressIndicatorService.setOverallProgress(overallProgress)
     };
+    await this.processDashboardLinks();
+    await this.progressIndicatorService.setProgress(95);
+    overallProgress = overallProgress + eachRemoteProgress;
+    this.progressIndicatorService.setOverallProgress(overallProgress)
     if (window && window['aptrinsic']) {
       window['aptrinsic']('track', 'gp_blueprint_forge_template_installed', {
         "templateName": this.templateDetails.title,
@@ -504,8 +509,36 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     }
   }
 
-  private processDashboardLinks() {
-
+  //Processing dashboardlinks for dashboard navigations
+  private async processDashboardLinks() {
+    if(this.templateDetails.dashboardLinks && this.templateDetails.dashboardLinks.length > 0){
+      if(this.currentApp.id) {   
+        this.progressIndicatorService.setMessage(`Updating Dashboard links`);
+        const app: any  = await (await this.appDataService.getAppDetails(this.currentApp.id + "")).toPromise();
+            if(app.applicationBuilder && app.applicationBuilder?.dashboards && app.applicationBuilder?.dashboards.length > 0){
+                let dashboards = app.applicationBuilder.dashboards;
+                for(let dbLinks of this.templateDetails.dashboardLinks) {
+                  const updatableDashboardId = dashboards.find( db => db.name === dbLinks.dashboardName)?.id;
+                  const targetDashboardId = dashboards.find( db => db.name === dbLinks.targetDashboardName)?.id;
+                  if(updatableDashboardId && targetDashboardId){
+                    const updatableDashboardObj = (await this.invService.detail(updatableDashboardId)).data?.c8y_Dashboard;
+                    if(updatableDashboardObj) {
+                      const keys = Object.keys(updatableDashboardObj.children);
+                      keys.forEach( (key, idx) => {
+                        if(updatableDashboardObj?.children[key]?.componentId ==dbLinks.widgetComponentId) {
+                          _.set( updatableDashboardObj.children[key],dbLinks.updatableProperty, targetDashboardId);
+                        } 
+                      });
+                      await this.invService.update({
+                        id: updatableDashboardId,
+                        "c8y_Dashboard": updatableDashboardObj
+                    });
+                  }
+                }
+                }  
+            }
+        };
+      }
   }
 
   openDeviceSelectorDialog(dashboard, templateType: number, index) {
