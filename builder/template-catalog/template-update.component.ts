@@ -118,6 +118,23 @@ export class TemplateUpdateModalComponent implements OnInit {
         
     }
 
+    private configureTemplateType(templateType: number) {
+        switch (templateType) {
+            case 1:
+                this.assetButtonText = "Device Group";
+                this.groupTemplate = true;
+                break;
+            case 2:
+                this.assetButtonText = "Device/Asset Type";
+                this.groupTemplate = true;
+                break;
+            default:
+                this.assetButtonText = "Device/Asset";
+                this.groupTemplate = false;
+                break;
+        }
+    }
+
     openDeviceSelectorDialog(device: any, index: number, templateType: number): void {
         switch (templateType) {
             case 1:

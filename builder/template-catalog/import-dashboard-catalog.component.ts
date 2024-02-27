@@ -186,7 +186,7 @@ export class ImportDashboardCatalogModalComponent implements OnInit {
 
     private async processingTemplate(dashboardObj: any) {
         if(dashboardObj && dashboardObj.children && Object.keys(dashboardObj.children).length > 0) {
-            const widCatalog = await this.getWidgetCatalog();
+            const widCatalog:any = await (await this.widgetCatalogService.fetchWidgetCatalog()).toPromise();
             const keys = Object.keys(dashboardObj.children);
             let devicePlaceholder = [];
             keys.forEach( (key, idx) => {
@@ -261,14 +261,5 @@ export class ImportDashboardCatalogModalComponent implements OnInit {
                 }
             });
         }
-    }
-
-    private getWidgetCatalog():Promise<any>{
-        return new Promise((resolve,reject)=>{
-            this.widgetCatalogService.fetchWidgetCatalog().subscribe(response => {
-                // this.widgetCatalog=response;
-                resolve(response);
-            }, error => {reject(error)});
-        });
     }
 }
