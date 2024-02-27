@@ -17,19 +17,19 @@
  */
 import { CdkStep } from '@angular/cdk/stepper';
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
-import { AlertService, AppStateService, C8yStepper, SetupComponent } from '@c8y/ngx-components';
+import { AlertService, AppStateService, C8yStepper, PluginsService, SetupComponent } from '@c8y/ngx-components';
 import { TemplateSetupStep } from '../../template-setup-step';
 import { TemplateCatalogSetupService } from '../../template-catalog-setup.service';
 import { catchError } from "rxjs/operators";
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { Observable, Subscription, interval } from 'rxjs';
 import { tap } from "rxjs/operators";
-import { ApplicationService, IApplication, IManagedObject } from '@c8y/client';
+import { ApplicationService, IApplication, IManagedObject, InventoryService } from '@c8y/client';
 import { AppDataService } from '../../../builder/app-data.service';
 import { ProgressIndicatorModalComponent } from '../../../builder/utils/progress-indicator-modal/progress-indicator-modal.component';
 import { ProgressIndicatorService } from '../../../builder/utils/progress-indicator-modal/progress-indicator.service';
 import { WidgetCatalogService } from '../../../builder/widget-catalog/widget-catalog.service';
-import { MicroserviceDetails, PluginDetails } from '../../template-setup.model';
+import { Dashboards, MicroserviceDetails, PluginDetails, TemplateBlueprintDetails } from '../../template-setup.model';
 import { ApplicationBinaryService } from '../../../builder/application-binary.service';
 import { TemplateCatalogService } from '../../../builder/template-catalog/template-catalog.service';
 import { DeviceSelectorModalComponent } from '../../../builder/utils/device-selector-modal/device-selector.component';
@@ -38,6 +38,7 @@ import { SetupConfigService } from '../../setup-config.service';
 import { SettingsService } from '../../../builder/settings/settings.service';
 import { DOCUMENT } from '@angular/common';
 import { NewSimulatorModalComponent } from '../../../builder/simulator-config/new-simulator-modal.component';
+import * as _ from 'lodash';
 @Component({
   selector: 'c8y-template-step-four-connect',
   templateUrl: './template-step-four-connect.component.html',
@@ -46,7 +47,7 @@ import { NewSimulatorModalComponent } from '../../../builder/simulator-config/ne
 })
 export class TemplateStepFourConnectComponent extends TemplateSetupStep implements OnInit {
 
-  templateDetails: any;
+  templateDetails: TemplateBlueprintDetails;
   private progressModal: BsModalRef;
   private appList = [];
   private microserviceDownloadProgress = interval(3000);
@@ -75,12 +76,12 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
   simulatorSelected: boolean;
   enableSimulator: boolean;
   simulatorModelContent: any;
-  disableSimulatorFromModal: string;
   blankTemplateDashboard: boolean;
   isSpin: boolean = false;
   fileUploadMessage: string;
   onSaveClicked: boolean = false;
   groupTemplateFromSimulator: boolean;
+  indexOfDashboardUpdatedFromDC: any;
 
 
   constructor(
@@ -89,14 +90,14 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     protected setup: SetupComponent,
     protected appState: AppStateService,
     protected alert: AlertService,
-    private templateCatalogSetupService: TemplateCatalogSetupService,
+    private templateCatalogSetupService: TemplateCatalogSetupService, private invService: InventoryService,
     private modalService: BsModalService, private applicationBinaryService: ApplicationBinaryService,
     private appService: ApplicationService,
     private appDataService: AppDataService, private widgetCatalogService: WidgetCatalogService,
     private progressIndicatorService: ProgressIndicatorService, private catalogService: TemplateCatalogService,
     @Inject(DOCUMENT) private document: Document, private deviceSelectorModalRef: BsModalRef, 
     private appStateService: AppStateService, protected setupConfigService: SetupConfigService, 
-    private settingsService: SettingsService,
+    private settingsService: SettingsService, private pluginsService: PluginsService
     
   ) {
     
@@ -125,6 +126,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
   }
 
   ngOnInit() {
+    this.simulatorSelected = false;
     this.enableSimulator = false;
     this.templateCatalogSetupService.templateData.subscribe(async currentData => {
       this.isFormValid = this.appConfigForm?.form.valid;
@@ -143,9 +145,13 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     this.templateCatalogSetupService.welcomeTemplateData.subscribe(welcomeTemplateData => {
       this.welcomeTemplateData = welcomeTemplateData;
     });
+    this.templateCatalogSetupService.dynamicDashboardTemplateDetails.subscribe(value => {
+      console.log('TEmplate details from dashboard catalog in step four', value);
+    })
   }
 
   async toggleToEnableSimulator(event, dashboard, index) {
+    this.indexOfDashboardUpdatedFromDC = index;
     this.simulatorSelected = true;
     this.enableSimulator = event.target.checked;
     if (this.enableSimulator) {
@@ -174,9 +180,11 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     this.bsModalRef.onHidden.subscribe( value => {
       
         this.appDataService.disableToggleForSimulator.subscribe(value => {
-          this.disableSimulatorFromModal = value;
           const checkBoxForDashboard = <HTMLInputElement>document.getElementById("dashboard-"+index);
-          if (!this.onSaveClicked)        checkBoxForDashboard.checked = false;
+          if (!this.onSaveClicked)        {
+            checkBoxForDashboard.checked = false;
+            this.enableSimulator = false;
+          }
         })
       })
     
@@ -249,10 +257,25 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       return;
     } 
       const currentHost = window.location.host.split(':')[0];
-    if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
-      this.alert.warning("Installation isn't supported when running Application on localhost.");
-      return;
-    }
+    // if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
+    //   this.alert.warning("Installation isn't supported when running Application on localhost.");
+    //   return;
+    // }  
+
+    this.templateCatalogSetupService.dynamicDashboardTemplateDetails.subscribe(value => {
+      this.templateDetails.plugins = this.templateDetails.plugins.concat(value.input.dependencies);
+    });
+ 
+   this.templateDetails.plugins = this.templateDetails.plugins.reduce((accumulator, current)=> {
+      if (!accumulator.find((item) => item.id === current.id)) {
+        current.selected = true;
+        if (this.widgetCatalogService.isCompatiblieVersion(current) ) {
+          accumulator.push(current);
+        }
+      }
+      return accumulator;
+    }, []);
+
 
     // Filter dashboards which are selected
     let configDataDashboards = this.templateDetails.dashboards.filter(item => item.selected === true);
@@ -272,8 +295,10 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     
     if (totalRemotes > 1) { this.progressIndicatorService.setOverallProgress(overallProgress) }
     this.progressIndicatorService.setOverallProgress(5);
+    const listOfPackages = await this.pluginsService.listPackages();
     for (let plugin of configDataPlugins) {
-      await this.installPlugin(plugin);
+      console.log('config data plugins value', configDataPlugins);
+      await this.installPlugin(plugin, listOfPackages);
       overallProgress = overallProgress + eachRemoteProgress;
       this.progressIndicatorService.setOverallProgress(overallProgress);
     };
@@ -297,7 +322,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
         "dashboard-theme-branded": true
       };
     }
-    for (let db of configDataDashboards) {
+    for (let [index, db] of configDataDashboards.entries()) {
       this.progressIndicatorService.setProgress(20);
       this.progressIndicatorService.setMessage(`Installing ${db.title}`);
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -307,7 +332,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
 
       let templateDetailsData;
       let  dashboardTemplates;
-      if (db.welcomeTemplates) {
+      if (db.dashboardTemplate) {
         this.templateCatalogSetupService.welcomeTemplateSelected.subscribe(value => this.templateSelected = value);
          dashboardTemplates =  this.welcomeTemplateData.find(dashboardTemplate => dashboardTemplate.dashboardName === this.templateSelected);
           if (dashboardTemplates && this.templateSelected === 'Default Template') {
@@ -354,23 +379,36 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       }
       this.appDataService.isGroupDashboardFromSimulator.subscribe(value => this.groupTemplateFromSimulator = value);
 
-      if ((db.templateType && db.templateType === 1 && !db.isGroupDashboard)) {
-        this.groupTemplate = true;
-      } else if ((db.templateType && db.templateType === 2 && !db.isGroupDashboard)) {
+
+      // 1. normal dashboard : isGroupDashboard: false
+      // 2. normal but device or group without folder: isGroupDashboard: false
+      // 3. group template -with folder - > isGroupDashboard : true
+      if(db.isGroupDashboard || db.templateType && db.templateType === 2) {
         this.groupTemplate = true;
       } else {
-        this.groupTemplate = false;
+        this. groupTemplate = false;
       }
 
-     if (db?.isGroupDashboardForSimulator) {
-      this.groupTemplate = false;
-     }
+      if (index === this.indexOfDashboardUpdatedFromDC) {
+        this.templateCatalogSetupService.dynamicDashboardTemplate.subscribe(value => {
+          db.dashboard = value.dashboard;
+        });
+        this.templateCatalogSetupService.dynamicDashboardTemplateDetails.subscribe(value => {
+          templateDetailsData.input.dependencies = JSON.parse(JSON.stringify(value.input.dependencies));
+          templateDetailsData.input.images = JSON.parse(JSON.stringify(value.input.images));
+          templateDetailsData.widgets = JSON.parse(JSON.stringify(value.widgets));
+        })
+      }
       
       await this.catalogService.createDashboard(this.currentApp, dashboardConfiguration, db, templateDetailsData, this.groupTemplate);
       this.progressIndicatorService.setProgress(90);
       overallProgress = overallProgress + eachRemoteProgress;
       this.progressIndicatorService.setOverallProgress(overallProgress)
     };
+    await this.processDashboardLinks();
+    await this.progressIndicatorService.setProgress(95);
+    overallProgress = overallProgress + eachRemoteProgress;
+    this.progressIndicatorService.setOverallProgress(overallProgress)
     if (window && window['aptrinsic']) {
       window['aptrinsic']('track', 'gp_blueprint_forge_template_installed', {
         "templateName": this.templateDetails.title,
@@ -392,9 +430,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       this.hideProgressModalDialog();
     } else {
       this.next();
-    
     }
-    
   }
 
   async installMicroservice(microService: MicroserviceDetails): Promise<void> {
@@ -438,9 +474,9 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     }
   }
 
-  async installPlugin(plugin: PluginDetails): Promise<void> {
-
-    const widgetBinaryFound = this.appList.find(app => app.manifest?.isPackage && (app.name.toLowerCase() === plugin.title?.toLowerCase() ||
+  async installPlugin(plugin: PluginDetails, listOfPlugins: IApplication[]): Promise<void> {
+    console.log('List of plugins', listOfPlugins);
+    const widgetBinaryFound = listOfPlugins.find(app => (app.name.toLowerCase() === plugin.title?.toLowerCase() ||
       (app.contextPath && app.contextPath?.toLowerCase() === plugin?.contextPath?.toLowerCase())));
     this.progressIndicatorService.setMessage(`Installing ${plugin.title}`);
     this.progressIndicatorService.setProgress(10);
@@ -473,7 +509,40 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     }
   }
 
+  //Processing dashboardlinks for dashboard navigations
+  private async processDashboardLinks() {
+    if(this.templateDetails.dashboardLinks && this.templateDetails.dashboardLinks.length > 0){
+      if(this.currentApp.id) {   
+        this.progressIndicatorService.setMessage(`Updating Dashboard links`);
+        const app: any  = await (await this.appDataService.getAppDetails(this.currentApp.id + "")).toPromise();
+            if(app.applicationBuilder && app.applicationBuilder?.dashboards && app.applicationBuilder?.dashboards.length > 0){
+                let dashboards = app.applicationBuilder.dashboards;
+                for(let dbLinks of this.templateDetails.dashboardLinks) {
+                  const updatableDashboardId = dashboards.find( db => db.name === dbLinks.dashboardName)?.id;
+                  const targetDashboardId = dashboards.find( db => db.name === dbLinks.targetDashboardName)?.id;
+                  if(updatableDashboardId && targetDashboardId){
+                    const updatableDashboardObj = (await this.invService.detail(updatableDashboardId)).data?.c8y_Dashboard;
+                    if(updatableDashboardObj) {
+                      const keys = Object.keys(updatableDashboardObj.children);
+                      keys.forEach( (key, idx) => {
+                        if(updatableDashboardObj?.children[key]?.componentId ==dbLinks.widgetComponentId) {
+                          _.set( updatableDashboardObj.children[key],dbLinks.updatableProperty, targetDashboardId);
+                        } 
+                      });
+                      await this.invService.update({
+                        id: updatableDashboardId,
+                        "c8y_Dashboard": updatableDashboardObj
+                    });
+                  }
+                }
+                }  
+            }
+        };
+      }
+  }
+
   openDeviceSelectorDialog(dashboard, templateType: number, index) {
+    this.indexOfDashboardUpdatedFromDC = index;
     this.simulatorSelected = false;
     switch (templateType) {
       case 1:
@@ -513,7 +582,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
             else if (this.templateDetails.dashboards[dd].isDeviceRequired === true && this.templateDetails.dashboards[dd].linkWithDashboard === dashboard.id) {
               this.templateDetails.dashboards[dd].devices = dashboard.devices;
                deviceFieldNotField = true;
-           } else {
+           }  else if (this.templateDetails.dashboards[dd].isDeviceRequired === true && this.templateDetails.dashboards[dd].linkWithDashboard !== dashboard.id && !dashboard.name) {
                 deviceFieldNotField = false;
                 break;
            }

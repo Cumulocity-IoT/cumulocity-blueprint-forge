@@ -20,12 +20,12 @@
 export interface TemplateCatalogEntry {
     title: string;
     description: string;
-    thumbnail: string;
+    thumbnail?: string;
     device?: string;
     manufactur?: string;
-    useCase: string;
+    useCase?: string;
     dashboard: string;
-    comingSoon: boolean;
+    comingSoon?: boolean;
     availability?: string;
     templateDetails?: TemplateDetails; // For Import templates
     thumbnailBinaryId?: any;
