@@ -25,6 +25,7 @@ import { TemplateCatalogService } from "./template-catalog.service";
 import { ProgressIndicatorModalComponent } from "../utils/progress-indicator-modal/progress-indicator-modal.component";
 import { ProgressIndicatorService } from "../utils/progress-indicator-modal/progress-indicator.service";
 import { AlertMessageModalComponent } from "../utils/alert-message-modal/alert-message-modal.component";
+import { WidgetCatalogService } from "../widget-catalog/widget-catalog.service";
 
 @Component({
     selector: 'import-dashboard-catalog',
@@ -59,16 +60,17 @@ export class ImportDashboardCatalogModalComponent implements OnInit {
     thumbnailPreviewImageURL: any = "";
     helpTemplatePopoverText = `
     <p class="m-b-8"><b>Share within tenant</b> availability will instantly make the dashboard visible within the tenant in the Dashboard Catalog.</p>
-    <p class="m-b-8"><b>Share with market</b> availability will make dashboard to visible publicly and become a permanent part of the Dashboard Catalog once approved. The approval process may take up to 5 working days. If not approved, users can seek support from the Tech Community.</p>
+    <p class="m-b-8"><b>Export Template</b> availability will instantly download dashboard template in json format, which can further be used to import in any tenant.</p>
     `;
-    
+    //for share with market
+    //<p class="m-b-8"><b>Share with market</b> availability will make dashboard to visible publicly and become a permanent part of the Dashboard Catalog once approved. The approval process may take up to 5 working days. If not approved, users can seek support from the Tech Community.</p>
     private previewImageFile: File;
     private thumbnailImageFile: File;
     private progressModal: BsModalRef;
 
     constructor(private modalRef: BsModalRef, private templateCatalogService: TemplateCatalogService,
-        private sanitizer: DomSanitizer,private invService: InventoryService, 
-        private modalService: BsModalService,private progressIndicatorService: ProgressIndicatorService) {}
+        private sanitizer: DomSanitizer,private invService: InventoryService,
+        private modalService: BsModalService,private progressIndicatorService: ProgressIndicatorService, private widgetCatalogService: WidgetCatalogService) {}
 
     async ngOnInit() {
         if(this.dashboardId) {
@@ -96,8 +98,8 @@ export class ImportDashboardCatalogModalComponent implements OnInit {
 
     async onSaveButtonClicked() {
         this.dashboardDetail.description = this.importDashboard.description;
-        this.showProgressModalDialog('Uploading images ...');
-        if(this.importDashboard.availability === 'SHARED'){
+        if (this.importDashboard.availability === 'SHARED') {
+            this.showProgressModalDialog('Uploading images ...');
             this.importDashboard.thumbnailBinaryId = (this.thumbnailImageFile ? await (this.templateCatalogService.uploadImage(this.thumbnailImageFile)) : "");
             this.progressIndicatorService.setOverallProgress(30);
             this.dashboardDetail.previewBinaryId = ( this.previewImageFile ? await (this.templateCatalogService.uploadImage(this.previewImageFile)) : "");
@@ -119,26 +121,55 @@ export class ImportDashboardCatalogModalComponent implements OnInit {
                 }
                 this.alertModalDialog(alertMessage);
             })
-            .catch(err => {
-                this.hideProgressModalDialog();
-                const alertMessage = {
-                    title: 'Error!',
-                    description: `Unable to import your dashboard into the Dashboard Catalog.`,
-                    type: 'danger',
-                    alertType: 'info', //info|confirm
-                }
-                this.alertModalDialog(alertMessage);
-            });
+                .catch(err => {
+                    this.hideProgressModalDialog();
+                    const alertMessage = {
+                        title: 'Error!',
+                        description: `Unable to import your dashboard into the Dashboard Catalog.`,
+                        type: 'danger',
+                        alertType: 'info', //info|confirm
+                    }
+                    this.alertModalDialog(alertMessage);
+                });
+        }
+        else if (this.importDashboard.availability === 'EXPORT') {
+            const thumbnailBase64 = this.thumbnailImageFile ? await (this.toBase64(this.thumbnailImageFile)) : "";
+            this.importDashboard.thumbnail = thumbnailBase64.toString();
+            const previewBase64 = this.previewImageFile ? await (this.toBase64(this.previewImageFile)) : "";
+            this.dashboardDetail.preview = previewBase64.toString();
+            this.importDashboard.templateDetails = this.dashboardDetail;
+            let importDashboardJson = JSON.stringify(this.importDashboard, null, 4);
+            let importDashboardBlob: Blob = new Blob([importDashboardJson], { type: 'application/json' });
+            this.download(importDashboardBlob);
         }
         this.modalRef.hide();
     }
 
+    toBase64 = (file: File) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = (error) => reject(error);
+        });
+    }
+
+    download(blob: Blob) {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `${this.importDashboard.title}_dashboard.json`;
+        link.click();
+        URL.revokeObjectURL(url);
+        link.remove();
+    }
+
     isImportButtonEnabled() {
-       return (this.importDashboard.title && this.importDashboard.title.length >= 0 &&
-        this.importDashboard.description && this.importDashboard.availability && 
-        ( this.importDashboard.availability === 'SHARED' || (
-            this.importDashboard.availability === 'MARKET' && this.previewImageFile &&  this.thumbnailImageFile
-        )));
+        return (this.importDashboard.title && this.importDashboard.title.length >= 0 &&
+            this.importDashboard.description && this.importDashboard.availability &&
+            ( this.importDashboard.availability === 'SHARED' || this.importDashboard.availability === 'EXPORT' || (
+                this.importDashboard.availability === 'MARKET' && this.previewImageFile &&  this.thumbnailImageFile
+            )));
     }
 
     private showProgressModalDialog(message: string): void {
@@ -153,40 +184,48 @@ export class ImportDashboardCatalogModalComponent implements OnInit {
         this.progressModal.hide();
     }
 
-    private processingTemplate(dashboardObj: any) {
+    private async processingTemplate(dashboardObj: any) {
         if(dashboardObj && dashboardObj.children && Object.keys(dashboardObj.children).length > 0) {
+            const widCatalog = await this.getWidgetCatalog();
             const keys = Object.keys(dashboardObj.children);
             let devicePlaceholder = [];
             keys.forEach( (key, idx) => {
                 const children = dashboardObj.children[key];
-                
+
                 // Processing device placeholders
                 const config = children.config;
                 if(config.device) { devicePlaceholder.push({
-                    ...config.device,
-                    placeholder: 'Device' + idx
-                })}
+                        ...config.device,
+                        placeholder: 'Device' + idx
+                    })}
                 if(config.datapoints && config.datapoints.length > 0) {
                     config.datapoints.forEach((dp, index) => {
                         devicePlaceholder.push({
                             ...dp.__target,
                             placeholder: 'DeviceTarget' + index
                         });
-                        
+
                     });
                 }
 
                 // Processing dashboardDetails -> Input -> Dependencies
-                this.dashboardDetail.input.dependencies.push({
-                    id: children.componentId,
-                    title: children.title,
-                    repository: "",
-                    link:""
-                })
-
+                if (widCatalog && widCatalog.widgets && widCatalog.widgets.length > 0) {
+                    let widget = widCatalog.widgets.find(widget => widget.id === children.componentId && this.widgetCatalogService.isCompatiblieVersion(widget))
+                    if (widget) {
+                        this.dashboardDetail.input.dependencies.push(widget);
+                    } 
+                    else {
+                        this.dashboardDetail.input.dependencies.push({
+                            id: children.componentId,
+                            title: children.title,
+                            repository: "",
+                            link:""
+                        })
+                    }
+                }
                 // Processing dashboardDetails -> widgets
                 this.dashboardDetail.widgets.push(children);
-                
+
             })
             this.dashboardDetail.input.dependencies = [...new Map(this.dashboardDetail.input.dependencies.map(v => [v.id, v])).values()]
             devicePlaceholder = [...new Map(devicePlaceholder.map(v => [v.id, v])).values()]
@@ -215,12 +254,21 @@ export class ImportDashboardCatalogModalComponent implements OnInit {
                                 if( deviceDP.__target && deviceDP.__target.id === dPlaceholder.id) {
                                     deviceDP.__target.id = `{{${dPlaceholder.placeholder}.id}}`;
                                     deviceDP.__target.name = `{{${dPlaceholder.placeholder}.name}}`
-                                }        
+                                }
                             });
                         }
                     })
                 }
             });
         }
+    }
+
+    private getWidgetCatalog():Promise<any>{
+        return new Promise((resolve,reject)=>{
+            this.widgetCatalogService.fetchWidgetCatalog().subscribe(response => {
+                // this.widgetCatalog=response;
+                resolve(response);
+            }, error => {reject(error)});
+        });
     }
 }

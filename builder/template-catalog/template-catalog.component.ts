@@ -19,7 +19,7 @@
 import { Component, OnInit, ViewEncapsulation } from "@angular/core";
 import { DomSanitizer } from "@angular/platform-browser";
 import {cloneDeep} from "lodash-es";
-import { ApplicationService, IApplication, IManagedObject } from '@c8y/client';
+import { ApplicationService, IApplication, IManagedObject, InventoryService } from '@c8y/client';
 import { DeviceSelectorModalComponent } from "../utils/device-selector-modal/device-selector.component";
 import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
 import { DependencyDescription, TemplateCatalogEntry, TemplateDetails } from "./template-catalog.model";
@@ -106,11 +106,15 @@ export class TemplateCatalogModalComponent implements OnInit {
     isPreviewLoading: boolean = false;
     isThumbnailLoading: boolean = false;
 
+    fileSelected: File;
+    fileJson:any;
+    importLoading:boolean=false;
+
     constructor(private modalService: BsModalService, private modalRef: BsModalRef, private appService: ApplicationService,
         private catalogService: TemplateCatalogService, private componentService: DynamicComponentService,
         private alertService: AlertService, private widgetCatalogService: WidgetCatalogService,
         private applicationBinaryService: ApplicationBinaryService, private sanitizer: DomSanitizer,
-        private accessRightsService: AccessRightsService, private progressIndicatorService: ProgressIndicatorService) {
+        private accessRightsService: AccessRightsService, private progressIndicatorService: ProgressIndicatorService,private invService: InventoryService) {
         this.onSave = new Subject();
         this.onCancel = new Subject();
     }
@@ -152,14 +156,16 @@ export class TemplateCatalogModalComponent implements OnInit {
                 this.filterTemplates = (this.templates ? this.templates : []);
                 this.filterTemplates.forEach(template => {
                     if ((template.thumbnail && template?.thumbnail != '')  || (template.thumbnailBinaryId && template.thumbnailBinaryId !='')) {
-                        if(template.availability && template.availability === "SHARED"){
-                            this.isThumbnailLoading = true;
-                            this.catalogService.downloadBinaryFromFileRepo(template.thumbnailBinaryId).
-                            then(async (res: { blob: () => Promise<any>; }) => {
-                                this.isThumbnailLoading = false;
-                                const blb = await res.blob();
-                                template.thumbnail = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(blb)) as any;
-                            });
+                        if(template.availability && (template.availability === "SHARED" || template.availability === 'EXPORT')){
+                            if (template.thumbnailBinaryId) {
+                                this.isThumbnailLoading = true;
+                                this.catalogService.downloadBinaryFromFileRepo(template.thumbnailBinaryId).
+                                    then(async (res: { blob: () => Promise<any>; }) => {
+                                        this.isThumbnailLoading = false;
+                                        const blb = await res.blob();
+                                        template.thumbnail = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(blb)) as any;
+                                    });
+                            }
                         } else {
                             template.thumbnail = this.catalogService.getGithubURL(template.thumbnail);
                         }
@@ -178,17 +184,19 @@ export class TemplateCatalogModalComponent implements OnInit {
     }
 
     async loadTemplateDetails(template: TemplateCatalogEntry): Promise<void> {
-        if(template.availability && template.availability === 'SHARED') {
+        if(template.availability && (template.availability === 'SHARED' || template.availability === 'EXPORT') ) {
             this.templateDetails = null;
             this.templateDetails = cloneDeep(template.templateDetails);
             if (this.templateDetails.preview || this.templateDetails.previewBinaryId) {
-                this.isPreviewLoading = true;
-                this.catalogService.downloadBinaryFromFileRepo(this.templateDetails.previewBinaryId).
+                if(this.templateDetails.previewBinaryId){
+                    this.isPreviewLoading = true;
+                    this.catalogService.downloadBinaryFromFileRepo(this.templateDetails.previewBinaryId).
                     then(async (res: { blob: () => Promise<any>; }) => {
                         const blb = await res.blob();
                         this.isPreviewLoading = false;
                         this.templateDetails.preview = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(blb)) as any;
                     });
+                }
             }
             this.updateDepedencies();
         } else {
@@ -423,13 +431,13 @@ export class TemplateCatalogModalComponent implements OnInit {
                 });
             } else {
                 this.progressIndicatorService.setProgress(10);
-                this.catalogService.downloadBinary(dependency.link)
+                    this.catalogService.downloadBinary(dependency.link?dependency.link : dependency.binaryLink)
                     .subscribe(data => {
                         this.progressIndicatorService.setProgress(20);
                         const blob = new Blob([data], {
                             type: 'application/zip'
                         });
-                        const fileName = dependency.link.replace(/^.*[\\\/]/, '');
+                        const fileName =dependency.link? dependency.link.replace(/^.*[\\\/]/, '') : dependency.binaryLink.replace(/^.*[\\\/]/, '');
                         const fileOfBlob = new File([blob], fileName);
                         this.widgetCatalogService.installPackage(fileOfBlob).then(async () => {
                             dependency.isInstalled = true;
@@ -524,7 +532,7 @@ export class TemplateCatalogModalComponent implements OnInit {
             await installDemoDialogRef.content.event.subscribe(async data => {
                 if (data && data.isConfirm) {
                     if(template.thumbnailBinaryId) { await this.catalogService.deleteBinary(template.thumbnailBinaryId); }
-                    if(template?.templateDetails?.preview) { await this.catalogService.deleteBinary(template.templateDetails.previewBinaryId); }
+                    if(template?.templateDetails?.previewBinaryId) { await this.catalogService.deleteBinary(template.templateDetails.previewBinaryId); }
                     this.catalogService.deleteSharedTemplate(template.id).then(() => {
                         this.templates = [... this.templates.filter( (dbTemplate: any) => dbTemplate.id !==  template.id)];
                         this.applyFilter();
@@ -536,5 +544,45 @@ export class TemplateCatalogModalComponent implements OnInit {
                 }
             });
         }
+    }
+
+    async onFileSelected(files: FileList){
+        this.fileSelected = files.item(0);
+        this.fileJson = JSON.parse(await( this.readFileContents(this.fileSelected)));
+    }
+
+    readFileContents(file: File): Promise<string> {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => {
+                resolve(reader.result as string);
+            };
+            reader.onerror = () => {
+                reader.abort();
+                reject(new DOMException("Problem parsing input file."));
+                this.alertService.danger("Problem parsing input file.");
+            };
+            reader.readAsText(file);
+        });
+    }
+
+    async onImportClicked(){
+        this.importLoading=true;
+        await this.invService.create({
+            c8y_Global: {},
+            type: "dashboard-catalog-templates",
+            template: this.fileJson
+        }).then(() => {
+            this.alertService.success("Dashboard Template imported succesfuly");
+            this.importLoading=false;
+        }).catch(err => {
+                this.alertService.danger("Failed to import Dashboard Template");
+                this.importLoading=false;
+            });
+        this.loadTemplateCatalog();
+    }
+
+    getImportButtonText():string{
+        return this.importLoading ? "Importing" : "Import";
     }
 }

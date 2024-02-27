@@ -87,6 +87,7 @@ export interface DependencyDescription {
     visible?: boolean;
     contextPath?: string;
     type?: string;
+    binaryLink?:string;
 }
 
 export interface CumulocityDashboard {
