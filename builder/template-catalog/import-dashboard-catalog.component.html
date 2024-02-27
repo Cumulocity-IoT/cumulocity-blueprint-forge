@@ -30,7 +30,8 @@
                       ></button>
                     <select name="availability" id="availability" [(ngModel)]="importDashboard.availability" required>
                         <option value="SHARED">Share within tenant</option>
-                        <option value="MARKET" disabled>Share with market</option>
+                        <!-- <option value="MARKET" disabled>Share with market</option> -->
+                        <option value="EXPORT">Export template</option>
                     </select>
                     
                 </div>
@@ -76,5 +77,9 @@
 <div class="modal-footer">
     <button type="button" class="btn btn-default" (click)="onCancelButtonClicked()">Cancel</button>
     <button type="button" class="btn btn-primary" [disabled]="!isImportButtonEnabled()" (click)="onSaveButtonClicked()"
-        >Import</button>
+        *ngIf="this.importDashboard.availability !== 'EXPORT'; else exportButton">Import</button>
 </div>
+<ng-template #exportButton>
+    <button type="button" class="btn btn-primary" [disabled]="!isImportButtonEnabled()" (click)="onSaveButtonClicked()"
+        >Export</button>
+</ng-template>
