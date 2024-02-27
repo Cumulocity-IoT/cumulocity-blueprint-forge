@@ -50,6 +50,13 @@ export class TemplateCatalogSetupService {
     public welcomeTemplateSelected = new BehaviorSubject("Default Template");
     welcomeTemplateSelected$ = this.welcomeTemplateSelected.asObservable();
 
+    public dynamicDashboardTemplate = new BehaviorSubject<any>(undefined);
+    dynamicDashboardTemplate$ = this.dynamicDashboardTemplate.asObservable();
+
+    public dynamicDashboardTemplateDetails =  new BehaviorSubject<any>(undefined);
+    dynamicDashboardTemplateDetails$ = this.dynamicDashboardTemplateDetails.asObservable();
+
+
     constructor(private http: HttpClient, private inventoryService: InventoryService,
         private appService: ApplicationService,
         private binaryService: InventoryBinaryService,

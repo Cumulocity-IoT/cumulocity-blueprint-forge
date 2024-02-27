@@ -17,7 +17,7 @@
  */
 import { CdkStep } from '@angular/cdk/stepper';
 import { AfterViewInit, Component, Inject, OnInit, Renderer2, ViewChild } from '@angular/core';
-import { AlertService, AppStateService, C8yStepper, SetupComponent } from '@c8y/ngx-components';
+import { AlertService, AppStateService, C8yStepper, DynamicComponentService, SetupComponent } from '@c8y/ngx-components';
 import { TemplateSetupStep } from './../../template-setup-step';
 import { TemplateCatalogSetupService } from '../../template-catalog-setup.service';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
@@ -37,6 +37,13 @@ import { SetupConfigService } from './../../setup-config.service';
 import { SetupWidgetConfigModalComponent } from '../../../setup/setup-widget-config-modal/setup-widget-config-modal.component';
 import { DOCUMENT } from '@angular/common';
 import { BrandingService } from '../../../builder/branding/branding.service';
+import { catchError } from "rxjs/operators";
+import { DomSanitizer } from '@angular/platform-browser';
+import {cloneDeep} from "lodash-es";
+import { WidgetCatalogService } from '../../../builder/widget-catalog/widget-catalog.service';
+import { DependencyDescription } from '../../../builder/template-catalog/template-catalog.model';
+import { ProgressIndicatorService } from '../../../builder/utils/progress-indicator-modal/progress-indicator.service';
+
 import { TemplateCatalogEntry } from '../../../builder/template-catalog/template-catalog.model';
 @Component({
   selector: 'c8y-template-step-three-config',
@@ -70,6 +77,13 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   isMSEnabled: boolean = false;
   blankTemplateDashboard: boolean;
   welcomeTemplateData: TemplateCatalogEntry;
+  templatesFromDC: any;
+  filterNames: any[];
+  selectedDashboardName: any;
+  sharedTemplates: any;
+  filterTemplates: any;
+  isPreviewLoading: boolean;
+  distinctDependencyNames: any;
 
 
   constructor(
@@ -84,6 +98,11 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
     @Inject(DOCUMENT) private document: Document, private brandingService: BrandingService,
     private renderer: Renderer2, private alertService: AlertService, 
     private appStateService: AppStateService, protected setupConfigService: SetupConfigService,
+    private templateCatalogFromDCService: TemplateCatalogService,
+    private sanitizer: DomSanitizer,
+    private componentService: DynamicComponentService,
+    private widgetCatalogService: WidgetCatalogService,
+    private progressIndicatorService: ProgressIndicatorService
   ) {
 
     super(stepper, step, setup, appState, alert, setupConfigService);
@@ -118,6 +137,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
     this.templateCatalogSetupService.welcomeTemplateData.subscribe(welcomeTemplateData => {
       this.welcomeTemplateData = welcomeTemplateData;
     });
+    this.loadTemplateCatalogFromDashboardCatalog();
   }
 
   ngAfterViewInit() {
@@ -275,5 +295,125 @@ async saveAppChanges(app) {
     this.templateCatalogSetupService.welcomeTemplateSelected.next(this.templateSelected);
   }
 
+  assignSelectedDashboard(selectedDashboard, index) {
+    console.log('selectedDashboard details', selectedDashboard, 'index', index);
+    this.selectedDashboardName = selectedDashboard.title.split("-")[0];
+    // this.templateDetails.dashboards[index] = JSON.parse(JSON.stringify(selectedDashboard));
+    this.templateCatalogSetupService.dynamicDashboardTemplate.next(selectedDashboard);
+    console.log('this.templateDetails', this.templateDetails);
+    this.loadTemplateDetails(selectedDashboard,index);
+  }
+
+
+  loadTemplateCatalogFromDashboardCatalog() {
+    this.templateCatalogFromDCService.getTemplateCatalog()
+      .pipe(catchError(err => {
+        console.log('Dashboard Catalog: Error in primary endpoint! using fallback...');
+        return this.templateCatalogFromDCService.getTemplateCatalogFallBack()
+      }))
+      .subscribe((catalog: any) => {
+        console.log('catalog value from DC', catalog)
+        this.templatesFromDC = catalog;
+        this.filterTemplates = this.templatesFromDC ? this.templatesFromDC : [];
+        this.filterTemplates = this.sortDashboardsByTitle();
+        console.log('filterTemplates', this.filterTemplates)
+        this.selectedDashboardName = this.filterTemplates[0].title.split("-")[0];
+        this.loadTemplateDetails(this.filterTemplates[0]);
+      }, error => {
+        this.alertService.danger("There is some technical error! Please try after sometime.");
+      });
+
+      
+  }
+
+  async loadTemplateDetails(template: any, index?): Promise<void> {
+    if(template.availability && template.availability === 'SHARED') {
+        this.templateDetails = null;
+        this.templateDetails[index] = cloneDeep(template.templateDetails);
+        if (this.templateDetails[index].preview || this.templateDetails[index].previewBinaryId) {
+            this.isPreviewLoading = true;
+            this.templateCatalogFromDCService.downloadBinaryFromFileRepo(this.templateDetails[index].previewBinaryId).
+                then(async (res: { blob: () => Promise<any>; }) => {
+                    const blb = await res.blob();
+                    this.isPreviewLoading = false;
+                    this.templateDetails[index].preview = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(blb)) as any;
+                });
+        }
+        this.updateDepedencies(index);
+    } else {
+        this.showProgressModalDialog("Fetching Dependencies");
+        await new Promise(resolve => setTimeout(resolve, 1000));
+    
+        this.templateCatalogFromDCService.getTemplateDetails(template.dashboard)
+        .pipe(catchError(err => {
+            console.log('Dashboard Catalog Details: Error in primary endpoint! using fallback...');
+            return this.templateCatalogFromDCService  
+            .getTemplateDetailsFallBack(template.dashboard);
+        }))
+        .subscribe(templateDetails => {
+            this.hideProgressModalDialog();
+            this.templateDetails[index] = templateDetails;
+            this.distinctDependencyNames = ([...new Set(this.templateDetails[index]?.input?.dependencies.map(item => item.title))]);
+            if (this.templateDetails[index].preview) {
+                this.templateDetails[index].preview = this.templateCatalogFromDCService.getGithubURL(this.templateDetails[index].preview);
+            }
+            this.updateDepedencies(index);
+            this.templateCatalogSetupService.dynamicDashboardTemplateDetails.next(this.templateDetails[index]);
+        });
+    }
+}
+
+async updateDepedencies(index) {
+  if (!this.templateDetails[index] || !this.templateDetails[index].input || !this.templateDetails[index].input.dependencies
+      || this.templateDetails[index].input.dependencies.length === 0) {
+      return;
+  }
+
+  for (let dependency of this.templateDetails[index].input.dependencies) {
+      if (dependency.type && dependency.type == "microservice") {
+          dependency.isInstalled = (await this.applicationBinaryService.verifyExistingMicroservices(dependency.id)) as any;;
+          dependency.isSupported = true;
+          dependency.visible = true;
+      } else {
+          this.verifyWidgetCompatibility(dependency, index);
+          if(dependency.ids && dependency.ids.length > 0) {
+              Promise.all(dependency.ids.map( async id => {
+                  return ( await this.componentService.getById(id) ? true : false);
+              })).then ((widgetStatusList: boolean[]) => {
+                  const widgetObj =  widgetStatusList.find(widget => !widget);
+                  dependency.isInstalled = (widgetObj == undefined);
+              })
+          } else  {
+              this.componentService.getById(dependency.id).then(widget => {
+                  dependency.isInstalled = (widget != undefined);
+              });
+          }
+      }
+  };
+}
+
+private verifyWidgetCompatibility(dependency: DependencyDescription, index) {
+  if (this.widgetCatalogService.isCompatiblieVersion(dependency)) {
+      dependency.isSupported = true;
+      dependency.visible = true;
+  } else {
+      const differentDependencyVersion = this.templateDetails[index].input.dependencies.find(widget => widget.id === dependency.id && widget.link !== dependency.link);
+      dependency.isSupported = false;
+      if (differentDependencyVersion) {
+          dependency.visible = false;
+      } else { dependency.visible = true; }
+  }
+}
+
+sortDashboardsByTitle() {
+  let sortedData = this.filterTemplates.sort((a, b) => {
+    let x = a.title.toLowerCase();
+      let y = b.title.toLowerCase();
+      if(x>y){return 1;}
+      if(x<y){return -1;}
+      return 0;
+  })
+  return sortedData;
+} 
 
 }
