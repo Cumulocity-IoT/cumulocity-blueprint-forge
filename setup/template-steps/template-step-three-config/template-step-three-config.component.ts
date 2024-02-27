@@ -124,6 +124,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
       this.isFormValid = this.appConfigForm?.form.valid;
       if (currentData) {
         this.templateDetails = currentData;
+        this.loadTemplateCatalogFromDashboardCatalog();
       }
       // In case of no device 
       if (!(this.templateDetails?.input) || !(this.templateDetails?.input?.devices) || !(this.templateDetails?.input?.devices?.length > 0)) {
@@ -137,7 +138,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
     this.templateCatalogSetupService.welcomeTemplateData.subscribe(welcomeTemplateData => {
       this.welcomeTemplateData = welcomeTemplateData;
     });
-    this.loadTemplateCatalogFromDashboardCatalog();
+    
   }
 
   ngAfterViewInit() {
@@ -296,11 +297,9 @@ async saveAppChanges(app) {
   }
 
   assignSelectedDashboard(selectedDashboard, index) {
-    console.log('selectedDashboard details', selectedDashboard, 'index', index);
     this.selectedDashboardName = selectedDashboard.title.split("-")[0];
     // this.templateDetails.dashboards[index] = JSON.parse(JSON.stringify(selectedDashboard));
     this.templateCatalogSetupService.dynamicDashboardTemplate.next(selectedDashboard);
-    console.log('this.templateDetails', this.templateDetails);
     this.loadTemplateDetails(selectedDashboard,index);
   }
 
@@ -312,12 +311,14 @@ async saveAppChanges(app) {
         return this.templateCatalogFromDCService.getTemplateCatalogFallBack()
       }))
       .subscribe((catalog: any) => {
-        console.log('catalog value from DC', catalog)
         this.templatesFromDC = catalog;
         this.filterTemplates = this.templatesFromDC ? this.templatesFromDC : [];
         this.filterTemplates = this.sortDashboardsByTitle();
-        console.log('filterTemplates', this.filterTemplates)
         this.selectedDashboardName = this.filterTemplates[0].title.split("-")[0];
+        console.log('this.template details in step three', this.templateDetails);
+          let dashboardToUpdateForTemplate = this.templateDetails.dashboards.find(dashboard => (!dashboard.isSimulatorConfigExist && dashboard.isDeviceRequired) || (dashboard.isSimulatorConfigExist && dashboard.linkWithDashboard === '' && dashboard.isDeviceRequired));
+          this.templateCatalogSetupService.dynamicDashboardTemplate.next(dashboardToUpdateForTemplate);
+        
         this.loadTemplateDetails(this.filterTemplates[0]);
       }, error => {
         this.alertService.danger("There is some technical error! Please try after sometime.");
@@ -358,7 +359,9 @@ async saveAppChanges(app) {
                 this.templateDetails[index].preview = this.templateCatalogFromDCService.getGithubURL(this.templateDetails[index].preview);
             }
             this.updateDepedencies(index);
+            console.log('this.templateDetails[index]', this.templateDetails[index]);
             this.templateCatalogSetupService.dynamicDashboardTemplateDetails.next(this.templateDetails[index]);
+            
         });
     }
 }

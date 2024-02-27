@@ -17,7 +17,7 @@
  */
 import { CdkStep } from '@angular/cdk/stepper';
 import { Component, Inject, OnInit, ViewChild } from '@angular/core';
-import { AlertService, AppStateService, C8yStepper, SetupComponent } from '@c8y/ngx-components';
+import { AlertService, AppStateService, C8yStepper, PluginsService, SetupComponent } from '@c8y/ngx-components';
 import { TemplateSetupStep } from '../../template-setup-step';
 import { TemplateCatalogSetupService } from '../../template-catalog-setup.service';
 import { catchError } from "rxjs/operators";
@@ -96,7 +96,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     private progressIndicatorService: ProgressIndicatorService, private catalogService: TemplateCatalogService,
     @Inject(DOCUMENT) private document: Document, private deviceSelectorModalRef: BsModalRef, 
     private appStateService: AppStateService, protected setupConfigService: SetupConfigService, 
-    private settingsService: SettingsService,
+    private settingsService: SettingsService, private pluginsService: PluginsService
     
   ) {
     
@@ -144,6 +144,9 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     this.templateCatalogSetupService.welcomeTemplateData.subscribe(welcomeTemplateData => {
       this.welcomeTemplateData = welcomeTemplateData;
     });
+    this.templateCatalogSetupService.dynamicDashboardTemplateDetails.subscribe(value => {
+      console.log('TEmplate details from dashboard catalog in step four', value);
+    })
   }
 
   async toggleToEnableSimulator(event, dashboard, index) {
@@ -256,7 +259,22 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     // if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
     //   this.alert.warning("Installation isn't supported when running Application on localhost.");
     //   return;
-    // }
+    // }  
+
+    this.templateCatalogSetupService.dynamicDashboardTemplateDetails.subscribe(value => {
+      this.templateDetails.plugins = this.templateDetails.plugins.concat(value.input.dependencies);
+    });
+ 
+   this.templateDetails.plugins = this.templateDetails.plugins.reduce((accumulator, current)=> {
+      if (!accumulator.find((item) => item.id === current.id)) {
+        current.selected = true;
+        if (this.widgetCatalogService.isCompatiblieVersion(current) ) {
+          accumulator.push(current);
+        }
+      }
+      return accumulator;
+    }, []);
+
 
     // Filter dashboards which are selected
     let configDataDashboards = this.templateDetails.dashboards.filter(item => item.selected === true);
@@ -276,8 +294,10 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     
     if (totalRemotes > 1) { this.progressIndicatorService.setOverallProgress(overallProgress) }
     this.progressIndicatorService.setOverallProgress(5);
+    const listOfPackages = await this.pluginsService.listPackages();
     for (let plugin of configDataPlugins) {
-      await this.installPlugin(plugin);
+      console.log('config data plugins value', configDataPlugins);
+      await this.installPlugin(plugin, listOfPackages);
       overallProgress = overallProgress + eachRemoteProgress;
       this.progressIndicatorService.setOverallProgress(overallProgress);
     };
@@ -302,7 +322,6 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       };
     }
     for (let [index, db] of configDataDashboards.entries()) {
-      console.log('index', index, 'db value', db);
       this.progressIndicatorService.setProgress(20);
       this.progressIndicatorService.setMessage(`Installing ${db.title}`);
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -371,21 +390,15 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
 
       if (index === this.indexOfDashboardUpdatedFromDC) {
         this.templateCatalogSetupService.dynamicDashboardTemplate.subscribe(value => {
-          console.log('value of template', value, 'db', db);
           db.dashboard = value.dashboard;
-          console.log('db after assigning', db);
         });
         this.templateCatalogSetupService.dynamicDashboardTemplateDetails.subscribe(value => {
-          console.log('value of template details', value, 'template details data', templateDetailsData);
           templateDetailsData.input.dependencies = JSON.parse(JSON.stringify(value.input.dependencies));
           templateDetailsData.input.images = JSON.parse(JSON.stringify(value.input.images));
           templateDetailsData.widgets = JSON.parse(JSON.stringify(value.widgets));
-          // templateDetailsData = JSON.parse(JSON.stringify(value));
-          // console.log('template details data after assigining', templateDetailsData);
         })
       }
       
-      // console.log('this.templateDetails in step four', this.templateDetails, 'templateDetailsData', templateDetailsData, 'db', db);
       await this.catalogService.createDashboard(this.currentApp, dashboardConfiguration, db, templateDetailsData, this.groupTemplate);
       this.progressIndicatorService.setProgress(90);
       overallProgress = overallProgress + eachRemoteProgress;
@@ -456,9 +469,9 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     }
   }
 
-  async installPlugin(plugin: PluginDetails): Promise<void> {
-
-    const widgetBinaryFound = this.appList.find(app => app.manifest?.isPackage && (app.name.toLowerCase() === plugin.title?.toLowerCase() ||
+  async installPlugin(plugin: PluginDetails, listOfPlugins: IApplication[]): Promise<void> {
+    console.log('List of plugins', listOfPlugins);
+    const widgetBinaryFound = listOfPlugins.find(app => (app.name.toLowerCase() === plugin.title?.toLowerCase() ||
       (app.contextPath && app.contextPath?.toLowerCase() === plugin?.contextPath?.toLowerCase())));
     this.progressIndicatorService.setMessage(`Installing ${plugin.title}`);
     this.progressIndicatorService.setProgress(10);

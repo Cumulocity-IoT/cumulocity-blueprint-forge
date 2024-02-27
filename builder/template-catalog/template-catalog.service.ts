@@ -397,7 +397,11 @@ export class TemplateCatalogService {
             let widgetStringDescription: any = JSON.stringify(widget);
 
             images.forEach(image => {
-                widgetStringDescription = widgetStringDescription.replaceAll(`"{{${image.placeholder}.id}}"`, `"${image.id}"`);
+                if (image?.id) {
+                    widgetStringDescription = widgetStringDescription.replaceAll(`"{{${image.placeholder}.id}}"`, `"${image.id}"`);
+                } else {
+                    widgetStringDescription = widgetStringDescription.replaceAll(`"{{${image.placeholder}.id}}"`, `""`);
+                }
             })
 
             widget = JSON.parse(widgetStringDescription);
