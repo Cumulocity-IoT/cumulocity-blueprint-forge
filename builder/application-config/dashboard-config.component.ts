@@ -32,7 +32,7 @@ import { contextPathFromURL } from "../utils/contextPathFromURL";
 import * as delay from "delay";
 import { TemplateCatalogModalComponent } from "../template-catalog/template-catalog.component";
 import { TemplateUpdateModalComponent } from "../template-catalog/template-update.component";
-import { BinaryDescription, DeviceDescription } from "../template-catalog/template-catalog.model";
+import { BinaryDescription, DeviceDescription, TemplateDashboardWidget } from "../template-catalog/template-catalog.model";
 import { SettingsService } from './../../builder/settings/settings.service';
 import { AlertMessageModalComponent } from "./../../builder/utils/alert-message-modal/alert-message-modal.component";
 import { AccessRightsService } from "./../../builder/access-rights.service";
@@ -60,7 +60,9 @@ export interface DashboardConfig {
         binaries?: Array<BinaryDescription>,
         staticBinaries?: Array<BinaryDescription>,
         availability?: string,
-        previewBinaryId?: string
+        previewBinaryId?: string,
+        preview?: string,
+        widgets?:Array<TemplateDashboardWidget>;
     }
 }
 

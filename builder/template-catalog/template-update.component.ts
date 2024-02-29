@@ -21,7 +21,7 @@ import { DashboardConfig } from "../application-config/dashboard-config.componen
 import { DeviceSelectorModalComponent } from "../utils/device-selector-modal/device-selector.component";
 import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
 import { IManagedObject } from '@c8y/client';
-import { TemplateDetails } from "./template-catalog.model";
+import { TemplateDashboardWidget, TemplateDetails } from "./template-catalog.model";
 import { TemplateCatalogService } from "./template-catalog.service";
 import { ProgressIndicatorModalComponent } from "../utils/progress-indicator-modal/progress-indicator-modal.component";
 import { catchError } from "rxjs/operators";
@@ -79,12 +79,13 @@ export class TemplateUpdateModalComponent implements OnInit {
         if(this.dashboardConfig?.templateType) {
             this.configureTemplateType(this.dashboardConfig?.templateType);
         }
-        if(this.dashboardConfig?.templateDashboard?.availability === 'SHARED' ){
+        if(this.dashboardConfig?.templateDashboard?.availability === 'SHARED' || this.dashboardConfig?.templateDashboard?.availability === 'EXPORT'){
             this.templateDetails.input.devices = this.dashboardConfig.templateDashboard.devices ? this.dashboardConfig.templateDashboard.devices : [];
             this.templateDetails.input.images = this.dashboardConfig.templateDashboard.binaries ? this.dashboardConfig.templateDashboard.binaries : [];
             this.templateDetails.input.binaries = this.dashboardConfig.templateDashboard.staticBinaries ? this.dashboardConfig.templateDashboard.staticBinaries : [];
-            this.templateDetails.previewBinaryId = this.dashboardConfig.templateDashboard.previewBinaryId;
+            this.templateDetails.widgets = this.dashboardConfig.templateDashboard.widgets ? this.dashboardConfig.templateDashboard.widgets : [];
             if (this.dashboardConfig.templateDashboard.previewBinaryId) {
+                this.templateDetails.previewBinaryId = this.dashboardConfig.templateDashboard.previewBinaryId;
                 this.isPreviewLoading = true;
                 this.catalogService.downloadBinaryFromFileRepo(this.templateDetails.previewBinaryId).
                     then(async (res: { blob: () => Promise<any>; }) => {
@@ -117,8 +118,38 @@ export class TemplateUpdateModalComponent implements OnInit {
         
     }
 
-    openDeviceSelectorDialog(index: number, templateType: number): void {
-        this.configureTemplateType(templateType);
+    private configureTemplateType(templateType: number) {
+        switch (templateType) {
+            case 1:
+                this.assetButtonText = "Device Group";
+                this.groupTemplate = true;
+                break;
+            case 2:
+                this.assetButtonText = "Device/Asset Type";
+                this.groupTemplate = true;
+                break;
+            default:
+                this.assetButtonText = "Device/Asset";
+                this.groupTemplate = false;
+                break;
+        }
+    }
+
+    openDeviceSelectorDialog(device: any, index: number, templateType: number): void {
+        switch (templateType) {
+            case 1:
+                device.assetButtonText = "Device Group";
+                this.groupTemplate = true;
+                break;
+            case 2:
+                device.assetButtonText = "Device/Asset Type";
+                this.groupTemplate = true;
+                break;
+            default:
+                device.assetButtonText = "Device/Asset";
+                this.groupTemplate = false;
+                break;
+        }
         this.dashboardConfig.templateType = templateType; 
         this.deviceSelectorModalRef = this.modalService.show(DeviceSelectorModalComponent, { class: 'c8y-wizard', initialState: {templateType} });
         if(templateType == 2) {
@@ -139,22 +170,6 @@ export class TemplateUpdateModalComponent implements OnInit {
         }
     }
 
-    private configureTemplateType(templateType: number) {
-        switch (templateType) {
-            case 1:
-                this.assetButtonText = "Device Group";
-                this.groupTemplate = true;
-                break;
-            case 2:
-                this.assetButtonText = "Device/Asset Type";
-                this.groupTemplate = true;
-                break;
-            default:
-                this.assetButtonText = "Device/Asset";
-                this.groupTemplate = false;
-                break;
-        }
-    }
 
     onImageSelected(files: FileList, index: number): void {
         this.catalogService.uploadImage(files.item(0)).then((binaryId: string) => {

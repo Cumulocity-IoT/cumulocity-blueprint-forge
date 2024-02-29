@@ -12,7 +12,7 @@
         <div class="">
             <div class="card-header">
             <!-- Search -->
-            <div id="searchWidget" class="col-xs-12 col-sm-12 col-md-12 col-lg-12 input-group input-group-search" style="padding-right: 0px;padding-left: 0px;">
+            <div id="searchWidget" class="col-xs-11 col-sm-11 col-md-11 col-lg-11 input-group input-group-search" style="padding-right: 0px;padding-left: 0px;">
                 <input
                 type="search"
                 class="form-control"
@@ -30,6 +30,10 @@
                 ></i>
                 </span>
             </div>
+            <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 dflex-end">
+                <button class="btn btn-dot" title="Import Dashboard Template" [popover]="importPopover" popoverTitle="Import Dashboard Template"
+                    placement="right" type="button"><i class="c8y-icon dlt-c8y-icon-upload"></i></button>
+            </div>
             </div>
         </div>
         <div class="row  modal-inner-scroll " style="padding-bottom: 20px;">
@@ -45,7 +49,9 @@
                                 <b>{{ template?.title }} </b>
                             </h3>
                             <button class="btn-clean" *ngIf="template.availability">
-                             <span class="label label-info" *ngIf="template.availability == 'SHARED'">Tenant only</span></button>
+                             <span class="label label-info" *ngIf="template.availability == 'SHARED'">Tenant only</span>
+                             <span class="label label-info" *ngIf="template.availability == 'EXPORT'">Custom</span>
+                            </button>
                         </div>
                         <div *ngIf="template.comingSoon==true" class="flip-card-font-coming-soon">
                         </div>
@@ -55,7 +61,9 @@
                         <div *ngIf="template.comingSoon==true" class="coming-soon-tag-backside">Coming Soon</div>
                         <div class="row" *ngIf="template.availability">
                                 <button class="m-l-16 btn-clean pull-left" style="cursor: default;">
-                                    <span class="label label-info" *ngIf="template.availability == 'SHARED'">Tenant only</span></button>
+                                    <span class="label label-info" *ngIf="template.availability == 'SHARED'">Tenant only</span>
+                                    <span class="label label-info" *ngIf="template.availability == 'EXPORT'">Custom</span>
+                                </button>
                                 <button class="m-r-16 btn-dot btn-dot--warning pull-right pull-right" (click)="deleteTemplate(template)" title="Delete">
                                     <i [c8yIcon]="'delete'"></i></button>
                         </div>
@@ -177,7 +185,8 @@
             <div class="template-preview">
                 <label for="Preview"><span>Preview:</span></label>
                 <div *ngIf="isPreviewLoading"><c8y-loading></c8y-loading></div>
-                <img *ngIf="!isPreviewLoading" style="width: 100%;" [src]="templateDetails.preview" />
+                <img *ngIf="!isPreviewLoading" style="width: 100%;"
+                    [src]="templateDetails.preview && templateDetails.preview !== '' ? templateDetails.preview : './img/no-image.png' " />
             </div>
             <div *ngIf="templateDetails.input?.dependencies?.length > 0">
                 <label for="Depedencies"><span>Dependencies:</span></label>
@@ -225,3 +234,14 @@
     <button *ngIf="isDetailPageDisplayed()" type="button" class="btn btn-primary" (click)="onSaveButtonClicked()"
         [disabled]="!isSaveButtonEnabled()">Create</button>
 </div>
+
+<ng-template #importPopover>
+    <div style="width: 200px;">
+        <div class="form-group">
+            <label for="importFile">Upload dashboard template file</label>
+            <input type="file" accept=".json" id="importFile" aria-describedby="helpinput" class="form-control"
+                (change)="onFileSelected($event.target.files)" />
+        </div>
+        <button [disabled]="importLoading" type="button" class="btn btn-primary" (click)="onImportClicked()">{{getImportButtonText()}}</button>
+    </div>
+</ng-template>

@@ -30,6 +30,7 @@ import { AppBuilderExternalAssetsService } from 'app-builder-external-assets';
 import { DashboardConfig } from "builder/application-config/dashboard-config.component";
 import { SettingsService } from "../settings/settings.service";
 import { AppDataService } from "../app-data.service";
+import * as _ from "lodash";
 
 const packageJson = require('./../../package.json');
 @Injectable()
@@ -184,6 +185,7 @@ export class TemplateCatalogService {
 
     async createDashboard(application, dashboardConfiguration, templateCatalogEntry: TemplateCatalogEntry, templateDetails: TemplateDetails, isGroupTemplate: boolean = false) {
         templateDetails = await this.uploadBinariesToC8Y(templateDetails);
+        const widgetsWithPlaceholder = _.cloneDeep(templateDetails.widgets);
         templateDetails = this.updateTemplateWidgetsWithInput(templateDetails,isGroupTemplate);
         let deviceId = "";
         if(templateDetails?.input?.devices && templateDetails.input.devices.length <= 1) {
@@ -219,7 +221,8 @@ export class TemplateCatalogService {
                         devices: templateDetails.input.devices ? templateDetails.input.devices : [],
                         binaries: templateDetails.input.images ? templateDetails.input.images : [],
                         staticBinaries: templateDetails.input.binaries ? templateDetails.input.binaries : [],
-                        previewBinaryId:(templateCatalogEntry?.availability === 'SHARED' ? templateDetails.previewBinaryId: undefined),
+                        previewBinaryId:(templateCatalogEntry?.availability === 'SHARED' || templateCatalogEntry?.availability === 'EXPORT' ? templateDetails.previewBinaryId: undefined),
+                        widgets: (templateCatalogEntry?.availability === 'SHARED' || templateCatalogEntry?.availability === 'EXPORT' ? widgetsWithPlaceholder: undefined)
                     },
                     ...(isGroupTemplate ? { groupTemplate: true } : {}),
                     templateType: dashboardConfiguration.templateType
@@ -245,8 +248,8 @@ export class TemplateCatalogService {
     }
 
     async updateDashboard(application, dashboardConfig: DashboardConfig, templateDetails: TemplateDetails, index: number, isGroupTemplate: boolean = false) {
-        console.log('application in update dashboard', application);
-        templateDetails = this.updateTemplateWidgetsWithInput(templateDetails, isGroupTemplate);
+        const widgetsWithPlaceholder = _.cloneDeep(templateDetails.widgets);
+        templateDetails = this.updateTemplateWidgetsWithInput(templateDetails, isGroupTemplate);console.log("updatedtempDetails:",templateDetails)
         let deviceId = "";
         if(templateDetails?.input?.devices && templateDetails.input.devices.length <= 1) {
             const device = templateDetails.input.devices.find(device => (device.reprensentation) && (device.reprensentation.id));
@@ -282,11 +285,11 @@ export class TemplateCatalogService {
                 binaries: templateDetails.input.images ? templateDetails.input.images : [],
                 staticBinaries: templateDetails.input.binaries ? templateDetails.input.binaries : [],
                 previewBinaryId:(dashboard.templateDashboard?.availability === 'SHARED' ? templateDetails.previewBinaryId: undefined),
+                widgets: (dashboard.templateDashboard?.availability === 'SHARED' || dashboard.templateDashboard?.availability === 'EXPORT' ? widgetsWithPlaceholder: undefined)
             },
             ...(isGroupTemplate ? { groupTemplate: true } : {}),
             templateType: dashboardConfig.templateType
         };
-
         await this.appService.update({
             id: application.id,
             applicationBuilder: application.applicationBuilder
