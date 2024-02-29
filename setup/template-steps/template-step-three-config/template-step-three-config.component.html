@@ -21,6 +21,7 @@
                   <h4 class="card-title">Ensuring a Seamless Setup: Unveiling the Components Ready to Empower Your Experience!</h4>
               </div>
           </div>
+          
           <div class="card-block" id="dashboardDiv">
               <div class="list-group">
                   <div class="list-group-item d-flex" *ngFor="let dashboard of templateDetails?.dashboards; let i = index">
@@ -35,7 +36,7 @@
                     <div class="list-item-icon">
                       <i title="Dashboard" c8yIcon="dashboard"></i>
                     </div>
-                
+                    
                     <div class="list-item-body text-left">
                       <div class="d-flex row">
                         <span class="col-sm-3 col-xs-12 title-width">{{dashboard.title}}</span>
@@ -63,7 +64,7 @@
                         </ul>
                         </div>
                         </div>
-
+                        
                         <div *ngIf="(!dashboard.isSimulatorConfigExist && dashboard.isDeviceRequired) || (dashboard.isSimulatorConfigExist && dashboard.linkWithDashboard === '' && dashboard.isDeviceRequired)">
                           <div class="dropdown" dropdown  container="body">
                             <button
@@ -81,7 +82,9 @@
                               </button>
                             </li>
                           </ul>
+                          <!-- <c8y-loading *ngIf="isSpin"></c8y-loading> -->
                           </div>
+                          <c8y-loading class="spinner-dashboard"></c8y-loading>
                         </div>
 
                         <div *ngIf="isPreviewLoading"><c8y-loading></c8y-loading></div>

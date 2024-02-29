@@ -84,6 +84,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   filterTemplates: any;
   isPreviewLoading: boolean;
   distinctDependencyNames: any;
+  isSpin: boolean = false;
 
 
   constructor(
@@ -120,6 +121,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   }
 
   ngOnInit() {
+    this.selectedDashboardName = "Default Dashboard";
     this.templateCatalogSetupService.templateData.subscribe(async currentData => {
       this.isFormValid = this.appConfigForm?.form.valid;
       if (currentData) {
@@ -297,6 +299,7 @@ async saveAppChanges(app) {
   }
 
   assignSelectedDashboard(selectedDashboard, index) {
+    this.templateCatalogSetupService.indexOfDashboardToUpdateTemplate = index;
     this.selectedDashboardName = selectedDashboard.title.split("-")[0];
     // this.templateDetails.dashboards[index] = JSON.parse(JSON.stringify(selectedDashboard));
     this.templateCatalogSetupService.dynamicDashboardTemplate.next(selectedDashboard);
@@ -313,13 +316,17 @@ async saveAppChanges(app) {
       .subscribe((catalog: any) => {
         this.templatesFromDC = catalog;
         this.filterTemplates = this.templatesFromDC ? this.templatesFromDC : [];
-        this.filterTemplates = this.sortDashboardsByTitle();
-        this.selectedDashboardName = this.filterTemplates[0].title.split("-")[0];
+        // this.selectedDashboardName = this.filterTemplates[0].title.split("-")[0];
+        
         console.log('this.template details in step three', this.templateDetails);
           let dashboardToUpdateForTemplate = this.templateDetails.dashboards.find(dashboard => (!dashboard.isSimulatorConfigExist && dashboard.isDeviceRequired) || (dashboard.isSimulatorConfigExist && dashboard.linkWithDashboard === '' && dashboard.isDeviceRequired));
           this.templateCatalogSetupService.dynamicDashboardTemplate.next(dashboardToUpdateForTemplate);
+          dashboardToUpdateForTemplate.title = this.selectedDashboardName;
+          this.filterTemplates.splice(0, 0, dashboardToUpdateForTemplate);
+          this.filterTemplates = this.sortDashboardsByTitle();
+        console.log('Filter templates', this.filterTemplates);
         
-        this.loadTemplateDetails(this.filterTemplates[0]);
+        this.loadTemplateDetails(dashboardToUpdateForTemplate);
       }, error => {
         this.alertService.danger("There is some technical error! Please try after sometime.");
       });
@@ -328,6 +335,7 @@ async saveAppChanges(app) {
   }
 
   async loadTemplateDetails(template: any, index?): Promise<void> {
+    this.isSpin = true;
     if(template.availability && template.availability === 'SHARED') {
         this.templateDetails = null;
         this.templateDetails[index] = cloneDeep(template.templateDetails);
@@ -342,9 +350,10 @@ async saveAppChanges(app) {
         }
         this.updateDepedencies(index);
     } else {
-        this.showProgressModalDialog("Fetching Dependencies");
-        await new Promise(resolve => setTimeout(resolve, 1000));
-    
+        // this.showProgressModalDialog("Fetching Dependencies");
+        
+        // await new Promise(resolve => setTimeout(resolve, 1000));
+        
         this.templateCatalogFromDCService.getTemplateDetails(template.dashboard)
         .pipe(catchError(err => {
             console.log('Dashboard Catalog Details: Error in primary endpoint! using fallback...');
@@ -352,17 +361,18 @@ async saveAppChanges(app) {
             .getTemplateDetailsFallBack(template.dashboard);
         }))
         .subscribe(templateDetails => {
-            this.hideProgressModalDialog();
+          
             this.templateDetails[index] = templateDetails;
             this.distinctDependencyNames = ([...new Set(this.templateDetails[index]?.input?.dependencies.map(item => item.title))]);
             if (this.templateDetails[index].preview) {
                 this.templateDetails[index].preview = this.templateCatalogFromDCService.getGithubURL(this.templateDetails[index].preview);
             }
             this.updateDepedencies(index);
-            console.log('this.templateDetails[index]', this.templateDetails[index]);
+            console.log('this.templateDetails[index]', this.templateDetails[index], 'full template details', this.templateDetails);
             this.templateCatalogSetupService.dynamicDashboardTemplateDetails.next(this.templateDetails[index]);
             
         });
+        this.isSpin = false;
     }
 }
 

@@ -74,6 +74,7 @@ export interface MicroserviceDetails {
 }
 
 export interface Dashboards {
+    welcomeTemplates: any;
     title: string;
     icon: string;
     isDeviceRequired: boolean;

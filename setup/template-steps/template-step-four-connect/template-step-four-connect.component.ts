@@ -82,6 +82,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
   onSaveClicked: boolean = false;
   groupTemplateFromSimulator: boolean;
   indexOfDashboardUpdatedFromDC: any;
+  dynamicDashboardValueToUpdate: any;
 
 
   constructor(
@@ -145,12 +146,18 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     this.templateCatalogSetupService.welcomeTemplateData.subscribe(welcomeTemplateData => {
       this.welcomeTemplateData = welcomeTemplateData;
     });
-    this.templateCatalogSetupService.dynamicDashboardTemplateDetails.subscribe(value => {
-      console.log('TEmplate details from dashboard catalog in step four', value);
-    })
+    this.templateCatalogSetupService.dynamicDashboardTemplate.subscribe(value => {
+      console.log('template value for dynamic dashboard', value);
+      this.dynamicDashboardValueToUpdate = value
+    });
+    // this.templateCatalogSetupService.dynamicDashboardTemplateDetails.subscribe(value => {
+    //   console.log('TEmplate details from dashboard catalog in step four', value, 'template details', this.templateDetails);
+    // })
+    
   }
 
   async toggleToEnableSimulator(event, dashboard, index) {
+    console.log('dashboard value', dashboard);
     this.indexOfDashboardUpdatedFromDC = index;
     this.simulatorSelected = true;
     this.enableSimulator = event.target.checked;
@@ -159,21 +166,36 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       this.onSaveClicked = false;
       this.isSpin = true;
         let templateDetailsData;
-         templateDetailsData = await (await this.loadTemplateDetails(dashboard.dashboard)).toPromise();
+        if (this.dynamicDashboardValueToUpdate) {
+          templateDetailsData = await (await this.loadTemplateDetails(this.dynamicDashboardValueToUpdate.dashboard)).toPromise();
+        } else {
+          templateDetailsData = await (await this.loadTemplateDetails(dashboard.dashboard)).toPromise();
+        }
+         
     // Need to pass Simulator config file array of object
- 
+      console.log('template details data', templateDetailsData, 'dashboard', dashboard);
     const SimultorConfigFiles = [];
     let currentSimulatorData;
 
-    // Not able to use forEach, as it takes callback as parameter which expects to be async
-    for (let i = 0; i < templateDetailsData.simulatorDTDL.length; i++) {
+
+    if (dashboard.title === "Default Dashboard") {
+      // Not able to use forEach, as it takes callback as parameter which expects to be async
+      for (let i = 0; i < templateDetailsData.simulatorDTDL.length; i++) {
       currentSimulatorData = await (await this.loadTemplateDetails(templateDetailsData.simulatorDTDL[i].simulatorFile)).toPromise();
       SimultorConfigFiles.push({
           fileName: templateDetailsData.simulatorDTDL[i].simulatorFileName,
           fileContent: currentSimulatorData
       });
     
+      }
+    } else {
+      currentSimulatorData = await (await this.loadTemplateDetails(templateDetailsData.simulatorDTDL[0].simulatorFile)).toPromise();
+      SimultorConfigFiles.push({
+        fileName: templateDetailsData.simulatorDTDL[0].simulatorFileName,
+        fileContent: currentSimulatorData
+      })
     }
+    
     
     this.bsModalRef = this.modalService.show(NewSimulatorModalComponent, { backdrop: 'static', class: 'c8y-wizard', initialState:{appId: this.currentApp.id + "", isBlueprintSimulator: true, enableSimulator: this.enableSimulator, simulatorConfigFiles: SimultorConfigFiles, fileLength: SimultorConfigFiles.length}} );
     this.isSpin = false;
@@ -332,7 +354,8 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
 
       let templateDetailsData;
       let  dashboardTemplates;
-      if (db.dashboardTemplate) {
+      console.log('dashboard', dashboardTemplates, 'db', db);
+      if (db.welcomeTemplates) {
         this.templateCatalogSetupService.welcomeTemplateSelected.subscribe(value => this.templateSelected = value);
          dashboardTemplates =  this.welcomeTemplateData.find(dashboardTemplate => dashboardTemplate.dashboardName === this.templateSelected);
           if (dashboardTemplates && this.templateSelected === 'Default Template') {
