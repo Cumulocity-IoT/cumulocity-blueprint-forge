@@ -36,6 +36,7 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep implement
   public templateDetails: TemplateBlueprintDetails;
   configDetails: any;
   images: GalleryItem[];
+  blueprintForgeTemplateURL: any;
 
   constructor(
     public stepper: C8yStepper,
@@ -56,7 +57,7 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep implement
           const templateURL = data.blueprintForge.templateURL;
           this.loadTemplateDetailsCatalog(templateURL);
           load = load + 1;
-          }
+          } 
         }
       });
     
@@ -75,7 +76,6 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep implement
       .subscribe((catalog: TemplateBlueprintDetails) => {
 
         this.templateDetails = catalog;
-
         if (this.templateDetails && this.templateDetails.media) {
           this.templateDetails.media.forEach((media: any) => {
             media.image = this.templateCatalogSetupService.getGithubURL(media.image);

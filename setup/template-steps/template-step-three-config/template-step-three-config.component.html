@@ -82,9 +82,8 @@
                               </button>
                             </li>
                           </ul>
-                          <!-- <c8y-loading *ngIf="isSpin"></c8y-loading> -->
                           </div>
-                          <c8y-loading class="spinner-dashboard"></c8y-loading>
+                          <c8y-loading *ngIf="isSpin" class="spinner-dashboard"></c8y-loading>
                         </div>
 
                         <div *ngIf="isPreviewLoading"><c8y-loading></c8y-loading></div>
@@ -98,7 +97,7 @@
                     </div>
                     
                   </div>
-                  <div class="list-group-item d-flex" *ngFor="let dependency of distinctDependencyNames; let dep =index">
+                  <!-- <div class="list-group-item d-flex" *ngFor="let dependency of distinctDependencyNames; let dep =index">
                     <div class="list-item-checkbox">
                       <label id="dependency{{dep}}" title="select" class="c8y-checkbox" >
                         <input type="checkbox" [checked]="true"
@@ -118,7 +117,7 @@
                         <div class="col-sm-6 col-xs-12 text-muted"></div>
                       </div>
                     </div>
-                  </div>
+                  </div> -->
                   <div class="list-group-item d-flex" *ngFor="let plugin of templateDetails?.plugins; let p =index">
                     <div class="list-item-checkbox">
                       <label id="plugin{{p}}" title="select" class="c8y-checkbox" >

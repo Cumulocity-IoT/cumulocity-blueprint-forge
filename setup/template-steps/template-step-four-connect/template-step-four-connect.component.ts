@@ -147,17 +147,17 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       this.welcomeTemplateData = welcomeTemplateData;
     });
     this.templateCatalogSetupService.dynamicDashboardTemplate.subscribe(value => {
-      console.log('template value for dynamic dashboard', value);
-      this.dynamicDashboardValueToUpdate = value
+      if (value?.defaultDashboardSet) {
+        this.dynamicDashboardValueToUpdate = value;
+        this.dynamicDashboardValueToUpdate.titleAssigned = "Default Dashboard";
+      } else {
+        this.dynamicDashboardValueToUpdate = value;
+        this.dynamicDashboardValueToUpdate.titleAssigned = value.title;
+      }
     });
-    // this.templateCatalogSetupService.dynamicDashboardTemplateDetails.subscribe(value => {
-    //   console.log('TEmplate details from dashboard catalog in step four', value, 'template details', this.templateDetails);
-    // })
-    
   }
 
   async toggleToEnableSimulator(event, dashboard, index) {
-    console.log('dashboard value', dashboard);
     this.indexOfDashboardUpdatedFromDC = index;
     this.simulatorSelected = true;
     this.enableSimulator = event.target.checked;
@@ -173,12 +173,10 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
         }
          
     // Need to pass Simulator config file array of object
-      console.log('template details data', templateDetailsData, 'dashboard', dashboard);
     const SimultorConfigFiles = [];
     let currentSimulatorData;
 
-
-    if (dashboard.title === "Default Dashboard") {
+    if (dashboard.defaultDashboardSet) {
       // Not able to use forEach, as it takes callback as parameter which expects to be async
       for (let i = 0; i < templateDetailsData.simulatorDTDL.length; i++) {
       currentSimulatorData = await (await this.loadTemplateDetails(templateDetailsData.simulatorDTDL[i].simulatorFile)).toPromise();
@@ -285,10 +283,23 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     // }  
 
     this.templateCatalogSetupService.dynamicDashboardTemplateDetails.subscribe(value => {
-      this.templateDetails.plugins = this.templateDetails.plugins.concat(value.input.dependencies);
+      const pluginDependencies = value.input.dependencies.filter(pluginDep => pluginDep === 'plugin');
+      const microserviceDependencies = value.input.dependencies.filter(microserviceDep => microserviceDep === 'microservice');
+      this.templateDetails.plugins = this.templateDetails.plugins.concat(pluginDependencies);
+      this.templateDetails.microservices = this.templateDetails.microservices.concat(microserviceDependencies);
     });
- 
    this.templateDetails.plugins = this.templateDetails.plugins.reduce((accumulator, current)=> {
+      if (!accumulator.find((item) => item.id === current.id)) {
+        current.selected = true;
+        if (this.widgetCatalogService.isCompatiblieVersion(current) ) {
+          accumulator.push(current);
+        }
+      }
+      return accumulator;
+    }, []);
+
+
+    this.templateDetails.microservices = this.templateDetails.microservices.reduce((accumulator, current)=> {
       if (!accumulator.find((item) => item.id === current.id)) {
         current.selected = true;
         if (this.widgetCatalogService.isCompatiblieVersion(current) ) {
@@ -319,7 +330,6 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     this.progressIndicatorService.setOverallProgress(5);
     const listOfPackages = await this.pluginsService.listPackages();
     for (let plugin of configDataPlugins) {
-      console.log('config data plugins value', configDataPlugins);
       await this.installPlugin(plugin, listOfPackages);
       overallProgress = overallProgress + eachRemoteProgress;
       this.progressIndicatorService.setOverallProgress(overallProgress);
@@ -354,7 +364,6 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
 
       let templateDetailsData;
       let  dashboardTemplates;
-      console.log('dashboard', dashboardTemplates, 'db', db);
       if (db.welcomeTemplates) {
         this.templateCatalogSetupService.welcomeTemplateSelected.subscribe(value => this.templateSelected = value);
          dashboardTemplates =  this.welcomeTemplateData.find(dashboardTemplate => dashboardTemplate.dashboardName === this.templateSelected);
@@ -366,6 +375,8 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       } else {
         templateDetailsData = await (await this.loadTemplateDetails(db.dashboard)).toPromise();
       }
+
+      
       const dashboardConfiguration = {
         dashboardId: '12598412',
         dashboardName: db.title,
@@ -415,14 +426,25 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       if (index === this.indexOfDashboardUpdatedFromDC) {
         this.templateCatalogSetupService.dynamicDashboardTemplate.subscribe(value => {
           db.dashboard = value.dashboard;
+       
+          if (value?.defaultDashboardSet) {
+            this.dynamicDashboardValueToUpdate = value;
+            this.dynamicDashboardValueToUpdate.titleAssigned = "Default Dashboard";
+          } else {
+            this.dynamicDashboardValueToUpdate = value;
+            this.dynamicDashboardValueToUpdate.titleAssigned = value.title;
+          }
+          if(this.dynamicDashboardValueToUpdate?.titleAssigned) {
+            dashboardConfiguration.dashboardName = this.dynamicDashboardValueToUpdate?.titleAssigned.split("-")[0];
+          }
         });
+        
         this.templateCatalogSetupService.dynamicDashboardTemplateDetails.subscribe(value => {
           templateDetailsData.input.dependencies = JSON.parse(JSON.stringify(value.input.dependencies));
           templateDetailsData.input.images = JSON.parse(JSON.stringify(value.input.images));
           templateDetailsData.widgets = JSON.parse(JSON.stringify(value.widgets));
         })
       }
-      
       await this.catalogService.createDashboard(this.currentApp, dashboardConfiguration, db, templateDetailsData, this.groupTemplate);
       this.progressIndicatorService.setProgress(90);
       overallProgress = overallProgress + eachRemoteProgress;
@@ -440,6 +462,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       });
     }
     this.hideProgressModalDialog();
+    sessionStorage.removeItem("templateURL");
     if (this.blankTemplateDashboard) {
       this.setup.steps[2].completed = true;
       this.setup.stepCompleted(2);
@@ -498,7 +521,6 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
   }
 
   async installPlugin(plugin: PluginDetails, listOfPlugins: IApplication[]): Promise<void> {
-    console.log('List of plugins', listOfPlugins);
     const widgetBinaryFound = listOfPlugins.find(app => (app.name.toLowerCase() === plugin.title?.toLowerCase() ||
       (app.contextPath && app.contextPath?.toLowerCase() === plugin?.contextPath?.toLowerCase())));
     this.progressIndicatorService.setMessage(`Installing ${plugin.title}`);

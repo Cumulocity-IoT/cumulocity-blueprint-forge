@@ -103,7 +103,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
     private sanitizer: DomSanitizer,
     private componentService: DynamicComponentService,
     private widgetCatalogService: WidgetCatalogService,
-    private progressIndicatorService: ProgressIndicatorService
   ) {
 
     super(stepper, step, setup, appState, alert, setupConfigService);
@@ -301,7 +300,6 @@ async saveAppChanges(app) {
   assignSelectedDashboard(selectedDashboard, index) {
     this.templateCatalogSetupService.indexOfDashboardToUpdateTemplate = index;
     this.selectedDashboardName = selectedDashboard.title.split("-")[0];
-    // this.templateDetails.dashboards[index] = JSON.parse(JSON.stringify(selectedDashboard));
     this.templateCatalogSetupService.dynamicDashboardTemplate.next(selectedDashboard);
     this.loadTemplateDetails(selectedDashboard,index);
   }
@@ -316,15 +314,20 @@ async saveAppChanges(app) {
       .subscribe((catalog: any) => {
         this.templatesFromDC = catalog;
         this.filterTemplates = this.templatesFromDC ? this.templatesFromDC : [];
-        // this.selectedDashboardName = this.filterTemplates[0].title.split("-")[0];
         
-        console.log('this.template details in step three', this.templateDetails);
-          let dashboardToUpdateForTemplate = this.templateDetails.dashboards.find(dashboard => (!dashboard.isSimulatorConfigExist && dashboard.isDeviceRequired) || (dashboard.isSimulatorConfigExist && dashboard.linkWithDashboard === '' && dashboard.isDeviceRequired));
+          const templateDetailsCopy = JSON.parse(JSON.stringify(this.templateDetails.dashboards));
+          let dashboardToUpdateForTemplate = templateDetailsCopy.find(dashboard => (!dashboard.isSimulatorConfigExist && dashboard.isDeviceRequired) || (dashboard.isSimulatorConfigExist && dashboard.linkWithDashboard === '' && dashboard.isDeviceRequired));
+          
+          if (this.selectedDashboardName !== "Default Dashboard") {
+            dashboardToUpdateForTemplate.title = this.selectedDashboardName;
+          } else {
+            dashboardToUpdateForTemplate.title = dashboardToUpdateForTemplate.title;
+            dashboardToUpdateForTemplate.defaultDashboardSet = true;
+          }
           this.templateCatalogSetupService.dynamicDashboardTemplate.next(dashboardToUpdateForTemplate);
-          dashboardToUpdateForTemplate.title = this.selectedDashboardName;
           this.filterTemplates.splice(0, 0, dashboardToUpdateForTemplate);
+          this.filterTemplates.filter(template => (template.title === dashboardToUpdateForTemplate.title) ? (template.title = 'Default Dashboard') :  null );
           this.filterTemplates = this.sortDashboardsByTitle();
-        console.log('Filter templates', this.filterTemplates);
         
         this.loadTemplateDetails(dashboardToUpdateForTemplate);
       }, error => {
@@ -350,10 +353,6 @@ async saveAppChanges(app) {
         }
         this.updateDepedencies(index);
     } else {
-        // this.showProgressModalDialog("Fetching Dependencies");
-        
-        // await new Promise(resolve => setTimeout(resolve, 1000));
-        
         this.templateCatalogFromDCService.getTemplateDetails(template.dashboard)
         .pipe(catchError(err => {
             console.log('Dashboard Catalog Details: Error in primary endpoint! using fallback...');
@@ -361,18 +360,42 @@ async saveAppChanges(app) {
             .getTemplateDetailsFallBack(template.dashboard);
         }))
         .subscribe(templateDetails => {
-          
+          this.isSpin = false;
             this.templateDetails[index] = templateDetails;
-            this.distinctDependencyNames = ([...new Set(this.templateDetails[index]?.input?.dependencies.map(item => item.title))]);
+            const pluginDependencies = this.templateDetails[index]?.input?.dependencies.filter(pluginDep => pluginDep === 'plugin');
+            this.templateDetails.plugins = this.templateDetails.plugins.concat(pluginDependencies);
+
+            this.templateDetails.plugins = this.templateDetails.plugins.reduce((accumulator, current)=> {
+              if (!accumulator.find((item) => item.id === current.id)) {
+                current.selected = true;
+                if (this.widgetCatalogService.isCompatiblieVersion(current) ) {
+                  accumulator.push(current);
+                }
+              }
+              return accumulator;
+            }, []);
+
+            // Microservice
+
+            const microserviceDependencies = this.templateDetails[index]?.input?.dependencies.filter(microserviceDep => microserviceDep === 'microservice');
+            this.templateDetails.microservices = this.templateDetails.microservices.concat(microserviceDependencies);
+            this.templateDetails.microservices = this.templateDetails.microservices.reduce((accumulator, current)=> {
+              if (!accumulator.find((item) => item.id === current.id)) {
+                current.selected = true;
+                if (this.widgetCatalogService.isCompatiblieVersion(current) ) {
+                  accumulator.push(current);
+                }
+              }
+              return accumulator;
+            }, []);
+
             if (this.templateDetails[index].preview) {
                 this.templateDetails[index].preview = this.templateCatalogFromDCService.getGithubURL(this.templateDetails[index].preview);
             }
             this.updateDepedencies(index);
-            console.log('this.templateDetails[index]', this.templateDetails[index], 'full template details', this.templateDetails);
             this.templateCatalogSetupService.dynamicDashboardTemplateDetails.next(this.templateDetails[index]);
             
         });
-        this.isSpin = false;
     }
 }
 
