@@ -83,6 +83,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
   groupTemplateFromSimulator: boolean;
   indexOfDashboardUpdatedFromDC: any;
   dynamicDashboardValueToUpdate: any;
+  
 
 
   constructor(
@@ -98,7 +99,8 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     private progressIndicatorService: ProgressIndicatorService, private catalogService: TemplateCatalogService,
     @Inject(DOCUMENT) private document: Document, private deviceSelectorModalRef: BsModalRef, 
     private appStateService: AppStateService, protected setupConfigService: SetupConfigService, 
-    private settingsService: SettingsService, private pluginsService: PluginsService
+    private settingsService: SettingsService, private pluginsService: PluginsService,
+    private alertService: AlertService
     
   ) {
     
@@ -149,10 +151,10 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     this.templateCatalogSetupService.dynamicDashboardTemplate.subscribe(value => {
       if (value?.defaultDashboardSet) {
         this.dynamicDashboardValueToUpdate = value;
-        this.dynamicDashboardValueToUpdate.titleAssigned = "Default Dashboard";
+        this.dynamicDashboardValueToUpdate.titleAssigned = "Default Template";
       } else {
         this.dynamicDashboardValueToUpdate = value;
-        this.dynamicDashboardValueToUpdate.titleAssigned = value.title;
+        this.dynamicDashboardValueToUpdate.titleAssigned = value?.title;
       }
     });
   }
@@ -166,6 +168,19 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       this.onSaveClicked = false;
       this.isSpin = true;
         let templateDetailsData;
+
+        this.templateCatalogSetupService.dynamicDashboardTemplate.subscribe(value => {
+          if (value?.defaultDashboardSet) {
+            this.dynamicDashboardValueToUpdate = value;
+            this.dynamicDashboardValueToUpdate.titleAssigned = "Default Template";
+          } else {
+            this.dynamicDashboardValueToUpdate = value;
+            this.dynamicDashboardValueToUpdate.titleAssigned = value?.title;
+          }
+        });
+
+
+
         if (this.dynamicDashboardValueToUpdate) {
           templateDetailsData = await (await this.loadTemplateDetails(this.dynamicDashboardValueToUpdate.dashboard)).toPromise();
         } else {
@@ -176,7 +191,14 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     const SimultorConfigFiles = [];
     let currentSimulatorData;
 
-    if (dashboard.defaultDashboardSet) {
+    console.log('templateDetailsData.simulatorDTDL', templateDetailsData.simulatorDTDL);
+    if (!templateDetailsData.simulatorDTDL) {
+      this.alertService.danger("Simulator File doesn't exist");
+      this.isSpin = false;
+      return false;
+    }
+    console.log('this.dynamicDashboardValueToUpdate', this.dynamicDashboardValueToUpdate, 'dashboard', dashboard);
+    if (this.dynamicDashboardValueToUpdate.defaultDashboardSet) {
       // Not able to use forEach, as it takes callback as parameter which expects to be async
       for (let i = 0; i < templateDetailsData.simulatorDTDL.length; i++) {
       currentSimulatorData = await (await this.loadTemplateDetails(templateDetailsData.simulatorDTDL[i].simulatorFile)).toPromise();
@@ -283,10 +305,10 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     // }  
 
     this.templateCatalogSetupService.dynamicDashboardTemplateDetails.subscribe(value => {
-      const pluginDependencies = value.input.dependencies.filter(pluginDep => pluginDep === 'plugin');
-      const microserviceDependencies = value.input.dependencies.filter(microserviceDep => microserviceDep === 'microservice');
-      this.templateDetails.plugins = this.templateDetails.plugins.concat(pluginDependencies);
-      this.templateDetails.microservices = this.templateDetails.microservices.concat(microserviceDependencies);
+      // const pluginDependencies = value.input.dependencies.filter(pluginDep => pluginDep === 'plugin');
+      // const microserviceDependencies = value.input.dependencies.filter(microserviceDep => microserviceDep === 'microservice');
+      this.templateDetails.plugins = this.templateDetails.plugins.concat(value.input.dependencies);
+      // this.templateDetails.microservices = this.templateDetails.microservices.concat(microserviceDependencies);
     });
    this.templateDetails.plugins = this.templateDetails.plugins.reduce((accumulator, current)=> {
       if (!accumulator.find((item) => item.id === current.id)) {
@@ -299,15 +321,15 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     }, []);
 
 
-    this.templateDetails.microservices = this.templateDetails.microservices.reduce((accumulator, current)=> {
-      if (!accumulator.find((item) => item.id === current.id)) {
-        current.selected = true;
-        if (this.widgetCatalogService.isCompatiblieVersion(current) ) {
-          accumulator.push(current);
-        }
-      }
-      return accumulator;
-    }, []);
+    // this.templateDetails.microservices = this.templateDetails.microservices.reduce((accumulator, current)=> {
+    //   if (!accumulator.find((item) => item.id === current.id)) {
+    //     current.selected = true;
+    //     if (this.widgetCatalogService.isCompatiblieVersion(current) ) {
+    //       accumulator.push(current);
+    //     }
+    //   }
+    //   return accumulator;
+    // }, []);
 
 
     // Filter dashboards which are selected
@@ -429,10 +451,10 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
        
           if (value?.defaultDashboardSet) {
             this.dynamicDashboardValueToUpdate = value;
-            this.dynamicDashboardValueToUpdate.titleAssigned = "Default Dashboard";
+            this.dynamicDashboardValueToUpdate.titleAssigned = "Default Template";
           } else {
             this.dynamicDashboardValueToUpdate = value;
-            this.dynamicDashboardValueToUpdate.titleAssigned = value.title;
+            this.dynamicDashboardValueToUpdate.titleAssigned = value?.title;
           }
           if(this.dynamicDashboardValueToUpdate?.titleAssigned) {
             dashboardConfiguration.dashboardName = this.dynamicDashboardValueToUpdate?.titleAssigned.split("-")[0];

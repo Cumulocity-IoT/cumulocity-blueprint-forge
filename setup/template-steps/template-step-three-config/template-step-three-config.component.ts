@@ -85,6 +85,8 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   isPreviewLoading: boolean;
   distinctDependencyNames: any;
   isSpin: boolean = false;
+  pluginDetailsArray: any;
+  microserviceArray: any;
 
 
   constructor(
@@ -120,11 +122,14 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   }
 
   ngOnInit() {
-    this.selectedDashboardName = "Default Dashboard";
+    this.selectedDashboardName = "Default Template";
     this.templateCatalogSetupService.templateData.subscribe(async currentData => {
       this.isFormValid = this.appConfigForm?.form.valid;
       if (currentData) {
         this.templateDetails = currentData;
+        this.pluginDetailsArray = JSON.parse(JSON.stringify(this.templateDetails?.plugins));
+        this.microserviceArray = JSON.parse(JSON.stringify(this.templateDetails?.microservices));
+        console.log('template details plugins', this.templateDetails?.plugins);
         this.loadTemplateCatalogFromDashboardCatalog();
       }
       // In case of no device 
@@ -318,7 +323,7 @@ async saveAppChanges(app) {
           const templateDetailsCopy = JSON.parse(JSON.stringify(this.templateDetails.dashboards));
           let dashboardToUpdateForTemplate = templateDetailsCopy.find(dashboard => (!dashboard.isSimulatorConfigExist && dashboard.isDeviceRequired) || (dashboard.isSimulatorConfigExist && dashboard.linkWithDashboard === '' && dashboard.isDeviceRequired));
           
-          if (this.selectedDashboardName !== "Default Dashboard") {
+          if (this.selectedDashboardName !== "Default Template") {
             dashboardToUpdateForTemplate.title = this.selectedDashboardName;
           } else {
             dashboardToUpdateForTemplate.title = dashboardToUpdateForTemplate.title;
@@ -326,7 +331,7 @@ async saveAppChanges(app) {
           }
           this.templateCatalogSetupService.dynamicDashboardTemplate.next(dashboardToUpdateForTemplate);
           this.filterTemplates.splice(0, 0, dashboardToUpdateForTemplate);
-          this.filterTemplates.filter(template => (template.title === dashboardToUpdateForTemplate.title) ? (template.title = 'Default Dashboard') :  null );
+          this.filterTemplates.filter(template => (template.title === dashboardToUpdateForTemplate.title) ? (template.title = 'Default Template') :  null );
           this.filterTemplates = this.sortDashboardsByTitle();
         
         this.loadTemplateDetails(dashboardToUpdateForTemplate);
@@ -361,8 +366,13 @@ async saveAppChanges(app) {
         }))
         .subscribe(templateDetails => {
           this.isSpin = false;
+          this.templateDetails[index] = null;
             this.templateDetails[index] = templateDetails;
-            const pluginDependencies = this.templateDetails[index]?.input?.dependencies.filter(pluginDep => pluginDep === 'plugin');
+            console.log('this.templateDetails.plugins', this.templateDetails.plugins);
+            
+            this.templateDetails.plugins.length = 0;
+            this.templateDetails.plugins = JSON.parse(JSON.stringify(this.pluginDetailsArray));
+            const pluginDependencies = this.templateDetails[index]?.input?.dependencies.filter(pluginDep => pluginDep.type === 'plugin');
             this.templateDetails.plugins = this.templateDetails.plugins.concat(pluginDependencies);
 
             this.templateDetails.plugins = this.templateDetails.plugins.reduce((accumulator, current)=> {
@@ -374,10 +384,12 @@ async saveAppChanges(app) {
               }
               return accumulator;
             }, []);
-
+            console.log('this.templateDetails.plugins step three', this.templateDetails.plugins);
             // Microservice
-
-            const microserviceDependencies = this.templateDetails[index]?.input?.dependencies.filter(microserviceDep => microserviceDep === 'microservice');
+            
+            this.templateDetails.microservices.length = 0;
+            this.templateDetails.microservices = JSON.parse(JSON.stringify(this.microserviceArray));
+            const microserviceDependencies = this.templateDetails[index]?.input?.dependencies.filter(microserviceDep => microserviceDep.type === 'microservice');
             this.templateDetails.microservices = this.templateDetails.microservices.concat(microserviceDependencies);
             this.templateDetails.microservices = this.templateDetails.microservices.reduce((accumulator, current)=> {
               if (!accumulator.find((item) => item.id === current.id)) {
@@ -388,6 +400,7 @@ async saveAppChanges(app) {
               }
               return accumulator;
             }, []);
+            console.log('this.templateDetails.microservices step three', this.templateDetails.microservices);
 
             if (this.templateDetails[index].preview) {
                 this.templateDetails[index].preview = this.templateCatalogFromDCService.getGithubURL(this.templateDetails[index].preview);
