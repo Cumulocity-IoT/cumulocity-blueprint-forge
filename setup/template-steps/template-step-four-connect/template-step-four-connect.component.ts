@@ -60,7 +60,6 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
   newAppName: string;
   newAppContextPath: string;
   newAppIcon: string;
-
   app: Observable<any>;
   currentApp: IApplication;
   templateDetailsData: any;
@@ -83,8 +82,6 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
   groupTemplateFromSimulator: boolean;
   indexOfDashboardUpdatedFromDC: any;
   dynamicDashboardValueToUpdate: any;
-  
-
 
   constructor(
     public stepper: C8yStepper,
@@ -151,10 +148,10 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     this.templateCatalogSetupService.dynamicDashboardTemplate.subscribe(value => {
       if (value?.defaultDashboardSet) {
         this.dynamicDashboardValueToUpdate = value;
-        this.dynamicDashboardValueToUpdate.titleAssigned = "Default Template";
+        this.dynamicDashboardValueToUpdate ? (this.dynamicDashboardValueToUpdate.titleAssigned = "Default Template") : null;
       } else {
         this.dynamicDashboardValueToUpdate = value;
-        this.dynamicDashboardValueToUpdate.titleAssigned = value?.title;
+        this.dynamicDashboardValueToUpdate ? (this.dynamicDashboardValueToUpdate.titleAssigned = value?.title) : null;
       }
     });
   }
@@ -191,13 +188,11 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     const SimultorConfigFiles = [];
     let currentSimulatorData;
 
-    console.log('templateDetailsData.simulatorDTDL', templateDetailsData.simulatorDTDL);
     if (!templateDetailsData.simulatorDTDL) {
       this.alertService.danger("Simulator File doesn't exist");
       this.isSpin = false;
       return false;
     }
-    console.log('this.dynamicDashboardValueToUpdate', this.dynamicDashboardValueToUpdate, 'dashboard', dashboard);
     if (this.dynamicDashboardValueToUpdate.defaultDashboardSet) {
       // Not able to use forEach, as it takes callback as parameter which expects to be async
       for (let i = 0; i < templateDetailsData.simulatorDTDL.length; i++) {
@@ -305,11 +300,9 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     // }  
 
     this.templateCatalogSetupService.dynamicDashboardTemplateDetails.subscribe(value => {
-      // const pluginDependencies = value.input.dependencies.filter(pluginDep => pluginDep === 'plugin');
-      // const microserviceDependencies = value.input.dependencies.filter(microserviceDep => microserviceDep === 'microservice');
       this.templateDetails.plugins = this.templateDetails.plugins.concat(value.input.dependencies);
-      // this.templateDetails.microservices = this.templateDetails.microservices.concat(microserviceDependencies);
     });
+
    this.templateDetails.plugins = this.templateDetails.plugins.reduce((accumulator, current)=> {
       if (!accumulator.find((item) => item.id === current.id)) {
         current.selected = true;
@@ -319,18 +312,6 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       }
       return accumulator;
     }, []);
-
-
-    // this.templateDetails.microservices = this.templateDetails.microservices.reduce((accumulator, current)=> {
-    //   if (!accumulator.find((item) => item.id === current.id)) {
-    //     current.selected = true;
-    //     if (this.widgetCatalogService.isCompatiblieVersion(current) ) {
-    //       accumulator.push(current);
-    //     }
-    //   }
-    //   return accumulator;
-    // }, []);
-
 
     // Filter dashboards which are selected
     let configDataDashboards = this.templateDetails.dashboards.filter(item => item.selected === true);
@@ -444,17 +425,17 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       } else {
         this. groupTemplate = false;
       }
-
+      
       if (index === this.indexOfDashboardUpdatedFromDC) {
         this.templateCatalogSetupService.dynamicDashboardTemplate.subscribe(value => {
           db.dashboard = value.dashboard;
        
           if (value?.defaultDashboardSet) {
             this.dynamicDashboardValueToUpdate = value;
-            this.dynamicDashboardValueToUpdate.titleAssigned = "Default Template";
+            this.dynamicDashboardValueToUpdate ? (this.dynamicDashboardValueToUpdate.titleAssigned = "Default Template") : null;
           } else {
             this.dynamicDashboardValueToUpdate = value;
-            this.dynamicDashboardValueToUpdate.titleAssigned = value?.title;
+            this.dynamicDashboardValueToUpdate ? (this.dynamicDashboardValueToUpdate.titleAssigned = value?.title) : null;
           }
           if(this.dynamicDashboardValueToUpdate?.titleAssigned) {
             dashboardConfiguration.dashboardName = this.dynamicDashboardValueToUpdate?.titleAssigned.split("-")[0];
@@ -586,7 +567,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
                 let dashboards = app.applicationBuilder.dashboards;
                 for(let dbLinks of this.templateDetails.dashboardLinks) {
                   const updatableDashboardId = dashboards.find( db => db.name === dbLinks.dashboardName)?.id;
-                  const targetDashboardId = dashboards.find( db => db.name === dbLinks.targetDashboardName)?.id;
+                  const targetDashboardId = dashboards.find( db => (db.name === dbLinks.targetDashboardName) || (db.name.trim() === this.dynamicDashboardValueToUpdate?.titleAssigned.split("-")[0].trim()))?.id;
                   if(updatableDashboardId && targetDashboardId){
                     const updatableDashboardObj = (await this.invService.detail(updatableDashboardId)).data?.c8y_Dashboard;
                     if(updatableDashboardObj) {

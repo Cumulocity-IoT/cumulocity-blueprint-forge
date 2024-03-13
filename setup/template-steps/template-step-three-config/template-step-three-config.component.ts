@@ -42,8 +42,6 @@ import { DomSanitizer } from '@angular/platform-browser';
 import {cloneDeep} from "lodash-es";
 import { WidgetCatalogService } from '../../../builder/widget-catalog/widget-catalog.service';
 import { DependencyDescription } from '../../../builder/template-catalog/template-catalog.model';
-import { ProgressIndicatorService } from '../../../builder/utils/progress-indicator-modal/progress-indicator.service';
-
 import { TemplateCatalogEntry } from '../../../builder/template-catalog/template-catalog.model';
 @Component({
   selector: 'c8y-template-step-three-config',
@@ -73,7 +71,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   groupTemplateInDashboard: boolean;
   dashboardName: any;
   dashboardTemplate: any;
-  templateSelected: string = 'Default Template';
+  templateSelected: string;
   isMSEnabled: boolean = false;
   blankTemplateDashboard: boolean;
   welcomeTemplateData: TemplateCatalogEntry;
@@ -122,14 +120,15 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   }
 
   ngOnInit() {
-    this.selectedDashboardName = "Default Template";
     this.templateCatalogSetupService.templateData.subscribe(async currentData => {
       this.isFormValid = this.appConfigForm?.form.valid;
       if (currentData) {
+        console.log('current data in step 3', currentData, 'template details data', this.templateDetails);
+        this.selectedDashboardName = "Default Template";
+        this.templateSelected = "Default Template";
         this.templateDetails = currentData;
         this.pluginDetailsArray = JSON.parse(JSON.stringify(this.templateDetails?.plugins));
         this.microserviceArray = JSON.parse(JSON.stringify(this.templateDetails?.microservices));
-        console.log('template details plugins', this.templateDetails?.plugins);
         this.loadTemplateCatalogFromDashboardCatalog();
       }
       // In case of no device 
@@ -324,22 +323,20 @@ async saveAppChanges(app) {
           let dashboardToUpdateForTemplate = templateDetailsCopy.find(dashboard => (!dashboard.isSimulatorConfigExist && dashboard.isDeviceRequired) || (dashboard.isSimulatorConfigExist && dashboard.linkWithDashboard === '' && dashboard.isDeviceRequired));
           
           if (this.selectedDashboardName !== "Default Template") {
-            dashboardToUpdateForTemplate.title = this.selectedDashboardName;
+            dashboardToUpdateForTemplate ? (dashboardToUpdateForTemplate.title = this.selectedDashboardName) : null;
           } else {
-            dashboardToUpdateForTemplate.title = dashboardToUpdateForTemplate.title;
+            dashboardToUpdateForTemplate ? (dashboardToUpdateForTemplate.title = dashboardToUpdateForTemplate.title) : null;
             dashboardToUpdateForTemplate.defaultDashboardSet = true;
           }
           this.templateCatalogSetupService.dynamicDashboardTemplate.next(dashboardToUpdateForTemplate);
-          this.filterTemplates.splice(0, 0, dashboardToUpdateForTemplate);
-          this.filterTemplates.filter(template => (template.title === dashboardToUpdateForTemplate.title) ? (template.title = 'Default Template') :  null );
+          this.filterTemplates?.splice(0, 0, dashboardToUpdateForTemplate);
+          this.filterTemplates?.filter(template => (template?.title === dashboardToUpdateForTemplate?.title) ? (template.title = 'Default Template') :  null );
           this.filterTemplates = this.sortDashboardsByTitle();
         
         this.loadTemplateDetails(dashboardToUpdateForTemplate);
       }, error => {
         this.alertService.danger("There is some technical error! Please try after sometime.");
       });
-
-      
   }
 
   async loadTemplateDetails(template: any, index?): Promise<void> {
@@ -368,7 +365,6 @@ async saveAppChanges(app) {
           this.isSpin = false;
           this.templateDetails[index] = null;
             this.templateDetails[index] = templateDetails;
-            console.log('this.templateDetails.plugins', this.templateDetails.plugins);
             
             this.templateDetails.plugins.length = 0;
             this.templateDetails.plugins = JSON.parse(JSON.stringify(this.pluginDetailsArray));
@@ -384,7 +380,6 @@ async saveAppChanges(app) {
               }
               return accumulator;
             }, []);
-            console.log('this.templateDetails.plugins step three', this.templateDetails.plugins);
             // Microservice
             
             this.templateDetails.microservices.length = 0;
@@ -400,7 +395,6 @@ async saveAppChanges(app) {
               }
               return accumulator;
             }, []);
-            console.log('this.templateDetails.microservices step three', this.templateDetails.microservices);
 
             if (this.templateDetails[index].preview) {
                 this.templateDetails[index].preview = this.templateCatalogFromDCService.getGithubURL(this.templateDetails[index].preview);

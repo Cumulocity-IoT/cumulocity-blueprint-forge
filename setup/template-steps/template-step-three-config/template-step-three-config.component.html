@@ -97,27 +97,7 @@
                     </div>
                     
                   </div>
-                  <!-- <div class="list-group-item d-flex" *ngFor="let dependency of distinctDependencyNames; let dep =index">
-                    <div class="list-item-checkbox">
-                      <label id="dependency{{dep}}" title="select" class="c8y-checkbox" >
-                        <input type="checkbox" [checked]="true"
-                        [disabled]=""/>
-                        <span></span>
-                      </label>
-                    </div>
-                    <div class="list-item-icon">
-                      <i title="Plugin" c8yIcon="big-parcel"></i>
-                    </div>
-                    <div class="list-item-body text-left">
-                      <div class="d-flex row">
-                        <span class="col-sm-3 col-xs-12 title-width">{{dependency}}</span>
-                        <div class="col-sm-3 col-xs-12 text-muted">
-                          <span translate></span>
-                        </div>
-                        <div class="col-sm-6 col-xs-12 text-muted"></div>
-                      </div>
-                    </div>
-                  </div> -->
+                  
                   <div class="list-group-item d-flex" *ngFor="let plugin of templateDetails?.plugins; let p =index">
                     <div class="list-item-checkbox">
                       <label id="plugin{{p}}" title="select" class="c8y-checkbox" >
@@ -232,8 +212,6 @@
     (onNext)="updateAppConfiguration(currentApp)"
     (onBack)="back()"
   >
-  <!-- validateandNext(currentApp) -->
-  <!-- saveandInstall(currentApp) -->
   </c8y-template-setup-stepper-buttons>
   <div class="alerts">
     <c8y-alert-outlet></c8y-alert-outlet>
