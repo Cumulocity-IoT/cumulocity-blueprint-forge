@@ -514,7 +514,7 @@ export class TemplateCatalogModalComponent implements OnInit {
     }
 
     applyFilter() {
-        if (this.filterTemplates && this.filterTemplates.length > 0) {console.log("filterTemplates:",this.filterTemplates);
+        if (this.filterTemplates && this.filterTemplates.length > 0) {
             this.searchFilterTemplates = this.filterTemplates.filter((template => 
                 template.title.toLowerCase().includes(this.searchTemplate.toLowerCase())  
                 ));
@@ -599,7 +599,6 @@ export class TemplateCatalogModalComponent implements OnInit {
                     this.filterTemplates = this.templates.filter(template => template.manufactur && template.manufactur != "");
                     break;
                 case '3':
-                    console.log("case 3->"); console.log("templates:", this.templates);
                     this.filterTemplates = this.templates.filter(template => template?.manufactur == '');
                     break;
                 case '4':
