@@ -77,7 +77,7 @@
                             dropdownToggle
                             class="btn btn-default dropdown-toggle c8y-dropdown"
                           >
-                            <span>{{(defaultLinkedDashboards && defaultLinkedDashboards[i]) ? defaultLinkedDashboards[i] : ""}}</span> <span class="caret"></span>
+                            <span>{{dashboard.defaultLinkedDashboard}}</span> <span class="caret"></span>
                           </button>
                           
                           <ul style="max-height: 225px; overflow-y: auto" class="dropdown-menu" *dropdownMenu>
@@ -102,7 +102,7 @@
                               dropdownToggle
                               class="btn btn-default dropdown-toggle c8y-dropdown"
                             >
-                              <span>{{(dashboardTemplateSelected && dashboardTemplateSelected[i]) ?  dashboardTemplateSelected[i] :  dashboard.title}}</span> <span class="caret"></span>
+                              <span>{{(dashboard.dashboardTemplateSelected && dashboard.dashboardTemplateSelected) ?  dashboard.dashboardTemplateSelected :  dashboard.title}}</span> <span class="caret"></span>
                             </button>
                             
                             <ul style="max-height: 225px; overflow-y: auto" class="dropdown-menu" *dropdownMenu>

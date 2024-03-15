@@ -132,6 +132,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       this.isFormValid = this.appConfigForm?.form.valid;
       if (currentData) {
         this.templateDetails = currentData;
+        console.log('template details in step 4', this.templateDetails?.dashboards);
       }
       // In case of no device 
       if (!(this.templateDetails?.input) || !(this.templateDetails?.input?.devices) || !(this.templateDetails?.input?.devices?.length > 0)) {
@@ -164,13 +165,6 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
         this.templateCatalogSetupService.dynamicDashboardTemplate.subscribe(value => {
           this.dynamicDashboardValueToUpdate = value;
             this.dynamicDashboardValueToUpdate.titleAssigned = value?.title;
-          // if (value?.defaultDashboardSet) {
-          //   this.dynamicDashboardValueToUpdate = value;
-          //   this.dynamicDashboardValueToUpdate.titleAssigned = "Default Template";
-          // } else {
-          //   this.dynamicDashboardValueToUpdate = value;
-          //   this.dynamicDashboardValueToUpdate.titleAssigned = value?.title;
-          // }
         });
 
 

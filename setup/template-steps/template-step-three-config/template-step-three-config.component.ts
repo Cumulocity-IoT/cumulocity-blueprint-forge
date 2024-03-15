@@ -89,10 +89,10 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   dashboardTemplateInputSearch: string;
   linkDashboards: any;
   linkDashboardDefault: any;
-  defaultLinkedDashboards: any;
+  defaultLinkedDashboard: any;
   dashboardTemplatesArray: any;
   linkDashboardsCopy: any;
-  dashboardTemplateSelected: any = [];
+  dashboardTemplateSelected: any;
 
   constructor(
     public stepper: C8yStepper,
@@ -340,21 +340,16 @@ async saveAppChanges(app) {
             dashboardTemplate.dashboardTemplatesArray = dashboardTemplate.dashboardTemplatesArray.filter(item => !item.manufactur);
             dashboardTemplate.dashboardTemplatesArray = this.sortDashboardsByTitle(dashboardTemplate.dashboardTemplatesArray);
           })
-          // this.dashboardTemplatesArray = this.templatesFromDC ? this.templatesFromDC : [];
-          // this.dashboardTemplatesArray = this.dashboardTemplatesArray.filter(item => !item.manufactur);
-          // this.dashboardTemplatesArray = this.sortDashboardsByTitle(this.dashboardTemplatesArray);
-
-          this.defaultLinkedDashboards = [];
+         
           let findMatchedIdObject;
-          this.defaultLinkedDashboards = this.templateDetails.dashboards.map(item => {
+          this.templateDetails.dashboards.forEach(item => {
             if (item.linkWithDashboard) {
               findMatchedIdObject = this.templateDetails.dashboards.find(match => match.id === item.linkWithDashboard);
-              return findMatchedIdObject.title;
+              item.defaultLinkedDashboard =  findMatchedIdObject.title;
             } else {
-              return "";
+              item.defaultLinkedDashboard =  "";
             }
-          });
-          
+          })
         
         this.loadTemplateDetails(dashboardToUpdateForTemplate);
       }, error => {
@@ -511,7 +506,7 @@ generateLinkingDashboards() {
 
 onSelectOfLinkingDashbord(title, dashboardIndex) {
   const disableButton = <HTMLElement>document.getElementById("dashboardTemplates-"+dashboardIndex);
-  this.defaultLinkedDashboards[dashboardIndex] = title;
+  this.templateDetails.dashboards[dashboardIndex].defaultLinkedDashboard = title;
   if (title === 'Unconfigure') {
     disableButton.classList.add("disable-dashboard-templates");
   } else {
@@ -520,6 +515,6 @@ onSelectOfLinkingDashbord(title, dashboardIndex) {
 }
 
 updateDashboardTemplateSelected (title, index) {
-  this.dashboardTemplateSelected[index] = title;
+  this.templateDetails.dashboards[index].dashboardTemplateSelected = title;
 }
 }

@@ -97,6 +97,7 @@ export interface Dashboards {
     templateType?: number;
     basicConfig?: WidgetDetail[];
     isConfigRequred?: boolean;
+    linkDashboards?: any
 }
 export interface DashboardWidgets {
     id?: string;
