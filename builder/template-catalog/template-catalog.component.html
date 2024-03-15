@@ -62,7 +62,7 @@
                             </h3>
                         </div>
                         <button class="btn-clean">
-                            <span class="label label-info">{{getTemplateType(template)}}</span>
+                            <span class="label label-info"><ng-container *ngTemplateOutlet="templateLabel; context: { $implicit: template }"></ng-container></span>
                         </button>
                         <div *ngIf="template.comingSoon==true" class="flip-card-font-coming-soon">
                         </div>
@@ -72,7 +72,7 @@
                         <div *ngIf="template.comingSoon==true" class="coming-soon-tag-backside">Coming Soon</div>
                         <div class="row">
                                 <button class="m-l-16 btn-clean pull-left" style="cursor: default;">
-                                    <span class="label label-info">{{getTemplateType(template)}}</span>
+                                    <span class="label label-info"><ng-container *ngTemplateOutlet="templateLabel; context: { $implicit: template }"></ng-container></span>
                                 </button>
                                 <button *ngIf="template.availability" class="m-r-16 btn-dot btn-dot--warning pull-right pull-right" (click)="deleteTemplate(template)" title="Delete">
                                     <i [c8yIcon]="'delete'"></i></button>
@@ -253,4 +253,13 @@
         </div>
         <button [disabled]="importLoading" type="button" class="btn btn-primary" (click)="onImportClicked()">{{getImportButtonText()}}</button>
     </div>
+</ng-template>
+
+<ng-template #templateLabel let-template>
+    <ng-container *ngIf="template.manufactur && template.manufactur !==''">Device</ng-container>
+    <ng-container *ngIf="template?.manufactur ===''">General</ng-container>
+    <ng-container *ngIf="template.availability">
+        <ng-container *ngIf="template.availability==='EXPORT'">Custom</ng-container>
+        <ng-container *ngIf="template.availability==='SHARED'">Tenant Only</ng-container>
+    </ng-container>
 </ng-template>

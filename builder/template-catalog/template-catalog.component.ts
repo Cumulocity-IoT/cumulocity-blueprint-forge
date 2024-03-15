@@ -611,20 +611,4 @@ export class TemplateCatalogModalComponent implements OnInit {
         }
         this.searchFilterTemplates= this.filterTemplates ? this.filterTemplates : [];
     }
-
-    getTemplateType(template):string{
-        if(template.manufactur && template?.manufactur!=''){
-            return 'Device'
-        }
-        else if(template?.manufactur==''){
-            return 'General'
-        }
-        else if(template?.availability=='EXPORT'){
-            return 'Custom'
-        }
-        else if(template?.availability=='SHARED'){
-            return 'Tenant Only'
-        }
-        return 
-    }
 }
