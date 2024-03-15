@@ -12,7 +12,7 @@
         <div class="">
             <div class="card-header">
             <!-- Search -->
-            <div id="searchWidget" class="col-xs-11 col-sm-11 col-md-11 col-lg-11 input-group input-group-search" style="padding-right: 0px;padding-left: 0px;">
+            <div id="searchWidget" class="col-xs-8 col-sm-8 col-md-8 col-lg-8 input-group input-group-search" style="padding-right: 0px;padding-left: 0px;">
                 <input
                 type="search"
                 class="form-control"
@@ -30,14 +30,26 @@
                 ></i>
                 </span>
             </div>
-            <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 dflex-end">
+            <div class="col-xs-3 col-sm-3 col-md-3 col-lg-3">
+                <div class="c8y-select-wrapper">
+                    <select class="form-control" [(ngModel)]="filter" style="border-radius:20px;"
+                        id="dashboardView" (change)="onFilterChange()">
+                        <option value="1">All</option>
+                        <option value="2">Devices</option>
+                        <option value="3">General</option>
+                        <option value="4">Custom</option>
+                        <option value="5">Tenant Only</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 dflex-center">
                 <button class="btn btn-dot" title="Import Dashboard Template" [popover]="importPopover" popoverTitle="Import Dashboard Template"
                     placement="right" type="button"><i class="c8y-icon dlt-c8y-icon-upload"></i></button>
             </div>
             </div>
         </div>
         <div class="row  modal-inner-scroll " style="padding-bottom: 20px;">
-        <div *ngFor="let template of filterTemplates" class="col-md-4 col-sm-6 col-xs-12 card-demo-container">
+        <div *ngFor="let template of searchFilterTemplates" class="col-md-4 col-sm-6 col-xs-12 card-demo-container">
             <div class="flip-card">
                 <div class="card-demo flip-card-inner">
                     <div class="flip-card-front">
@@ -48,23 +60,21 @@
                             <h3 [title]="template?.title">
                                 <b>{{ template?.title }} </b>
                             </h3>
-                            <button class="btn-clean" *ngIf="template.availability">
-                             <span class="label label-info" *ngIf="template.availability == 'SHARED'">Tenant only</span>
-                             <span class="label label-info" *ngIf="template.availability == 'EXPORT'">Custom</span>
-                            </button>
                         </div>
+                        <button class="btn-clean">
+                            <span class="label label-info"><ng-container *ngTemplateOutlet="templateLabel; context: { $implicit: template }"></ng-container></span>
+                        </button>
                         <div *ngIf="template.comingSoon==true" class="flip-card-font-coming-soon">
                         </div>
                         <div *ngIf="template.comingSoon==true" class="coming-soon-tag">Coming soon</div>
                     </div>
                     <div class="flip-card-back" [ngClass]="template.comingSoon==true?'coming-soon-back':''">
                         <div *ngIf="template.comingSoon==true" class="coming-soon-tag-backside">Coming Soon</div>
-                        <div class="row" *ngIf="template.availability">
+                        <div class="row">
                                 <button class="m-l-16 btn-clean pull-left" style="cursor: default;">
-                                    <span class="label label-info" *ngIf="template.availability == 'SHARED'">Tenant only</span>
-                                    <span class="label label-info" *ngIf="template.availability == 'EXPORT'">Custom</span>
+                                    <span class="label label-info"><ng-container *ngTemplateOutlet="templateLabel; context: { $implicit: template }"></ng-container></span>
                                 </button>
-                                <button class="m-r-16 btn-dot btn-dot--warning pull-right pull-right" (click)="deleteTemplate(template)" title="Delete">
+                                <button *ngIf="template.availability" class="m-r-16 btn-dot btn-dot--warning pull-right pull-right" (click)="deleteTemplate(template)" title="Delete">
                                     <i [c8yIcon]="'delete'"></i></button>
                         </div>
                         
@@ -238,10 +248,18 @@
 <ng-template #importPopover>
     <div style="width: 200px;">
         <div class="form-group">
-            <label for="importFile">Upload dashboard template file</label>
             <input type="file" accept=".json" id="importFile" aria-describedby="helpinput" class="form-control"
                 (change)="onFileSelected($event.target.files)" />
         </div>
         <button [disabled]="importLoading" type="button" class="btn btn-primary" (click)="onImportClicked()">{{getImportButtonText()}}</button>
     </div>
+</ng-template>
+
+<ng-template #templateLabel let-template>
+    <ng-container *ngIf="template.manufactur && template.manufactur !==''">Device</ng-container>
+    <ng-container *ngIf="template?.manufactur ===''">General</ng-container>
+    <ng-container *ngIf="template.availability">
+        <ng-container *ngIf="template.availability==='EXPORT'">Custom</ng-container>
+        <ng-container *ngIf="template.availability==='SHARED'">Tenant Only</ng-container>
+    </ng-container>
 </ng-template>
