@@ -16,4 +16,10 @@
     position: absolute;
     padding-left: 5%;
 }
+.disable-dashboard-templates {
+    background-color: #d3d3d3; 
+    pointer-events: none; 
+    cursor: default; 
+    color: gray;
+}
 

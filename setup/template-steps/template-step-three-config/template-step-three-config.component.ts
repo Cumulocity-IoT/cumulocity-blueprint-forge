@@ -37,12 +37,13 @@ import { SetupConfigService } from './../../setup-config.service';
 import { SetupWidgetConfigModalComponent } from '../../../setup/setup-widget-config-modal/setup-widget-config-modal.component';
 import { DOCUMENT } from '@angular/common';
 import { BrandingService } from '../../../builder/branding/branding.service';
-import { catchError } from "rxjs/operators";
+import { catchError, map, startWith } from "rxjs/operators";
 import { DomSanitizer } from '@angular/platform-browser';
 import {cloneDeep} from "lodash-es";
 import { WidgetCatalogService } from '../../../builder/widget-catalog/widget-catalog.service';
 import { DependencyDescription } from '../../../builder/template-catalog/template-catalog.model';
 import { TemplateCatalogEntry } from '../../../builder/template-catalog/template-catalog.model';
+import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/typeahead-match.class';
 @Component({
   selector: 'c8y-template-step-three-config',
   templateUrl: './template-step-three-config.component.html',
@@ -85,7 +86,13 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   isSpin: boolean = false;
   pluginDetailsArray: any;
   microserviceArray: any;
-
+  dashboardTemplateInputSearch: string;
+  linkDashboards: any;
+  linkDashboardDefault: any;
+  defaultLinkedDashboards: any;
+  dashboardTemplatesArray: any;
+  linkDashboardsCopy: any;
+  dashboardTemplateSelected: any = [];
 
   constructor(
     public stepper: C8yStepper,
@@ -123,13 +130,12 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
     this.templateCatalogSetupService.templateData.subscribe(async currentData => {
       this.isFormValid = this.appConfigForm?.form.valid;
       if (currentData) {
-        console.log('current data in step 3', currentData, 'template details data', this.templateDetails);
-        this.selectedDashboardName = "Default Template";
         this.templateSelected = "Default Template";
         this.templateDetails = currentData;
         this.pluginDetailsArray = JSON.parse(JSON.stringify(this.templateDetails?.plugins));
         this.microserviceArray = JSON.parse(JSON.stringify(this.templateDetails?.microservices));
         this.loadTemplateCatalogFromDashboardCatalog();
+        this.generateLinkingDashboards();
       }
       // In case of no device 
       if (!(this.templateDetails?.input) || !(this.templateDetails?.input?.devices) || !(this.templateDetails?.input?.devices?.length > 0)) {
@@ -301,11 +307,11 @@ async saveAppChanges(app) {
     this.templateCatalogSetupService.welcomeTemplateSelected.next(this.templateSelected);
   }
 
-  assignSelectedDashboard(selectedDashboard, index) {
+  assignSelectedDashboard(selectedDashboard, index, event) {
     this.templateCatalogSetupService.indexOfDashboardToUpdateTemplate = index;
-    this.selectedDashboardName = selectedDashboard.title.split("-")[0];
-    this.templateCatalogSetupService.dynamicDashboardTemplate.next(selectedDashboard);
-    this.loadTemplateDetails(selectedDashboard,index);
+    this.selectedDashboardName = event.value;
+    this.templateCatalogSetupService.dynamicDashboardTemplate.next(event.item);
+    this.loadTemplateDetails(event.item,index);
   }
 
 
@@ -322,16 +328,33 @@ async saveAppChanges(app) {
           const templateDetailsCopy = JSON.parse(JSON.stringify(this.templateDetails.dashboards));
           let dashboardToUpdateForTemplate = templateDetailsCopy.find(dashboard => (!dashboard.isSimulatorConfigExist && dashboard.isDeviceRequired) || (dashboard.isSimulatorConfigExist && dashboard.linkWithDashboard === '' && dashboard.isDeviceRequired));
           
-          if (this.selectedDashboardName !== "Default Template") {
-            dashboardToUpdateForTemplate ? (dashboardToUpdateForTemplate.title = this.selectedDashboardName) : null;
-          } else {
-            dashboardToUpdateForTemplate ? (dashboardToUpdateForTemplate.title = dashboardToUpdateForTemplate.title) : null;
+
+          dashboardToUpdateForTemplate ? (dashboardToUpdateForTemplate.title = dashboardToUpdateForTemplate.title) : null;
             dashboardToUpdateForTemplate.defaultDashboardSet = true;
-          }
           this.templateCatalogSetupService.dynamicDashboardTemplate.next(dashboardToUpdateForTemplate);
-          this.filterTemplates?.splice(0, 0, dashboardToUpdateForTemplate);
-          this.filterTemplates?.filter(template => (template?.title === dashboardToUpdateForTemplate?.title) ? (template.title = 'Default Template') :  null );
-          this.filterTemplates = this.sortDashboardsByTitle();
+          this.filterTemplates?.map(template => template.title = template.title.split("-")[0]);
+          this.filterTemplates = this.sortDashboardsByTitle(this.filterTemplates);
+
+          this.templateDetails.dashboards.forEach(dashboardTemplate => {
+            dashboardTemplate.dashboardTemplatesArray = this.templatesFromDC ? this.templatesFromDC : [];
+            dashboardTemplate.dashboardTemplatesArray = dashboardTemplate.dashboardTemplatesArray.filter(item => !item.manufactur);
+            dashboardTemplate.dashboardTemplatesArray = this.sortDashboardsByTitle(dashboardTemplate.dashboardTemplatesArray);
+          })
+          // this.dashboardTemplatesArray = this.templatesFromDC ? this.templatesFromDC : [];
+          // this.dashboardTemplatesArray = this.dashboardTemplatesArray.filter(item => !item.manufactur);
+          // this.dashboardTemplatesArray = this.sortDashboardsByTitle(this.dashboardTemplatesArray);
+
+          this.defaultLinkedDashboards = [];
+          let findMatchedIdObject;
+          this.defaultLinkedDashboards = this.templateDetails.dashboards.map(item => {
+            if (item.linkWithDashboard) {
+              findMatchedIdObject = this.templateDetails.dashboards.find(match => match.id === item.linkWithDashboard);
+              return findMatchedIdObject.title;
+            } else {
+              return "";
+            }
+          });
+          
         
         this.loadTemplateDetails(dashboardToUpdateForTemplate);
       }, error => {
@@ -448,8 +471,8 @@ private verifyWidgetCompatibility(dependency: DependencyDescription, index) {
   }
 }
 
-sortDashboardsByTitle() {
-  let sortedData = this.filterTemplates.sort((a, b) => {
+sortDashboardsByTitle(sortableArray) {
+  let sortedData = sortableArray.sort((a, b) => {
     let x = a.title.toLowerCase();
       let y = b.title.toLowerCase();
       if(x>y){return 1;}
@@ -459,4 +482,44 @@ sortDashboardsByTitle() {
   return sortedData;
 } 
 
+getLinkedDashboard(id) {
+  let  linkedDashboard;
+  linkedDashboard =  this.templateDetails.dashboards.filter(item => item.id === id);
+  return linkedDashboard[0].title;
+}
+
+generateLinkingDashboards() {
+  this.linkDashboards = JSON.parse(JSON.stringify(this.templateDetails.dashboards));
+        this.linkDashboards = this.linkDashboards.filter(item => item.title != "Welcome" && item.title !== "Help and Support" && item.title !== "Instruction");
+        this.linkDashboardsCopy = JSON.parse(JSON.stringify(this.linkDashboards));
+        let findMatchedTitle;
+        this.templateDetails.dashboards.forEach(dashboardItem => {
+          if (dashboardItem.title != 'Instruction' && dashboardItem.title != 'Help and Support' && dashboardItem.title != 'Welcome') {
+            this.linkDashboards = JSON.parse(JSON.stringify(this.linkDashboardsCopy));
+          this.linkDashboards[this.linkDashboards.length] = {
+            title: "Unconfigure"
+        };
+          dashboardItem.linkDashboards = this.linkDashboards;
+          findMatchedTitle = dashboardItem.linkDashboards.findIndex(titleObject => titleObject.title === dashboardItem.title);
+          if (findMatchedTitle >= 0) {
+            dashboardItem.linkDashboards.splice(findMatchedTitle, 1);
+          }
+          }
+          
+        });
+}
+
+onSelectOfLinkingDashbord(title, dashboardIndex) {
+  const disableButton = <HTMLElement>document.getElementById("dashboardTemplates-"+dashboardIndex);
+  this.defaultLinkedDashboards[dashboardIndex] = title;
+  if (title === 'Unconfigure') {
+    disableButton.classList.add("disable-dashboard-templates");
+  } else {
+    disableButton.classList.remove("disable-dashboard-templates");
+  }
+}
+
+updateDashboardTemplateSelected (title, index) {
+  this.dashboardTemplateSelected[index] = title;
+}
 }

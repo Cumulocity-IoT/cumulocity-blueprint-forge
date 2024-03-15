@@ -146,13 +146,8 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       this.welcomeTemplateData = welcomeTemplateData;
     });
     this.templateCatalogSetupService.dynamicDashboardTemplate.subscribe(value => {
-      if (value?.defaultDashboardSet) {
-        this.dynamicDashboardValueToUpdate = value;
-        this.dynamicDashboardValueToUpdate ? (this.dynamicDashboardValueToUpdate.titleAssigned = "Default Template") : null;
-      } else {
-        this.dynamicDashboardValueToUpdate = value;
+      this.dynamicDashboardValueToUpdate = value;
         this.dynamicDashboardValueToUpdate ? (this.dynamicDashboardValueToUpdate.titleAssigned = value?.title) : null;
-      }
     });
   }
 
@@ -167,13 +162,15 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
         let templateDetailsData;
 
         this.templateCatalogSetupService.dynamicDashboardTemplate.subscribe(value => {
-          if (value?.defaultDashboardSet) {
-            this.dynamicDashboardValueToUpdate = value;
-            this.dynamicDashboardValueToUpdate.titleAssigned = "Default Template";
-          } else {
-            this.dynamicDashboardValueToUpdate = value;
+          this.dynamicDashboardValueToUpdate = value;
             this.dynamicDashboardValueToUpdate.titleAssigned = value?.title;
-          }
+          // if (value?.defaultDashboardSet) {
+          //   this.dynamicDashboardValueToUpdate = value;
+          //   this.dynamicDashboardValueToUpdate.titleAssigned = "Default Template";
+          // } else {
+          //   this.dynamicDashboardValueToUpdate = value;
+          //   this.dynamicDashboardValueToUpdate.titleAssigned = value?.title;
+          // }
         });
 
 
@@ -274,11 +271,9 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
               this.templateDetails.dashboards[dd].devices = dashboard.devices;
            } 
           }
-          
         this.deviceFormValid = false;
     }
   }
-
 
   async loadTemplateDetails(dbDashboard): Promise<Observable<any>> {
     return this.catalogService.getTemplateDetails(dbDashboard)
@@ -294,10 +289,10 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       return;
     } 
       const currentHost = window.location.host.split(':')[0];
-    // if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
-    //   this.alert.warning("Installation isn't supported when running Application on localhost.");
-    //   return;
-    // }  
+    if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
+      this.alert.warning("Installation isn't supported when running Application on localhost.");
+      return;
+    }  
 
     this.templateCatalogSetupService.dynamicDashboardTemplateDetails.subscribe(value => {
       this.templateDetails.plugins = this.templateDetails.plugins.concat(value.input.dependencies);
@@ -429,14 +424,10 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       if (index === this.indexOfDashboardUpdatedFromDC) {
         this.templateCatalogSetupService.dynamicDashboardTemplate.subscribe(value => {
           db.dashboard = value.dashboard;
-       
-          if (value?.defaultDashboardSet) {
-            this.dynamicDashboardValueToUpdate = value;
-            this.dynamicDashboardValueToUpdate ? (this.dynamicDashboardValueToUpdate.titleAssigned = "Default Template") : null;
-          } else {
-            this.dynamicDashboardValueToUpdate = value;
+
+
+          this.dynamicDashboardValueToUpdate = value;
             this.dynamicDashboardValueToUpdate ? (this.dynamicDashboardValueToUpdate.titleAssigned = value?.title) : null;
-          }
           if(this.dynamicDashboardValueToUpdate?.titleAssigned) {
             dashboardConfiguration.dashboardName = this.dynamicDashboardValueToUpdate?.titleAssigned.split("-")[0];
           }

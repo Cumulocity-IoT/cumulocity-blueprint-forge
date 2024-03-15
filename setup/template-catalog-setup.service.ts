@@ -59,6 +59,8 @@ export class TemplateCatalogSetupService {
     public indexOfDashboardToUpdateTemplate = new BehaviorSubject<any>(null); 
     indexOfDashboardToUpdateTemplate$ = this.indexOfDashboardToUpdateTemplate.asObservable();
 
+    public searchDashboardTemplate$ = new BehaviorSubject<string>('');
+
 
     constructor(private http: HttpClient, private inventoryService: InventoryService,
         private appService: ApplicationService,
