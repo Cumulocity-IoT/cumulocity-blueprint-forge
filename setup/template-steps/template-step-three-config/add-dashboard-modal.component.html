@@ -1,0 +1,21 @@
+<div class="modal-header text-center bg-primary">
+    <h4 class="text-uppercase" style="margin:0; letter-spacing: 0.15em;">Add Dashboard</h4>
+</div>
+<div class="m-8">
+    <div class="form-group">
+        <label for="title"><span>Title</span></label>
+        <input type="text" class="form-control" id="title" name="title"
+            placeholder="Dashboard title (required)" required [(ngModel)]="title"/>
+        <label for="description" class="m-t-8"><span>Description</span></label>
+        <input type="text" class="form-control" id="description" name="description"
+            placeholder="Dashboard description (required)" required [(ngModel)]="description"/>
+        <label class="c8y-switch m-t-8">
+            <input type="checkbox" [(ngModel)]="isGroup" />
+            <span></span>Group Dashboard
+        </label>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-default" (click)="cancelClicked()">Cancel</button>
+    <button type="button" class="btn btn-primary" [disabled]="title == '' || description == ''" (click)="addDashboardClicked()">Save</button>
+</div>
