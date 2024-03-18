@@ -44,7 +44,7 @@ import { WidgetCatalogService } from '../../../builder/widget-catalog/widget-cat
 import { DependencyDescription } from '../../../builder/template-catalog/template-catalog.model';
 import { TemplateCatalogEntry } from '../../../builder/template-catalog/template-catalog.model';
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/typeahead-match.class';
-import { AddDashboardModalComponent } from './add-dashboard-modal.component';
+import { ConfigureCustomDashboardModalComponent } from './configure-custom-dashboard-modal.component';
 @Component({
   selector: 'c8y-template-step-three-config',
   templateUrl: './template-step-three-config.component.html',
@@ -519,8 +519,8 @@ updateDashboardTemplateSelected (title, index) {
   this.templateDetails.dashboards[index].dashboardTemplateSelected = title;
 }
 
-addDashboardClicked(){
-  this.bsModalRef=this.modalService.show(AddDashboardModalComponent,{ class: 'c8y-wizard'});
+configureCustomDashboard(){
+  this.bsModalRef=this.modalService.show(ConfigureCustomDashboardModalComponent,{ class: 'c8y-wizard'});
   this.bsModalRef.content.onSave.subscribe((response) => {
     this.templateDetails.dashboards.push(response);
   });

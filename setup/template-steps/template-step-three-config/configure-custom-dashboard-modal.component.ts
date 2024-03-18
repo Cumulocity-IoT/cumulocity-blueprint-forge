@@ -21,11 +21,11 @@ import { BsModalRef } from "ngx-bootstrap/modal";
 import { Subject } from "rxjs";
 
 @Component({
-    selector: 'add-dashboard-modal',
-    templateUrl: './add-dashboard-modal.component.html',
+    selector: 'configure-custom-dashboard-modal',
+    templateUrl: './configure-custom-dashboard-modal.component.html',
 })
 
-export class AddDashboardModalComponent{
+export class ConfigureCustomDashboardModalComponent{
 
     title:string = '';
     description:string= '';
@@ -37,7 +37,7 @@ export class AddDashboardModalComponent{
         this.onSave=new Subject();
     };
 
-    addDashboardClicked(){
+    save(){
         let response:any={
             title:this.title,
             description:this.description,
@@ -51,7 +51,7 @@ export class AddDashboardModalComponent{
         this.onSave.next(response);
         this.bsModalRef.hide();
     }
-    cancelClicked(){
+    cancel(){
         this.bsModalRef.hide();
     }
 }
