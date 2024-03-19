@@ -24,7 +24,7 @@ import { DeviceSelectorModalComponent } from "../utils/device-selector-modal/dev
 import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
 import { DependencyDescription, TemplateCatalogEntry, TemplateDetails } from "./template-catalog.model";
 import { TemplateCatalogService } from "./template-catalog.service";
-import { AlertService, DynamicComponentDefinition, DynamicComponentService } from "@c8y/ngx-components";
+import { AlertService, DynamicComponentDefinition, DynamicComponentService, PluginsService } from "@c8y/ngx-components";
 import { Observable, Subject, Subscription, interval } from "rxjs";
 import { ProgressIndicatorModalComponent } from "../utils/progress-indicator-modal/progress-indicator-modal.component";
 
@@ -76,6 +76,8 @@ export class TemplateCatalogModalComponent implements OnInit {
 
     private appList = [];
 
+    private listOfPackages = [];
+
     private sharedTemplates:any = [];
 
     public dashboardConfiguration = {
@@ -114,7 +116,8 @@ export class TemplateCatalogModalComponent implements OnInit {
         private catalogService: TemplateCatalogService, private componentService: DynamicComponentService,
         private alertService: AlertService, private widgetCatalogService: WidgetCatalogService,
         private applicationBinaryService: ApplicationBinaryService, private sanitizer: DomSanitizer,
-        private accessRightsService: AccessRightsService, private progressIndicatorService: ProgressIndicatorService,private invService: InventoryService) {
+        private accessRightsService: AccessRightsService, private progressIndicatorService: ProgressIndicatorService, 
+        private invService: InventoryService, private pluginsService: PluginsService) {
         this.onSave = new Subject();
         this.onCancel = new Subject();
     }
@@ -131,6 +134,7 @@ export class TemplateCatalogModalComponent implements OnInit {
             this.loadTemplateCatalog();
         }
         this.appList = (await this.appService.list({ pageSize: 2000 })).data;
+        this.listOfPackages = await this.pluginsService.listPackages();
         this.isMSEnabled =  this.applicationBinaryService.isMicroserviceEnabled(this.appList);
     }
 
@@ -413,8 +417,8 @@ export class TemplateCatalogModalComponent implements OnInit {
                 });
             
         } else { // installing plugin
-            const widgetBinaryFound = this.appList.find(app => app.manifest?.isPackage && (app.name.toLowerCase() === dependency.title?.toLowerCase() ||
-                (app.contextPath && app.contextPath?.toLowerCase() === dependency?.contextPath?.toLowerCase())));
+            const widgetBinaryFound = this.listOfPackages.find(app => (app.name.toLowerCase() === dependency.title?.toLowerCase() ||
+            (app.contextPath && app.contextPath?.toLowerCase() === dependency?.contextPath?.toLowerCase())));
             this.showProgressModalDialog(`Installing ${dependency.title}`);
             this.progressIndicatorService.setProgress(10);
             if (widgetBinaryFound) {
