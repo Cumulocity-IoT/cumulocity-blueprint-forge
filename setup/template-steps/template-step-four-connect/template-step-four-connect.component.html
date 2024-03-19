@@ -26,21 +26,39 @@
             <div class="card-block" id="dashboardDiv"  style="min-height: 300px">
               <div class="list-group">
                   <div class="list-group-item d-flex" >
-                
-                
                     <div class="list-item-body text-left">
+                      <div class="heading-align"> 
+                        <label for="group-details" style="font-weight: 550">Dashboard Name</label>
+                        <label for="group-details"></label>
+                        <label for="group-details" style="margin-left: 16.5%; font-weight: 550;">Link/Configure Dashboard</label>
+                        <label for="group-details" style="margin-left: 18%; font-weight: 550">Select Template</label>
+                        <label for="group-details" style="margin-left: 10%; font-weight: 550">Simulator Configuration</label>
+                      </div>
+                      
                       <div *ngFor="let dashboard of templateDetails?.dashboards; let i = index">
-                        <div class="d-flex row padd-bottom" *ngIf="(!dashboard.isSimulatorConfigExist && dashboard.isDeviceRequired) || (dashboard.isSimulatorConfigExist && dashboard.linkWithDashboard === '' && dashboard.isDeviceRequired)">
-                        <span translate class="col-sm-2 col-xs-12 title-width">{{dashboard.title}}</span>
+                        <div class="d-flex row padd-bottom"*ngIf="dashboard.title !== 'Instruction' && dashboard.title !== 'Welcome' && dashboard.title !== 'Help and Support'">
+                        <span translate class="col-sm-1 col-xs-12 title-width">{{dashboard.title}}</span>
                         <!-- <div class="col-sm-3 col-xs-12 text-muted">
                           Please choose Device/Group or Simulator
                         </div> -->
                         
-                        <div *ngIf="dashboard.isGroupDashboard" class="col-sm-2 col-xs-12 text-muted">
-                          <label class="c8y-switch">
-                            <input type="checkbox" id="dashboard-{{i}}" (change)="toggleToEnableSimulator($event, dashboard, i)"/>
-                            <span></span>Simulator
-                            </label>
+                        <div class="col-sm-2 col-xs-12 text-muted sim-width">
+
+                          <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-default"
+                            (click)="connectActualDeviceOrGroup(dashboard)">
+                              <i c8yIcon="multiple-devices"
+                              ></i></button>
+
+                              <button type="button" class="btn btn-default"
+                              (click)="toggleToEnableSimulator($event, dashboard, i)">
+                              <span c8yIcon="c8y-simulator"></span></button>
+
+                                <button type="button" class="btn btn-default" [disabled]="dashboard.isGroupDashboard"
+                                (click)="linkOtherDashboard(dashboard)">
+                                  <i c8yIcon="link"></i></button>
+</div>
+                          
                             <c8y-loading *ngIf="isSpin"></c8y-loading>
                         </div>
                         
@@ -49,13 +67,35 @@
                         </div>
                         
                         
-                        <div class="col-sm-5 col-xs-12 text-muted" >
+                        <div class="col-sm-4 col-xs-12 text-muted" >
                         <div class="col-md-12 col-sm-12 pad-left">
                          
                           <form class="form-inline" name="deviceForm" #deviceForm="ngForm">
 
                             <div class="form-group" class="col-sm-12 col-md-12 col-xs-12" style="padding:0">
-                              <div *ngIf="dashboard.isGroupDashboard && !enableSimulator" class="col-sm-6 col-md-6 col-xs-12 input-group-btn dropdown" style="padding-left: 0; max-width: 100%; text-align: end" dropdown>
+
+                              
+                              <div *ngIf="dashboard.enableSimulator" class="col-sm-6 col-md-6 col-xs-12 input-group-btn dropdown enable-sim" dropdown>
+                                <div class="simulator-section">
+                                  
+                                </div>
+                                
+                                <input
+                                type="text"
+                                class="form-control"
+                                placeholder="Group/Type Name"
+                                style="margin-right: 3%"
+                                /> 
+                                
+                                <input
+                                type="text"
+                                class="form-control"
+                                placeholder="# of Devices"
+                                style="margin-right: 2%; width: 50%"
+                                /> 
+                              </div>
+
+                              <div *ngIf="dashboard.enableDeviceOrGroup" class="col-sm-6 col-md-6 col-xs-12 input-group-btn dropdown" style="padding-left: 0; max-width: 100%; text-align: end" dropdown>
                                  
                                 <label class="sr-only" for="selected-device">Select Device/asset for dashboard</label>
                                   
@@ -76,10 +116,69 @@
                                 </ul> 
                               </div>
 
-                              <div class="col-md-3"></div>
+
+                              <div *ngIf="dashboard.enableLink" class="col-sm-7 col-md-7 col-xs-12 pad-left">
+                                <div class="dropdown wd-100" dropdown  container="body">
+                                  
+                                  <button
+                                  type="button"
+                                  title="dropdown-toggle"
+                                  dropdownToggle
+                                  class="btn btn-default dropdown-toggle c8y-dropdown wd-100"
+                                >
+                                  <span>{{dashboard.defaultLinkedDashboard}}</span> <span class="caret"></span>
+                                </button>
+                                
+                                <ul style="max-height: 225px; overflow-y: auto" class="dropdown-menu" *dropdownMenu>
+                                  <li  *ngFor="let linkDashboard of dashboard.linkDashboards; let sl = index;">
+                                    <button type="button" (click)="onSelectOfLinkingDashbord(linkDashboard.title, i)">
+                                      {{linkDashboard.title}}
+                                    </button>
+                                  </li>
+                                </ul>
+                                </div>
+                                </div>
+
+
+                              
+
                                 </div>
                           </form>
                         </div>
+                      </div>
+
+
+                      <div *ngIf="dashboard.enableLink" class="col-md-2 col-sm-3 set-margin">
+                        <div *ngIf="!dashboard.isHidden" class="dropdown wd-100" dropdown  container="body">
+                          <input [(ngModel)]="dashboard.dashboardTemplateSelected"
+                          [typeahead]="dashboard.dashboardTemplatesArray"
+                          id="dashboardTemplates-{{i}}"
+                          typeaheadOptionField="title"
+                          class="form-control"
+                          placeholder="Select Template"
+                          [typeaheadMinLength]="2" 
+                          (typeaheadOnSelect)="updateDashboardTemplateSelected($event, i)"
+                        [ngModelOptions]="{standalone: true}">
+                </div>
+                      </div>
+
+                      <div *ngIf="dashboard.isGroupDashboard" class="col-md-2 col-sm-3 set-margin">
+                        <div class="dropdown wd-100" dropdown  container="body">
+                        <input [(ngModel)]="dashboard.selectedDashboardName"
+              [typeahead]="filterTemplates"
+              typeaheadOptionField="title"
+               class="form-control"
+               placeholder="Select Template"
+               [typeaheadMinLength]="2" 
+               (typeaheadOnSelect)="assignSelectedDashboard(selectedDasboard, i, $event)"
+               [ngModelOptions]="{standalone: true}">
+              </div>
+                      </div>   
+                      <div *ngIf="(dashboard.isGroupDashboard) && (dashboard.selectedDashboardName === dashboard.title)" class="col-md-3 col-sm-3">
+                        <select class="form-control" [(ngModel)]="dashboard.fileName" style="border-radius:15px;"
+                      id="dashboardView" (ngModelChange)="updateConfigurationFile()">
+                      <option *ngFor="let simulatorConfigFile of simulatorConfigFiles" [value]="simulatorConfigFile.fileName">{{simulatorConfigFile.fileName}}</option>
+                </select>
                       </div>
                       </div>
                     </div>
@@ -92,7 +191,7 @@
         </div>
         
         <div  class="col-xs-12 col-sm-4 col-md-3">
-          
+
         </div>
       </div>
       </div>

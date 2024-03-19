@@ -3,5 +3,33 @@
     cursor: pointer;
 }
 .padd-bottom {
-    padding-bottom: 1%;
+    padding-bottom: 2%;
+}
+.title-width {
+    width: 11%;
+    padding-top: 4px;
+}
+.simulator-section {
+    padding-right: 22%;
+}
+.enable-sim {
+    padding-left: 0; 
+    max-width: 100%; 
+    text-align: end;
+}
+.sim-width {
+    width: 13%;
+}
+.set-margin {
+    margin-left: -4%;
+}
+.pad-left {
+    padding-left: 0;
+}
+.wd-100 {
+    width: 100%;
+}
+.heading-align {
+    margin-bottom: 2%;
+    
 }

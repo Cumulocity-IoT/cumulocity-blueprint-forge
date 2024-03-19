@@ -74,6 +74,8 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
   welcomeTemplateData: any;
   simulatorSelected: boolean;
   enableSimulator: boolean;
+  enableDeviceOrGroup: boolean;
+  enableLik: boolean;
   simulatorModelContent: any;
   blankTemplateDashboard: boolean;
   isSpin: boolean = false;
@@ -82,6 +84,13 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
   groupTemplateFromSimulator: boolean;
   indexOfDashboardUpdatedFromDC: any;
   dynamicDashboardValueToUpdate: any;
+  filterTemplates: Array<[]>;
+  dashboardTemplateSelected: any;
+  linkDashboards: any;
+  linkDashboardsCopy: any;
+  storeDefaultDashboardName: string;
+  fileName: string = 'Select File';
+  simulatorConfigFiles: any[];
 
   constructor(
     public stepper: C8yStepper,
@@ -127,11 +136,12 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
 
   ngOnInit() {
     this.simulatorSelected = false;
-    this.enableSimulator = false;
     this.templateCatalogSetupService.templateData.subscribe(async currentData => {
       this.isFormValid = this.appConfigForm?.form.valid;
       if (currentData) {
         this.templateDetails = currentData;
+        this.generateLinkingDashboards();
+        this.dashboardManipulations();
         console.log('template details in step 4', this.templateDetails?.dashboards);
       }
       // In case of no device 
@@ -150,105 +160,19 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       this.dynamicDashboardValueToUpdate = value;
         this.dynamicDashboardValueToUpdate ? (this.dynamicDashboardValueToUpdate.titleAssigned = value?.title) : null;
     });
+    
+    this.templateCatalogSetupService.templatesFromDashboardCatalog.subscribe(filterTemplates => this.filterTemplates = filterTemplates);
+    
   }
 
   async toggleToEnableSimulator(event, dashboard, index) {
     this.indexOfDashboardUpdatedFromDC = index;
     this.simulatorSelected = true;
-    this.enableSimulator = event.target.checked;
-    if (this.enableSimulator) {
-      this.fileUploadMessage = null;
-      this.onSaveClicked = false;
-      this.isSpin = true;
-        let templateDetailsData;
-
-        this.templateCatalogSetupService.dynamicDashboardTemplate.subscribe(value => {
-          this.dynamicDashboardValueToUpdate = value;
-            this.dynamicDashboardValueToUpdate.titleAssigned = value?.title;
-        });
-
-
-
-        if (this.dynamicDashboardValueToUpdate) {
-          templateDetailsData = await (await this.loadTemplateDetails(this.dynamicDashboardValueToUpdate.dashboard)).toPromise();
-        } else {
-          templateDetailsData = await (await this.loadTemplateDetails(dashboard.dashboard)).toPromise();
-        }
-         
-    // Need to pass Simulator config file array of object
-    const SimultorConfigFiles = [];
-    let currentSimulatorData;
-
-    if (!templateDetailsData.simulatorDTDL) {
-      this.alertService.danger("Simulator File doesn't exist");
-      this.isSpin = false;
-      return false;
-    }
-    if (this.dynamicDashboardValueToUpdate.defaultDashboardSet) {
-      // Not able to use forEach, as it takes callback as parameter which expects to be async
-      for (let i = 0; i < templateDetailsData.simulatorDTDL.length; i++) {
-      currentSimulatorData = await (await this.loadTemplateDetails(templateDetailsData.simulatorDTDL[i].simulatorFile)).toPromise();
-      SimultorConfigFiles.push({
-          fileName: templateDetailsData.simulatorDTDL[i].simulatorFileName,
-          fileContent: currentSimulatorData
-      });
-    
-      }
-    } else {
-      currentSimulatorData = await (await this.loadTemplateDetails(templateDetailsData.simulatorDTDL[0].simulatorFile)).toPromise();
-      SimultorConfigFiles.push({
-        fileName: templateDetailsData.simulatorDTDL[0].simulatorFileName,
-        fileContent: currentSimulatorData
-      })
-    }
-    
-    
-    this.bsModalRef = this.modalService.show(NewSimulatorModalComponent, { backdrop: 'static', class: 'c8y-wizard', initialState:{appId: this.currentApp.id + "", isBlueprintSimulator: true, enableSimulator: this.enableSimulator, simulatorConfigFiles: SimultorConfigFiles, fileLength: SimultorConfigFiles.length}} );
-    this.isSpin = false;
-    this.bsModalRef.onHidden.subscribe( value => {
+    dashboard.enableSimulator = !dashboard.enableSimulator;
+    dashboard.enableLink = false;
+    dashboard.enableDeviceOrGroup = dashboard.enableSimulator ? false : true;
+    if (dashboard.enableSimulator) {
       
-        this.appDataService.disableToggleForSimulator.subscribe(value => {
-          const checkBoxForDashboard = <HTMLInputElement>document.getElementById("dashboard-"+index);
-          if (!this.onSaveClicked)        {
-            checkBoxForDashboard.checked = false;
-            this.enableSimulator = false;
-          }
-        })
-      })
-    
-    this.bsModalRef.content.onSave.subscribe( content => {
-      this.onSaveClicked = true;
-      this.currentApp.applicationBuilder.simulators= content.simulators;
-      this.simulatorModelContent = content;
-      dashboard.name = this.simulatorModelContent?.deviceId;
-      dashboard.templateType = dashboard.templateType;
-      dashboard.devices = [{
-        type: "Temperature Sensor",
-          placeholder: "device01",
-          reprensentation : {
-            id: this.simulatorModelContent?.deviceId,
-            name: this.simulatorModelContent?.deviceName,
-          }
-      }]
-    let deviceFieldNotField;
-    for (let dd = 0; dd < this.templateDetails.dashboards.length; dd++) {
-      if (this.templateDetails.dashboards[dd].isDeviceRequired === false ) {
-        deviceFieldNotField = true;
-      } 
-      else if (this.templateDetails.dashboards[dd].isDeviceRequired === true && this.templateDetails.dashboards[dd].linkWithDashboard === dashboard.id) {
-        this.templateDetails.dashboards[dd].devices = dashboard.devices;
-         deviceFieldNotField = true;
-     } else if (this.templateDetails.dashboards[dd].isDeviceRequired === true && this.templateDetails.dashboards[dd].isSimulatorConfigExist) {
-        deviceFieldNotField = true;
-     } else {
-          deviceFieldNotField = false;
-          break;
-     }
-    }
-    this.fileUploadMessage = "Your file for "+content?.deviceName+' is successfully uploaded';
-
-    this.deviceFormValid = deviceFieldNotField;
-    });
     } else {
       this.fileUploadMessage = null;
       dashboard.name = null;
@@ -665,4 +589,126 @@ else {
     this.progressModal = this.modalService.show(ProgressIndicatorModalComponent, { class: 'c8y-wizard', initialState: { message } });
   }
 
+  
+  assignSelectedDashboard(selectedDashboard, index, event) {
+    console.log('')
+    // this.templateCatalogSetupService.indexOfDashboardToUpdateTemplate = index;
+    // this.selectedDashboardName = event.value;
+    // this.templateCatalogSetupService.dynamicDashboardTemplate.next(event.item);
+    // this.loadTemplateDetails(event.item,index);
+  }
+
+
+  updateDashboardTemplateSelected (event, index) {
+    this.templateDetails.dashboards[index].dashboardTemplateSelected = event.value;
+  }
+
+  dashboardManipulations() {
+    this.templateDetails.dashboards.forEach(dashboard => {
+      dashboard.enableSimulator = false;
+      dashboard.enableDeviceOrGroup = true;
+      dashboard.enableLink = false;
+      if (dashboard.linkWithDashboard) {
+        dashboard.findMatchedLink = this.templateDetails.dashboards.find(matchedItem => dashboard.linkWithDashboard === matchedItem.id);
+        dashboard.defaultLinkedDashboard = dashboard.findMatchedLink.title;
+        dashboard.dashboardTemplateSelected = dashboard.findMatchedLink.title;
+      } else if (!dashboard.linkWithDashboard && dashboard.isGroupDashboard ){
+        dashboard.selectedDashboardName = dashboard.title;
+        dashboard.fileName ="Select File";
+
+        this.loadSimulatorConfigFiles(dashboard);
+
+      }
+    });
+}
+
+
+async loadSimulatorConfigFiles(dashboard) {
+  let templateDetailsData;
+        templateDetailsData = await (await this.loadTemplateDetails(dashboard.dashboard)).toPromise();
+
+        const SimulatorConfigFiles = [];
+    let currentSimulatorData;
+    for (let i = 0; i < templateDetailsData.simulatorDTDL.length; i++) {
+      currentSimulatorData = await (await this.loadTemplateDetails(templateDetailsData.simulatorDTDL[i].simulatorFile)).toPromise();
+      SimulatorConfigFiles.push({
+          fileName: templateDetailsData.simulatorDTDL[i].simulatorFileName,
+          fileContent: currentSimulatorData
+      });
+    
+      }
+      this.simulatorConfigFiles = JSON.parse(JSON.stringify(SimulatorConfigFiles));
+      console.log('Simulator config files value', this.simulatorConfigFiles);
+}
+  linkOtherDashboard(dashboard) {
+    dashboard.enableLink = !dashboard.enableLink;
+    dashboard.enableSimulator = false;
+    dashboard.enableDeviceOrGroup = dashboard.enableLink ? false : true;
+  }
+
+  connectActualDeviceOrGroup(dashboard) {
+    dashboard.enableDeviceOrGroup = true;
+    dashboard.enableSimulator = dashboard.enableLink = false;
+  }
+
+  updateConfigurationFile() {
+    // let matchedConfigValue = JSON.parse(JSON.stringify(this.SimulatorConfigFiles)).find(element => element.fileName === this.fileName);
+    // const fileInput = JSON.stringify(matchedConfigValue.fileContent)
+    // const validJson = this.isValidJson(fileInput);
+    // this.isConfigFileUploading = true;
+    //         if (validJson) {
+    //         this.processFileInput(validJson);
+    //         }
+
+}
+
+private isValidJson(input: any) {
+  try {
+      if (input) {
+          const o = JSON.parse(input);
+          if (o && (o.constructor === Object || o.constructor === Array)) {
+              console.log('o constructor value', o.constructor);
+              return o;
+          }
+      }
+  } catch (e) { }
+  return false;
+}
+
+// processFileInput(validJson) {
+//   this.selectedStrategyFactory = this.simulationStrategiesService.strategiesByName.get(validJson.type);
+//           if (this.selectedStrategyFactory === undefined) {
+//               this.isConfigFileError = true;
+//           } else {
+//               this.configFromFile = validJson.config;
+//               this.simulatorName = validJson.name;
+//               if (this.enableSimulator) {
+//                   this.wizard.selectStep('device');
+//               }
+//           }
+// }
+
+
+
+generateLinkingDashboards() {
+  this.linkDashboards = JSON.parse(JSON.stringify(this.templateDetails.dashboards));
+        this.linkDashboards = this.linkDashboards.filter(item => item.title != "Welcome" && item.title !== "Help and Support" && item.title !== "Instruction");
+        this.linkDashboardsCopy = JSON.parse(JSON.stringify(this.linkDashboards));
+        let findMatchedTitle;
+        this.templateDetails.dashboards.forEach(dashboardItem => {
+          if (dashboardItem.title != 'Instruction' && dashboardItem.title != 'Help and Support' && dashboardItem.title != 'Welcome') {
+            this.linkDashboards = JSON.parse(JSON.stringify(this.linkDashboardsCopy));
+          dashboardItem.linkDashboards = this.linkDashboards;
+          findMatchedTitle = dashboardItem.linkDashboards.findIndex(titleObject => titleObject.title === dashboardItem.title);
+          if (findMatchedTitle >= 0) {
+            dashboardItem.linkDashboards.splice(findMatchedTitle, 1);
+          }
+          }
+          
+        });
+
+
+        this.templateDetails.dashboards.forEach(item => item.dashboardTemplateSelected = item.title);
+}
+  
   }

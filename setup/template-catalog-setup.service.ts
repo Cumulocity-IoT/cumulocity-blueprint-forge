@@ -61,6 +61,9 @@ export class TemplateCatalogSetupService {
 
     public searchDashboardTemplate$ = new BehaviorSubject<string>('');
 
+    public templatesFromDashboardCatalog = new BehaviorSubject<Array<[]>>([]);
+    templatesFromDashboardCatalog$ = this.templatesFromDashboardCatalog.asObservable();
+
 
     constructor(private http: HttpClient, private inventoryService: InventoryService,
         private appService: ApplicationService,

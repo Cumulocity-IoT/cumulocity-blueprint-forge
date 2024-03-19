@@ -74,6 +74,17 @@ export interface MicroserviceDetails {
 }
 
 export interface Dashboards {
+    fileName: string;
+    defaultLinkedDashboard: string;
+    findMatchedLink: Dashboards;
+    selectedDashboardName: string;
+    id: string;
+    dashboardTemplatesArray: any;
+    dashboardTemplateSelected: any;
+    enableLink?: boolean;
+    enableDeviceOrGroup?: boolean;
+    enableSimulator?: boolean;
+    isSimulator: boolean;
     welcomeTemplates: any;
     title: string;
     icon: string;

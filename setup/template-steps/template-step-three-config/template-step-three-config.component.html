@@ -24,7 +24,6 @@
           
           <div class="card-block" id="dashboardDiv">
               <div class="list-group">
-                <label style="color: #058192; margin-left: 21%">Select Device From</label>
                   <div class="list-group-item d-flex" *ngFor="let dashboard of templateDetails?.dashboards; let i = index">
                     <div class="list-item-checkbox">
                       <label id="dashboard{{i}}" title="Select" class="c8y-checkbox">
@@ -66,54 +65,6 @@
                         </div>
                         </div>
 
-
-
-                        <div *ngIf="dashboard.title !== 'Instruction' && dashboard.title !== 'Welcome' && dashboard.title !== 'Help and Support' && !dashboard.isGroupDashboard" class="col-sm-5 col-md-5 col-xs-12 pad-left">
-                          <div class="dropdown" dropdown  container="body">
-                            
-                            <button
-                            type="button"
-                            title="dropdown-toggle"
-                            dropdownToggle
-                            class="btn btn-default dropdown-toggle c8y-dropdown"
-                          >
-                            <span>{{dashboard.defaultLinkedDashboard}}</span> <span class="caret"></span>
-                          </button>
-                          
-                          <ul style="max-height: 225px; overflow-y: auto" class="dropdown-menu" *dropdownMenu>
-                            <li  *ngFor="let linkDashboard of dashboard.linkDashboards; let sl = index;">
-                              <button type="button" (click)="onSelectOfLinkingDashbord(linkDashboard.title, i)">
-                                {{linkDashboard.title}}
-                              </button>
-                            </li>
-                          </ul>
-                          </div>
-                          </div>
-
-
-
-                          <div *ngIf="dashboard.title !== 'Instruction' && dashboard.title !== 'Welcome' && dashboard.title !== 'Help and Support' && !dashboard.isGroupDashboard" class="col-sm-5 col-md-5 col-xs-12 pad-left">
-                            <div class="dropdown" dropdown  container="body">
-                              
-                              <button
-                              id="dashboardTemplates-{{i}}" 
-                              type="button"
-                              title="dropdown-toggle"
-                              dropdownToggle
-                              class="btn btn-default dropdown-toggle c8y-dropdown"
-                            >
-                              <span>{{(dashboard.dashboardTemplateSelected && dashboard.dashboardTemplateSelected) ?  dashboard.dashboardTemplateSelected :  dashboard.title}}</span> <span class="caret"></span>
-                            </button>
-                            
-                            <ul style="max-height: 225px; overflow-y: auto" class="dropdown-menu" *dropdownMenu>
-                              <li *ngFor="let template of dashboard.dashboardTemplatesArray; let dt= index">
-                                <button type="button"(click)="updateDashboardTemplateSelected(template.title, i)">
-                                  {{template.title}}
-                                </button>
-                              </li>
-                            </ul>
-                            </div>
-                            </div>
                           
                         
                         
