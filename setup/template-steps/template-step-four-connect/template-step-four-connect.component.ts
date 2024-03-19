@@ -142,7 +142,6 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
         this.templateDetails = currentData;
         this.generateLinkingDashboards();
         this.dashboardManipulations();
-        console.log('template details in step 4', this.templateDetails?.dashboards);
       }
       // In case of no device 
       if (!(this.templateDetails?.input) || !(this.templateDetails?.input?.devices) || !(this.templateDetails?.input?.devices?.length > 0)) {
@@ -168,9 +167,9 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
   async toggleToEnableSimulator(event, dashboard, index) {
     this.indexOfDashboardUpdatedFromDC = index;
     this.simulatorSelected = true;
-    dashboard.enableSimulator = !dashboard.enableSimulator;
+    dashboard.enableSimulator = true;
     dashboard.enableLink = false;
-    dashboard.enableDeviceOrGroup = dashboard.enableSimulator ? false : true;
+    dashboard.enableDeviceOrGroup = false;
     if (dashboard.enableSimulator) {
       this.loadSimulatorConfigFiles(dashboard);
     } else {
@@ -591,7 +590,6 @@ else {
 
   
   assignSelectedDashboard(selectedDashboard, index, event) {
-    console.log('')
     // this.templateCatalogSetupService.indexOfDashboardToUpdateTemplate = index;
     // this.selectedDashboardName = event.value;
     // this.templateCatalogSetupService.dynamicDashboardTemplate.next(event.item);
@@ -604,6 +602,12 @@ else {
   }
 
   dashboardManipulations() {
+    this.templateDetails.dashboards = this.templateDetails.dashboards.reduce((acc, element) => {
+      if (element.isGroupDashboard) {
+        return [element, ...acc];
+      }
+      return [...acc, element];
+    }, []);
     this.templateDetails.dashboards.forEach(dashboard => {
       
       dashboard.enableSimulator = false;
@@ -644,13 +648,12 @@ async loadSimulatorConfigFiles(dashboard) {
     
       }
       this.simulatorConfigFiles = JSON.parse(JSON.stringify(SimulatorConfigFiles));
-      dashboard.fileName = this.simulatorConfigFiles[0].fileName;
-      console.log('Simulator config files value', this.simulatorConfigFiles);
+      // dashboard.fileName = this.simulatorConfigFiles[0].fileName;
 }
   linkOtherDashboard(dashboard) {
-    dashboard.enableLink = !dashboard.enableLink;
+    dashboard.enableLink = true;
     dashboard.enableSimulator = false;
-    dashboard.enableDeviceOrGroup = dashboard.enableLink ? false : true;
+    dashboard.enableDeviceOrGroup = false;
   }
 
   connectActualDeviceOrGroup(dashboard) {

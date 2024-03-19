@@ -31,8 +31,8 @@
                         <label for="group-details" style="font-weight: 550">Dashboard Name</label>
                         <label for="group-details"></label>
                         <label for="group-details" style="margin-left: 16.5%; font-weight: 550;">Link/Configure Dashboard</label>
-                        <label for="group-details" style="margin-left: 18%; font-weight: 550">Select Template</label>
-                        <label for="group-details" style="margin-left: 10%; font-weight: 550">Simulator Configuration</label>
+                        <label for="group-details" style="margin-left: 18%; font-weight: 550">Dashboard Template</label>
+                        <label for="group-details" style="margin-left: 7%; font-weight: 550">Simulator Configuration</label>
                       </div>
                       
                       <div *ngFor="let dashboard of templateDetails?.dashboards; let i = index">
@@ -41,7 +41,6 @@
                         <!-- <div class="col-sm-3 col-xs-12 text-muted">
                           Please choose Device/Group or Simulator
                         </div> -->
-                        
                         <div class="col-sm-2 col-xs-12 text-muted sim-width">
 
                           <div class="btn-group" role="group">
@@ -174,7 +173,7 @@
                [ngModelOptions]="{standalone: true}">
               </div>
                       </div>   
-                      <div *ngIf="((dashboard.isGroupDashboard) && (dashboard.selectedDashboardName === dashboard.title)) || ((!dashboard.enableLink) && (dashboard.selectedDashboardName === dashboard.title))" class="col-md-3 col-sm-3">
+                      <div *ngIf="((dashboard.isGroupDashboard) && (dashboard.selectedDashboardName === dashboard.title)) || ((dashboard.enableSimulator) && (dashboard.selectedDashboardName === dashboard.title))" class="col-md-3 col-sm-3">
                         <select class="form-control" [(ngModel)]="dashboard.fileName" style="border-radius:15px;"
                       id="dashboardView" (ngModelChange)="updateConfigurationFile()"
                       >
