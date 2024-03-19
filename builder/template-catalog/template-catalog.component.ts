@@ -60,6 +60,8 @@ export class TemplateCatalogModalComponent implements OnInit {
 
     public filterTemplates: Array<TemplateCatalogEntry> = [];
 
+    public searchFilterTemplates: Array<TemplateCatalogEntry> = [];
+
     public selectedTemplate: TemplateCatalogEntry;
 
     public templateDetails: TemplateDetails;
@@ -112,6 +114,8 @@ export class TemplateCatalogModalComponent implements OnInit {
     fileJson:any;
     importLoading:boolean=false;
 
+    filter='1'; //value of filter selected
+
     constructor(private modalService: BsModalService, private modalRef: BsModalRef, private appService: ApplicationService,
         private catalogService: TemplateCatalogService, private componentService: DynamicComponentService,
         private alertService: AlertService, private widgetCatalogService: WidgetCatalogService,
@@ -158,6 +162,7 @@ export class TemplateCatalogModalComponent implements OnInit {
                     });
                 }
                 this.filterTemplates = (this.templates ? this.templates : []);
+                this.searchFilterTemplates=(this.filterTemplates ? this.filterTemplates : []);
                 this.filterTemplates.forEach(template => {
                     if ((template.thumbnail && template?.thumbnail != '')  || (template.thumbnailBinaryId && template.thumbnailBinaryId !='')) {
                         if(template.availability && (template.availability === "SHARED" || template.availability === 'EXPORT')){
@@ -513,14 +518,12 @@ export class TemplateCatalogModalComponent implements OnInit {
     }
 
     applyFilter() {
-        if (this.templates && this.templates.length > 0) {
-            this.filterTemplates = this.templates.filter((template => 
-                template.title.toLowerCase().includes(this.searchTemplate.toLowerCase()) || 
-                (template.availability && template.availability.toLowerCase().includes(this.searchTemplate.toLowerCase()))
+        if (this.filterTemplates && this.filterTemplates.length > 0) {
+            this.searchFilterTemplates = this.filterTemplates.filter((template => 
+                template.title.toLowerCase().includes(this.searchTemplate.toLowerCase())  
                 ));
-            this.filterTemplates = [...this.filterTemplates];
+            this.searchFilterTemplates = [...this.searchFilterTemplates];
         }
-
     }
 
     async deleteTemplate(template: any) {
@@ -588,5 +591,28 @@ export class TemplateCatalogModalComponent implements OnInit {
 
     getImportButtonText():string{
         return this.importLoading ? "Importing" : "Import";
+    }
+
+    onFilterChange(){
+        if (this.templates && this.templates.length>0) {
+            switch (this.filter) {
+                case '1':
+                    this.filterTemplates = this.templates;
+                    break;
+                case '2':
+                    this.filterTemplates = this.templates.filter(template => template.manufactur && template.manufactur != "");
+                    break;
+                case '3':
+                    this.filterTemplates = this.templates.filter(template => template?.manufactur == '');
+                    break;
+                case '4':
+                    this.filterTemplates = this.templates.filter(template => template.availability && template.availability == 'EXPORT');
+                    break;
+                case '5':
+                    this.filterTemplates = this.templates.filter(template => template.availability && template.availability == 'SHARED');
+                    break;
+            }
+        }
+        this.searchFilterTemplates= this.filterTemplates ? this.filterTemplates : [];
     }
 }
