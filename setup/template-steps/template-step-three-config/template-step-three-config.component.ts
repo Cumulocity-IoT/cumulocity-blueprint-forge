@@ -44,6 +44,7 @@ import { WidgetCatalogService } from '../../../builder/widget-catalog/widget-cat
 import { DependencyDescription } from '../../../builder/template-catalog/template-catalog.model';
 import { TemplateCatalogEntry } from '../../../builder/template-catalog/template-catalog.model';
 import { TypeaheadMatch } from 'ngx-bootstrap/typeahead/typeahead-match.class';
+import { ConfigureCustomDashboardModalComponent } from './configure-custom-dashboard-modal.component';
 @Component({
   selector: 'c8y-template-step-three-config',
   templateUrl: './template-step-three-config.component.html',
@@ -477,5 +478,26 @@ sortDashboardsByTitle(sortableArray) {
 } 
 
 
+
+onSelectOfLinkingDashbord(title, dashboardIndex) {
+  const disableButton = <HTMLElement>document.getElementById("dashboardTemplates-"+dashboardIndex);
+  this.templateDetails.dashboards[dashboardIndex].defaultLinkedDashboard = title;
+  if (title === 'Unconfigure') {
+    disableButton.classList.add("disable-dashboard-templates");
+  } else {
+    disableButton.classList.remove("disable-dashboard-templates");
+  }
+}
+
+updateDashboardTemplateSelected (title, index) {
+  this.templateDetails.dashboards[index].dashboardTemplateSelected = title;
+}
+
+configureCustomDashboard(){
+  this.bsModalRef=this.modalService.show(ConfigureCustomDashboardModalComponent,{ class: 'c8y-wizard'});
+  this.bsModalRef.content.onSave.subscribe((response) => {
+    this.templateDetails.dashboards.push(response);
+  });
+}
 
 }
