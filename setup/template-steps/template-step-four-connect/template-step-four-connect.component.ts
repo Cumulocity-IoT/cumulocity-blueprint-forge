@@ -172,7 +172,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     dashboard.enableLink = false;
     dashboard.enableDeviceOrGroup = dashboard.enableSimulator ? false : true;
     if (dashboard.enableSimulator) {
-      
+      this.loadSimulatorConfigFiles(dashboard);
     } else {
       this.fileUploadMessage = null;
       dashboard.name = null;
@@ -605,20 +605,26 @@ else {
 
   dashboardManipulations() {
     this.templateDetails.dashboards.forEach(dashboard => {
+      
       dashboard.enableSimulator = false;
       dashboard.enableDeviceOrGroup = true;
       dashboard.enableLink = false;
       if (dashboard.linkWithDashboard) {
+        dashboard.enableLink = true;
+        dashboard.enableSimulator = dashboard.enableDeviceOrGroup = false;
         dashboard.findMatchedLink = this.templateDetails.dashboards.find(matchedItem => dashboard.linkWithDashboard === matchedItem.id);
         dashboard.defaultLinkedDashboard = dashboard.findMatchedLink.title;
         dashboard.dashboardTemplateSelected = dashboard.findMatchedLink.title;
+        dashboard.selectedDashboardName = dashboard.title;
+        dashboard.fileName ="Select File";
       } else if (!dashboard.linkWithDashboard && dashboard.isGroupDashboard ){
+        this.loadSimulatorConfigFiles(dashboard);
         dashboard.selectedDashboardName = dashboard.title;
         dashboard.fileName ="Select File";
 
-        this.loadSimulatorConfigFiles(dashboard);
+        
 
-      }
+      } 
     });
 }
 
@@ -638,6 +644,7 @@ async loadSimulatorConfigFiles(dashboard) {
     
       }
       this.simulatorConfigFiles = JSON.parse(JSON.stringify(SimulatorConfigFiles));
+      dashboard.fileName = this.simulatorConfigFiles[0].fileName;
       console.log('Simulator config files value', this.simulatorConfigFiles);
 }
   linkOtherDashboard(dashboard) {

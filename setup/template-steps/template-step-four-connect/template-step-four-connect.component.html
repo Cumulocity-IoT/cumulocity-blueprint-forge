@@ -47,16 +47,16 @@
                           <div class="btn-group" role="group">
                             <button type="button" class="btn btn-default"
                             (click)="connectActualDeviceOrGroup(dashboard)">
-                              <i c8yIcon="multiple-devices"
+                              <i c8yIcon="multiple-devices" title="Connect your dashboard with Device/Group or Type"
                               ></i></button>
 
                               <button type="button" class="btn btn-default"
                               (click)="toggleToEnableSimulator($event, dashboard, i)">
-                              <span c8yIcon="c8y-simulator"></span></button>
+                              <span c8yIcon="c8y-simulator" title="Configure your simulator to connect with the Dashboard"></span></button>
 
                                 <button type="button" class="btn btn-default" [disabled]="dashboard.isGroupDashboard"
                                 (click)="linkOtherDashboard(dashboard)">
-                                  <i c8yIcon="link"></i></button>
+                                  <i c8yIcon="link" title="Link with other dashboard. No need to connect device or simulate it. It will automatically be taken care using the linked dashboard"></i></button>
 </div>
                           
                             <c8y-loading *ngIf="isSpin"></c8y-loading>
@@ -162,7 +162,7 @@
                 </div>
                       </div>
 
-                      <div *ngIf="dashboard.isGroupDashboard" class="col-md-2 col-sm-3 set-margin">
+                      <div *ngIf="dashboard.isGroupDashboard || !dashboard.enableLink" class="col-md-2 col-sm-3 set-margin">
                         <div class="dropdown wd-100" dropdown  container="body">
                         <input [(ngModel)]="dashboard.selectedDashboardName"
               [typeahead]="filterTemplates"
@@ -174,9 +174,11 @@
                [ngModelOptions]="{standalone: true}">
               </div>
                       </div>   
-                      <div *ngIf="(dashboard.isGroupDashboard) && (dashboard.selectedDashboardName === dashboard.title)" class="col-md-3 col-sm-3">
+                      <div *ngIf="((dashboard.isGroupDashboard) && (dashboard.selectedDashboardName === dashboard.title)) || ((!dashboard.enableLink) && (dashboard.selectedDashboardName === dashboard.title))" class="col-md-3 col-sm-3">
                         <select class="form-control" [(ngModel)]="dashboard.fileName" style="border-radius:15px;"
-                      id="dashboardView" (ngModelChange)="updateConfigurationFile()">
+                      id="dashboardView" (ngModelChange)="updateConfigurationFile()"
+                      >
+                      
                       <option *ngFor="let simulatorConfigFile of simulatorConfigFiles" [value]="simulatorConfigFile.fileName">{{simulatorConfigFile.fileName}}</option>
                 </select>
                       </div>
