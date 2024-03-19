@@ -88,12 +88,10 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   pluginDetailsArray: any;
   microserviceArray: any;
   dashboardTemplateInputSearch: string;
-  linkDashboards: any;
   linkDashboardDefault: any;
   defaultLinkedDashboard: any;
   dashboardTemplatesArray: any;
-  linkDashboardsCopy: any;
-  dashboardTemplateSelected: any;
+  
 
   constructor(
     public stepper: C8yStepper,
@@ -136,7 +134,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
         this.pluginDetailsArray = JSON.parse(JSON.stringify(this.templateDetails?.plugins));
         this.microserviceArray = JSON.parse(JSON.stringify(this.templateDetails?.microservices));
         this.loadTemplateCatalogFromDashboardCatalog();
-        this.generateLinkingDashboards();
+        
       }
       // In case of no device 
       if (!(this.templateDetails?.input) || !(this.templateDetails?.input?.devices) || !(this.templateDetails?.input?.devices?.length > 0)) {
@@ -335,6 +333,7 @@ async saveAppChanges(app) {
           this.templateCatalogSetupService.dynamicDashboardTemplate.next(dashboardToUpdateForTemplate);
           this.filterTemplates?.map(template => template.title = template.title.split("-")[0]);
           this.filterTemplates = this.sortDashboardsByTitle(this.filterTemplates);
+          this.templateCatalogSetupService.templatesFromDashboardCatalog.next(this.filterTemplates);
 
           this.templateDetails.dashboards.forEach(dashboardTemplate => {
             dashboardTemplate.dashboardTemplatesArray = this.templatesFromDC ? this.templatesFromDC : [];
@@ -478,32 +477,7 @@ sortDashboardsByTitle(sortableArray) {
   return sortedData;
 } 
 
-getLinkedDashboard(id) {
-  let  linkedDashboard;
-  linkedDashboard =  this.templateDetails.dashboards.filter(item => item.id === id);
-  return linkedDashboard[0].title;
-}
 
-generateLinkingDashboards() {
-  this.linkDashboards = JSON.parse(JSON.stringify(this.templateDetails.dashboards));
-        this.linkDashboards = this.linkDashboards.filter(item => item.title != "Welcome" && item.title !== "Help and Support" && item.title !== "Instruction");
-        this.linkDashboardsCopy = JSON.parse(JSON.stringify(this.linkDashboards));
-        let findMatchedTitle;
-        this.templateDetails.dashboards.forEach(dashboardItem => {
-          if (dashboardItem.title != 'Instruction' && dashboardItem.title != 'Help and Support' && dashboardItem.title != 'Welcome') {
-            this.linkDashboards = JSON.parse(JSON.stringify(this.linkDashboardsCopy));
-          this.linkDashboards[this.linkDashboards.length] = {
-            title: "Unconfigure"
-        };
-          dashboardItem.linkDashboards = this.linkDashboards;
-          findMatchedTitle = dashboardItem.linkDashboards.findIndex(titleObject => titleObject.title === dashboardItem.title);
-          if (findMatchedTitle >= 0) {
-            dashboardItem.linkDashboards.splice(findMatchedTitle, 1);
-          }
-          }
-          
-        });
-}
 
 onSelectOfLinkingDashbord(title, dashboardIndex) {
   const disableButton = <HTMLElement>document.getElementById("dashboardTemplates-"+dashboardIndex);

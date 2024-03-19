@@ -122,15 +122,15 @@ export class TemplateUpdateModalComponent implements OnInit {
         switch (templateType) {
             case 1:
                 this.assetButtonText = "Device Group";
-                this.groupTemplate = true;
+                // this.groupTemplate = true;
                 break;
             case 2:
                 this.assetButtonText = "Device/Asset Type";
-                this.groupTemplate = true;
+                // this.groupTemplate = true;
                 break;
             default:
                 this.assetButtonText = "Device/Asset";
-                this.groupTemplate = false;
+                // this.groupTemplate = false;
                 break;
         }
     }
@@ -139,15 +139,15 @@ export class TemplateUpdateModalComponent implements OnInit {
         switch (templateType) {
             case 1:
                 device.assetButtonText = "Device Group";
-                this.groupTemplate = true;
+                // this.groupTemplate = true;
                 break;
             case 2:
                 device.assetButtonText = "Device/Asset Type";
-                this.groupTemplate = true;
+                // this.groupTemplate = true;
                 break;
             default:
                 device.assetButtonText = "Device/Asset";
-                this.groupTemplate = false;
+                // this.groupTemplate = false;
                 break;
         }
         this.dashboardConfig.templateType = templateType; 
