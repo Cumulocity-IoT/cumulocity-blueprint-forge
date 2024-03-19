@@ -259,15 +259,15 @@ export class TemplateCatalogModalComponent implements OnInit {
         switch (templateType) {
             case 1:
                 device.assetButtonText = "Device Group";
-                this.groupTemplate = true;
+                // this.groupTemplate = true;
                 break;
             case 2:
                 device.assetButtonText = "Device/Asset Type";
-                this.groupTemplate = true;
+                // this.groupTemplate = true;
                 break;
             default:
                 device.assetButtonText = "Device/Asset";
-                this.groupTemplate = false;
+                // this.groupTemplate = false;
                 break;
         }
         this.dashboardConfiguration.templateType = templateType;
