@@ -48,7 +48,7 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { TemplateStepFourConnectComponent } from './setup/template-steps/template-step-four-connect/template-step-four-connect.component';
 import { WizardModule } from './wizard/wizard.module';
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
-import { ConfigureCustomDashboardModalComponent } from './setup/template-steps/template-step-three-config/configure-custom-dashboard-modal.component';
+import { ConfigureCustomDashboardModalComponent } from './setup/template-steps/template-step-four-connect/configure-custom-dashboard-modal.component';
 @NgModule({
   declarations: [
     TemplateStepOneComponent, 

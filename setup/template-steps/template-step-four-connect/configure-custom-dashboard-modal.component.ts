@@ -46,7 +46,8 @@ export class ConfigureCustomDashboardModalComponent{
             isSelectAsset: true,
             isSelectGroup: true,
             isSelectType: true,
-            selected: true
+            selected: true,
+            isCustom: true
         };
         this.onSave.next(response);
         this.bsModalRef.hide();

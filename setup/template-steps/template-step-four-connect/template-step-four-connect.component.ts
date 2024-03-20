@@ -39,6 +39,7 @@ import { SettingsService } from '../../../builder/settings/settings.service';
 import { DOCUMENT } from '@angular/common';
 import { NewSimulatorModalComponent } from '../../../builder/simulator-config/new-simulator-modal.component';
 import * as _ from 'lodash';
+import { ConfigureCustomDashboardModalComponent } from './configure-custom-dashboard-modal.component';
 @Component({
   selector: 'c8y-template-step-four-connect',
   templateUrl: './template-step-four-connect.component.html',
@@ -719,6 +720,17 @@ generateLinkingDashboards() {
 
 
         this.templateDetails.dashboards.forEach(item => item.dashboardTemplateSelected = item.title);
+}
+
+configureCustomDashboard(){
+  this.bsModalRef=this.modalService.show(ConfigureCustomDashboardModalComponent,{ class: 'c8y-wizard'});
+  this.bsModalRef.content.onSave.subscribe((response) => {
+    this.templateDetails.dashboards.push(response);
+  });
+}
+
+removeCustomDashboard(i){
+  this.templateDetails.dashboards.splice(i,1);
 }
   
   }
