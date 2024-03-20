@@ -606,10 +606,7 @@ export class TemplateCatalogModalComponent implements OnInit {
                     this.filterTemplates = this.templates.filter(template => template?.manufactur == '');
                     break;
                 case '4':
-                    this.filterTemplates = this.templates.filter(template => template.availability && template.availability == 'EXPORT');
-                    break;
-                case '5':
-                    this.filterTemplates = this.templates.filter(template => template.availability && template.availability == 'SHARED');
+                    this.filterTemplates = this.templates.filter(template => template.availability);
                     break;
             }
         }

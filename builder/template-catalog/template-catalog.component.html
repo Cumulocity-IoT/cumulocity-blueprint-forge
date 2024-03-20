@@ -35,10 +35,9 @@
                     <select class="form-control" [(ngModel)]="filter" style="border-radius:20px;"
                         id="dashboardView" (change)="onFilterChange()">
                         <option value="1">All</option>
-                        <option value="2">Devices</option>
+                        <option value="2">Device/Asset</option>
                         <option value="3">General</option>
-                        <option value="4">Custom</option>
-                        <option value="5">Tenant Only</option>
+                        <option value="4">Tenant Only</option>
                     </select>
                 </div>
             </div>
@@ -262,10 +261,7 @@
 </ng-template>
 
 <ng-template #templateLabel let-template>
-    <ng-container *ngIf="template.manufactur && template.manufactur !==''">Device</ng-container>
+    <ng-container *ngIf="template.manufactur && template.manufactur !==''">Device/Asset</ng-container>
     <ng-container *ngIf="template?.manufactur ===''">General</ng-container>
-    <ng-container *ngIf="template.availability">
-        <ng-container *ngIf="template.availability==='EXPORT'">Custom</ng-container>
-        <ng-container *ngIf="template.availability==='SHARED'">Tenant Only</ng-container>
-    </ng-container>
+    <ng-container *ngIf="template.availability">Tenant Only</ng-container>
 </ng-template>
