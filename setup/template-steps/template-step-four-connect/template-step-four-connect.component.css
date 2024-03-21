@@ -33,3 +33,17 @@
     margin-bottom: 2%;
     
 }
+.btn-xs-warning {
+    padding: var(--c8y-btn-padding-xs-vertical) var(--c8y-btn-padding-xs-horizontal);
+    font-size: var(--c8y-btn-font-size-xs);
+    line-height: var(--c8y-btn-line-height-xs);
+    border-radius: var(--c8y-btn-border-radius-xs);
+    height: calc(var(--c8y-unit-base)* 2);
+    position: relative;
+}
+.btn-icon:hover {
+    outline: none !important;
+}
+.download-color {
+    color: var(--brand-primary, var(--c8y-brand-primary));
+}

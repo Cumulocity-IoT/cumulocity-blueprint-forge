@@ -74,6 +74,7 @@ export interface MicroserviceDetails {
 }
 
 export interface Dashboards {
+    simulatorFileExists: boolean;
     fileName: string;
     defaultLinkedDashboard: string;
     findMatchedLink: Dashboards;

@@ -48,17 +48,20 @@
 
                                 <div class="btn-group" role="group">
                                   <button type="button" class="btn btn-default"
-                                    (click)="connectActualDeviceOrGroup(dashboard)">
+                                    (click)="connectActualDeviceOrGroup(dashboard)"
+                                    [ngStyle]="{'background-color': dashboard.enableDeviceOrGroup ? '#C5EDEA': none}">
                                     <i c8yIcon="multiple-devices"
                                       title="Connect your dashboard with Device/Group or Type"></i></button>
 
                                   <button type="button" class="btn btn-default"
-                                    (click)="toggleToEnableSimulator($event, dashboard, i)">
+                                    (click)="toggleToEnableSimulator($event, dashboard, i)"
+                                    [ngStyle]="{'background-color': dashboard.enableSimulator? '#C5EDEA': none}">
                                     <span c8yIcon="c8y-simulator"
                                       title="Configure your simulator to connect with the Dashboard"></span></button>
 
                                   <button type="button" class="btn btn-default" [disabled]="dashboard.isGroupDashboard"
-                                    (click)="linkOtherDashboard(dashboard)">
+                                    (click)="linkOtherDashboard(dashboard)"
+                                    [ngStyle]="{'background-color': dashboard.enableLink ? '#C5EDEA': none}">
                                     <i c8yIcon="link"
                                       title="Link with other dashboard. No need to connect device or simulate it. It will automatically be taken care using the linked dashboard"></i></button>
                                 </div>
@@ -172,8 +175,8 @@
                                 </div>
                               </div>
 
-                              <div class="col-md-2 col-sm-3 set-margin">
-                                <div *ngIf="dashboard.isGroupDashboard || !dashboard.enableLink" class="dropdown wd-100"
+                              <div *ngIf="dashboard.isGroupDashboard || !dashboard.enableLink" class="col-md-2 col-sm-3 set-margin">
+                                <div class="dropdown wd-100"
                                   dropdown container="body">
                                   <input [(ngModel)]="dashboard.selectedDashboardName" [typeahead]="filterTemplates"
                                     typeaheadOptionField="title" class="form-control" placeholder="Select Template"
@@ -182,15 +185,21 @@
                                     [ngModelOptions]="{standalone: true}">
                                 </div>
                               </div>
-                              <div class="col-md-2 col-sm-2">
-                                <select
+                              <div *ngIf="!dashboard.simulatorFileExists" class="col-md-1 col-sm-1">
+                                <!-- <select
                                   *ngIf="((dashboard.isGroupDashboard) && (dashboard.selectedDashboardName === dashboard.title)) || ((dashboard.enableSimulator) && (dashboard.selectedDashboardName === dashboard.title))"
                                   class="form-control" [(ngModel)]="dashboard.fileName" style="border-radius:15px;"
                                   id="dashboardView" (ngModelChange)="updateConfigurationFile()">
 
                                   <option *ngFor="let simulatorConfigFile of simulatorConfigFiles"
                                     [value]="simulatorConfigFile.fileName">{{simulatorConfigFile.fileName}}</option>
-                                </select>
+                                </select> -->
+                                <button type="button" style="margin-left: 10px; color: #DC143C; border: none; font-size: 25px !important; padding-bottom: 44%"
+                                class="btn btn-xs-warning" title="Simulator configuration file doesn't exist for the selected Dashboard Template">
+                                <i class="fa fa-warning"></i>
+                                </button>
+                                <i style="width: 36%; font-size: x-large" class="c8y-icon dlt-c8y-icon-download download-color"
+                                title="Download DTDL"></i>
                               </div>
                               <div class="col-sm-1 col-md-1">
                                 <button *ngIf="dashboard.isCustom && dashboard.isCustom == true" type="button" class="btn btn-dot" style="float: right;" (click)="removeCustomDashboard(i)" title="Remove Dashboard">

@@ -47,7 +47,9 @@ export class ConfigureCustomDashboardModalComponent{
             isSelectGroup: true,
             isSelectType: true,
             selected: true,
-            isCustom: true
+            isCustom: true,
+            isDeviceRequired: true,
+            enableDeviceOrGroup: true
         };
         this.onSave.next(response);
         this.bsModalRef.hide();

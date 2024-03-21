@@ -499,6 +499,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
   }
 
   openDeviceSelectorDialog(dashboard, templateType: number, index) {
+    console.log('dashboard value', dashboard);
     this.indexOfDashboardUpdatedFromDC = index;
     this.simulatorSelected = false;
     switch (templateType) {
@@ -537,7 +538,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
               deviceFieldNotField = true;
             } 
             else if (this.templateDetails.dashboards[dd].isDeviceRequired === true && this.templateDetails.dashboards[dd].linkWithDashboard === dashboard.id) {
-              this.templateDetails.dashboards[dd].devices = dashboard.devices;
+              // this.templateDetails.dashboards[dd].devices = dashboard.devices;
                deviceFieldNotField = true;
            }  else if (this.templateDetails.dashboards[dd].isDeviceRequired === true && this.templateDetails.dashboards[dd].linkWithDashboard !== dashboard.id && !dashboard.name) {
                 deviceFieldNotField = false;
@@ -550,6 +551,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     }
 else {
   this.deviceSelectorModalRef.content.onDeviceSelected.subscribe((selectedItem: IManagedObject) => {
+    
       dashboard.name = selectedItem['name'];
       dashboard.templateType = templateType;
       dashboard.devices = [{
@@ -568,7 +570,7 @@ else {
             deviceFieldNotField = true;
           } 
           else if (this.templateDetails.dashboards[dd].isDeviceRequired === true && this.templateDetails.dashboards[dd].linkWithDashboard === dashboard.id) {
-            this.templateDetails.dashboards[dd].devices = dashboard.devices;
+            // this.templateDetails.dashboards[dd].devices = dashboard.devices;
              deviceFieldNotField = true;
          } else if (this.templateDetails.dashboards[dd].isDeviceRequired === true && this.templateDetails.dashboards[dd].linkWithDashboard !== dashboard.id && !dashboard.name) {
               deviceFieldNotField = false;
@@ -577,6 +579,7 @@ else {
         }
         this.deviceFormValid = deviceFieldNotField;
       }
+      console.log('template details after device selection', this.templateDetails.dashboards);
   });
 }
  }
@@ -590,11 +593,15 @@ else {
   }
 
   
-  assignSelectedDashboard(selectedDashboard, index, event) {
-    // this.templateCatalogSetupService.indexOfDashboardToUpdateTemplate = index;
-    // this.selectedDashboardName = event.value;
-    // this.templateCatalogSetupService.dynamicDashboardTemplate.next(event.item);
-    // this.loadTemplateDetails(event.item,index);
+  async assignSelectedDashboard(selectedDashboard, index, event) {
+    let templateDetailsData;
+    templateDetailsData = await (await this.loadTemplateDetails(event.item.dashboard)).toPromise();
+    if (templateDetailsData.simulatorDTDL && templateDetailsData.simulatorDTDL[0].simulatorFile && templateDetailsData.simulatorDTDL[0].simulatorFileName) {
+      this.templateDetails.dashboards[index].simulatorFileExists = true;
+    } else {
+      this.templateDetails.dashboards[index].simulatorFileExists = false;
+    }
+    
   }
 
 
@@ -603,12 +610,12 @@ else {
   }
 
   dashboardManipulations() {
-    this.templateDetails.dashboards = this.templateDetails.dashboards.reduce((acc, element) => {
-      if (element.isGroupDashboard) {
-        return [element, ...acc];
-      }
-      return [...acc, element];
-    }, []);
+    // this.templateDetails.dashboards = this.templateDetails.dashboards.reduce((acc, element) => {
+    //   if (element.isGroupDashboard) {
+    //     return [element, ...acc];
+    //   }
+    //   return [...acc, element];
+    // }, []);
     this.templateDetails.dashboards.forEach(dashboard => {
       
       dashboard.enableSimulator = false;
@@ -618,18 +625,20 @@ else {
         dashboard.enableLink = true;
         dashboard.enableSimulator = dashboard.enableDeviceOrGroup = false;
         dashboard.findMatchedLink = this.templateDetails.dashboards.find(matchedItem => dashboard.linkWithDashboard === matchedItem.id);
-        dashboard.defaultLinkedDashboard = dashboard.findMatchedLink.title;
-        dashboard.dashboardTemplateSelected = dashboard.findMatchedLink.title;
-        dashboard.selectedDashboardName = dashboard.title;
+        dashboard.defaultLinkedDashboard ? dashboard.findMatchedLink.title : "Blank Dashboard";
+        dashboard.dashboardTemplateSelected ? dashboard.findMatchedLink.title : "Blank Dashboard";
+        // dashboard.selectedDashboardName = dashboard.title;
         dashboard.fileName ="Select File";
       } else if (!dashboard.linkWithDashboard && dashboard.isGroupDashboard ){
         this.loadSimulatorConfigFiles(dashboard);
-        dashboard.selectedDashboardName = dashboard.title;
+        // dashboard.selectedDashboardName = dashboard.title;
         dashboard.fileName ="Select File";
 
         
 
       } 
+      dashboard.selectedDashboardName = "Blank Dashboard";
+      dashboard.dashboardTemplateSelected ? dashboard.dashboardTemplateSelected : "Blank Dashboard";
     });
 }
 
@@ -725,6 +734,8 @@ generateLinkingDashboards() {
 configureCustomDashboard(){
   this.bsModalRef=this.modalService.show(ConfigureCustomDashboardModalComponent,{ class: 'c8y-wizard'});
   this.bsModalRef.content.onSave.subscribe((response) => {
+    response.dashboardTemplateSelected = "Blank Dashboard";
+    response.selectedDashboardName = "Blank Dashboard"; 
     this.templateDetails.dashboards.push(response);
   });
 }
