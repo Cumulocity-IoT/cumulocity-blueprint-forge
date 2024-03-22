@@ -143,6 +143,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
         this.templateDetails = currentData;
         this.generateLinkingDashboards();
         this.dashboardManipulations();
+        console.log('Dashboards value', this.templateDetails.dashboards);
       }
       // In case of no device 
       if (!(this.templateDetails?.input) || !(this.templateDetails?.input?.devices) || !(this.templateDetails?.input?.devices?.length > 0)) {
@@ -610,12 +611,12 @@ else {
   }
 
   dashboardManipulations() {
-    // this.templateDetails.dashboards = this.templateDetails.dashboards.reduce((acc, element) => {
-    //   if (element.isGroupDashboard) {
-    //     return [element, ...acc];
-    //   }
-    //   return [...acc, element];
-    // }, []);
+    this.templateDetails.dashboards = this.templateDetails.dashboards.reduce((acc, element) => {
+      if (element.isGroupDashboard) {
+        return [element, ...acc];
+      }
+      return [...acc, element];
+    }, []);
     this.templateDetails.dashboards.forEach(dashboard => {
       
       dashboard.enableSimulator = false;
@@ -670,17 +671,6 @@ async loadSimulatorConfigFiles(dashboard) {
     dashboard.enableDeviceOrGroup = true;
     dashboard.enableSimulator = dashboard.enableLink = false;
   }
-
-  updateConfigurationFile() {
-    // let matchedConfigValue = JSON.parse(JSON.stringify(this.SimulatorConfigFiles)).find(element => element.fileName === this.fileName);
-    // const fileInput = JSON.stringify(matchedConfigValue.fileContent)
-    // const validJson = this.isValidJson(fileInput);
-    // this.isConfigFileUploading = true;
-    //         if (validJson) {
-    //         this.processFileInput(validJson);
-    //         }
-
-}
 
 private isValidJson(input: any) {
   try {

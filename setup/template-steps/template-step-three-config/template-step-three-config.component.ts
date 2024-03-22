@@ -332,11 +332,7 @@ async saveAppChanges(app) {
           this.templateCatalogSetupService.dynamicDashboardTemplate.next(dashboardToUpdateForTemplate);
           this.filterTemplates?.map(template => template.title = template.title.split("-")[0]);
           this.filterTemplates.push({title: "Blank Dashboard"});
-          console.log('filter templates value', this.filterTemplates);
-          
-          // this.filterTemplates[0] = {
-          //   title: "Blank Dashboard"
-          // };
+        
           this.filterTemplates = this.sortDashboardsByTitle(this.filterTemplates);
           this.templateCatalogSetupService.templatesFromDashboardCatalog.next(this.filterTemplates);
 

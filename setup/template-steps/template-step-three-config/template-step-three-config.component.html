@@ -13,11 +13,11 @@
     <div class="container-fluid fit-w">
       <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
-      <div class="card-group interact-grid" style="text-align:center;padding-top: 10px;">
+      <div class="card-group interact-grid grid-align">
         <div class="col-xs-12 col-sm-8 col-md-9">
            <div class="card">
           <div class="card-header">
-              <div class="col-xs-11 col-sm-11 col-md-11" style="text-align: left;">
+              <div class="col-xs-11 col-sm-11 col-md-11 align-left">
                   <h4 class="card-title">Ensuring a Seamless Setup: Unveiling the Components Ready to Empower Your Experience!</h4>
               </div>
           </div>
@@ -55,7 +55,7 @@
                         >
                           <span>{{templateSelected}}</span> <span class="caret"></span>
                         </button>
-                        <ul style="max-height: 225px; overflow-y: auto" class="dropdown-menu" *dropdownMenu>
+                        <ul class="dropdown-menu welcome-list" *dropdownMenu>
                           <li *ngFor="let selectedWelcomeTemplate of welcomeTemplateData; let st = index">
                             <button type="button" title="{{selectedWelcomeTemplate.description}}" (click)="assignDashboardName(selectedWelcomeTemplate)">
                               {{selectedWelcomeTemplate.dashboardName}}
@@ -116,8 +116,8 @@
                     <div class="list-item-body text-left">
                       <div class="d-flex row">
                         <span class="col-sm-3 col-xs-12 title-width">{{microservice.title}}
-                          <button *ngIf="!isMSEnabled" disabled type="button" style="margin-left: 10px"
-                                class="btn btn-xs btn-icon">
+                          <button *ngIf="!isMSEnabled" disabled type="button" 
+                                class="btn btn-xs btn-icon mr-left">
                                 <i class="fa fa-warning"></i>
                                 Not supported!</button>
                         </span>
@@ -135,7 +135,7 @@
         </div>
         
         <div  class="col-xs-12 col-sm-4 col-md-3">
-          <div class="card" style="text-align: left;">
+          <div class="card align-left">
             <div class="card-header">
                 <div class="col-xs-12 col-sm-12 col-md-12" >
                     <h4 class="card-title">Application Configuration</h4>

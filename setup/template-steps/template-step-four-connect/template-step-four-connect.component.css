@@ -44,6 +44,65 @@
 .btn-icon:hover {
     outline: none !important;
 }
-.download-color {
+.download-file {
+    width: 36%; 
+    font-size: x-large;
     color: var(--brand-primary, var(--c8y-brand-primary));
+}
+.simulator-warning {
+    margin-left: 10px; 
+    color: #DC143C; 
+    border: none; 
+    font-size: 25px !important; 
+    padding-bottom: 44%;
+}
+.flt-right {
+    float: right;
+}
+.grid-align {
+    text-align:center;
+    padding-top: 10px;
+}
+.align-left {
+    text-align: left;
+}
+.dashboard-div-height {
+    min-height: 300px;
+}
+.label-name {
+    font-weight: 550;
+}
+.label-configure {
+    margin-left: 16.5%; 
+    font-weight: 550;
+}
+.label-template {
+    margin-left: 18%; 
+    font-weight: 550;
+}
+.label-simulator {
+    margin-left: 7%; 
+    font-weight: 550;
+}
+.padd-0 {
+    padding:0;
+}
+.group-name-inp {
+    margin-right: 3%;
+}
+.count-inp {
+    margin-right: 2%; 
+    width: 50%;
+}
+.device-div {
+    padding-left: 0; 
+    max-width: 100%; 
+    text-align: end;
+}
+.link-list {
+    max-height: 225px; 
+    overflow-y: auto;
+}
+.fl-rgt {
+    float: right;
 }

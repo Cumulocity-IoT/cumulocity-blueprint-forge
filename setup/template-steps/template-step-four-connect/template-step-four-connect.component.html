@@ -13,27 +13,27 @@
     <div class="container-fluid fit-w">
       <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
-          <div class="card-group interact-grid" style="text-align:center;padding-top: 10px;">
+          <div class="card-group interact-grid grid-align">
             <div class="col-xs-12 col-sm-12 col-md-12">
               <div class="card">
                 <div class="card-header">
-                  <div class="col-xs-12 col-sm-12 col-md-12" style="text-align: left;">
+                  <div class="col-xs-12 col-sm-12 col-md-12 align-left">
                     <h4 class="card-title">Link Device / Group for your dashboard or Simulate it</h4>
                   </div>
                 </div>
                 <div class="card-block" id="dashboardDiv">
-                  <div class="card-block" id="dashboardDiv" style="min-height: 300px">
+                  <div class="card-block dashboard-div-height" id="dashboardDiv">
                     <div class="list-group">
                       <div class="list-group-item d-flex">
                         <div class="list-item-body text-left">
                           <div class="heading-align">
-                            <label for="group-details" style="font-weight: 550">Dashboard Name</label>
+                            <label for="group-details label-name">Dashboard Name</label>
                             <label for="group-details"></label>
-                            <label for="group-details" style="margin-left: 16.5%; font-weight: 550;">Link/Configure
+                            <label for="group-details label-configure">Link/Configure
                               Dashboard</label>
-                            <label for="group-details" style="margin-left: 18%; font-weight: 550">Dashboard
+                            <label for="group-details label-template">Dashboard
                               Template</label>
-                            <label for="group-details" style="margin-left: 7%; font-weight: 550">Simulator
+                            <label for="group-details label-simulator">Simulator
                               Configuration</label>
                           </div>
 
@@ -79,7 +79,7 @@
 
                                   <form class="form-inline" name="deviceForm" #deviceForm="ngForm">
 
-                                    <div class="form-group" class="col-sm-12 col-md-12 col-xs-12" style="padding:0">
+                                    <div class="form-group" class="col-sm-12 col-md-12 col-xs-12 padd-0">
 
 
                                       <div *ngIf="dashboard.enableSimulator"
@@ -89,23 +89,23 @@
 
                                         </div>
 
-                                        <input type="text" class="form-control" placeholder="Group/Type Name"
-                                          style="margin-right: 3%" />
+                                        <input type="text" class="form-control group-name-inp" placeholder="Group/Type Name"
+                                          />
 
-                                        <input type="text" class="form-control" placeholder="# of Devices"
-                                          style="margin-right: 2%; width: 50%" />
+                                        <input type="text" class="form-control count-inp" placeholder="# of Devices"
+                                          />
                                       </div>
 
                                       <div *ngIf="dashboard.enableDeviceOrGroup"
-                                        class="col-sm-6 col-md-6 col-xs-12 input-group-btn dropdown"
-                                        style="padding-left: 0; max-width: 100%; text-align: end" dropdown>
+                                        class="col-sm-6 col-md-6 col-xs-12 input-group-btn dropdown device-div"
+                                        dropdown>
 
                                         <label class="sr-only" for="selected-device">Select Device/asset for
                                           dashboard</label>
 
                                         <input *ngIf="dashboard.isDeviceRequired || dashboard.isGroupDashboard"
-                                          name="selectedItem" class="form-control" [(ngModel)]="dashboard.name" required
-                                          readonly style="width: 100%" id="selected-device-{{dashboard.title}}"
+                                          name="selectedItem" class="form-control wd-100" [(ngModel)]="dashboard.name" required
+                                          readonly id="selected-device-{{dashboard.title}}"
                                           placeholder="Select Device/Asset" type="text">
 
                                         <button type="button" dropdownToggle
@@ -143,7 +143,7 @@
                                               class="caret"></span>
                                           </button>
 
-                                          <ul style="max-height: 225px; overflow-y: auto" class="dropdown-menu"
+                                          <ul class="dropdown-menu link-list"
                                             *dropdownMenu>
                                             <li *ngFor="let linkDashboard of dashboard.linkDashboards; let sl = index;">
                                               <button type="button"
@@ -186,29 +186,21 @@
                                 </div>
                               </div>
                               <div *ngIf="!dashboard.simulatorFileExists" class="col-md-1 col-sm-1">
-                                <!-- <select
-                                  *ngIf="((dashboard.isGroupDashboard) && (dashboard.selectedDashboardName === dashboard.title)) || ((dashboard.enableSimulator) && (dashboard.selectedDashboardName === dashboard.title))"
-                                  class="form-control" [(ngModel)]="dashboard.fileName" style="border-radius:15px;"
-                                  id="dashboardView" (ngModelChange)="updateConfigurationFile()">
-
-                                  <option *ngFor="let simulatorConfigFile of simulatorConfigFiles"
-                                    [value]="simulatorConfigFile.fileName">{{simulatorConfigFile.fileName}}</option>
-                                </select> -->
-                                <button type="button" style="margin-left: 10px; color: #DC143C; border: none; font-size: 25px !important; padding-bottom: 44%"
-                                class="btn btn-xs-warning" title="Simulator configuration file doesn't exist for the selected Dashboard Template">
+                                <button type="button" 
+                                class="btn btn-xs-warning simulator-warning" title="Simulator configuration file doesn't exist for the selected Dashboard Template">
                                 <i class="fa fa-warning"></i>
                                 </button>
-                                <i style="width: 36%; font-size: x-large" class="c8y-icon dlt-c8y-icon-download download-color"
+                                <i class="c8y-icon dlt-c8y-icon-download download-file"
                                 title="Download DTDL"></i>
                               </div>
                               <div class="col-sm-1 col-md-1">
-                                <button *ngIf="dashboard.isCustom && dashboard.isCustom == true" type="button" class="btn btn-dot" style="float: right;" (click)="removeCustomDashboard(i)" title="Remove Dashboard">
+                                <button *ngIf="dashboard.isCustom && dashboard.isCustom == true" type="button" class="btn btn-dot fl-rgt" (click)="removeCustomDashboard(i)" title="Remove Dashboard">
                                   <i c8yIcon="minus-circle" class="icon-24 text-danger"></i>
                                 </button>
                               </div>
                             </div>
                           </div>
-                          <div class="col-xs-1 col-sm-1 col-md-1" style="float: right;">
+                          <div class="col-xs-1 col-sm-1 col-md-1 flt-right">
                             <button type="button" class="btn btn-dot" (click)="configureCustomDashboard()" title="Add Dashboard">
                               <i c8yIcon="add-circle-outline" class="icon-24"></i>
                             </button>
