@@ -37,7 +37,7 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep implement
   configDetails: any;
   images: GalleryItem[];
   blueprintForgeTemplateURL: any;
-  dataBlueprintForgeURL: any;
+  dataBlueprintForgeURL: string = "";
   load: number;
 
   constructor(
@@ -55,10 +55,10 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep implement
     
       this.setup.data$.subscribe(data => {
         if (data.blueprintForge && data.blueprintForge != '') {
-          if (this.load == 0) {
+          if (this.load == 0 && this.dataBlueprintForgeURL !== data.blueprintForge.templateURL) {
           this.templateDetails = null;
-          const templateURL = data.blueprintForge.templateURL;
-          this.loadTemplateDetailsCatalog(templateURL);
+          this.dataBlueprintForgeURL = data.blueprintForge.templateURL;
+          this.loadTemplateDetailsCatalog(this.dataBlueprintForgeURL);
           this.load = this.load + 1;
           } 
         }

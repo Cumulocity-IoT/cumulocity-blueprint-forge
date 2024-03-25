@@ -552,6 +552,7 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
                 }
             });
         }
+        //await this.deleteAllDashboards(app);
 
     }
 
@@ -750,6 +751,17 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
         }
     }
 
+    // This method for internal testing only
+    private async deleteAllDashboards(app: any) {
+        for(let element of app.applicationBuilder.dashboards) {
+           await this.inventoryService.delete(element.id);
+        };
+        app.applicationBuilder.dashboards = [];
+        this.delayedAppUpdateSubject.next({
+            id: app.id,
+            applicationBuilder:  app.applicationBuilder
+        } as any);
+    }
     // TODO: we need to see how can we use product icons instead of device selector
     /* async openIconModal() {
         const icon = await this.iconSelector.selectIcon();

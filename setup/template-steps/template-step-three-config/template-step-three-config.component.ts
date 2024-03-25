@@ -23,7 +23,7 @@ import { TemplateCatalogSetupService } from '../../template-catalog-setup.servic
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { TemplateCatalogModalComponent } from '../../../builder/template-catalog/template-catalog.component';
 import { Observable, from, Subscription, interval } from 'rxjs';
-import { tap } from "rxjs/operators";
+import { distinctUntilChanged, first, tap } from "rxjs/operators";
 import { ApplicationService, IApplication } from '@c8y/client';
 import { ProgressIndicatorModalComponent } from '../../../builder/utils/progress-indicator-modal/progress-indicator-modal.component';
 import { Dashboards } from './../../template-setup.model';
@@ -79,7 +79,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   templatesFromDC: any;
   filterNames: any[];
   selectedDashboardName: any;
-  sharedTemplates: any;
+  haredTemplates: any;
   filterTemplates: any;
   isPreviewLoading: boolean;
   distinctDependencyNames: any;
@@ -90,7 +90,8 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   linkDashboardDefault: any;
   defaultLinkedDashboard: any;
   dashboardTemplatesArray: any;
-  
+
+  private templateId = "";
 
   constructor(
     public stepper: C8yStepper,
@@ -125,29 +126,31 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   }
 
   ngOnInit() {
-    this.templateCatalogSetupService.templateData.subscribe(async currentData => {
-      this.isFormValid = this.appConfigForm?.form.valid;
-      if (currentData) {
-        this.templateSelected = "Default Template";
-        this.templateDetails = currentData;
-        this.pluginDetailsArray = JSON.parse(JSON.stringify(this.templateDetails?.plugins));
-        this.microserviceArray = JSON.parse(JSON.stringify(this.templateDetails?.microservices));
-        this.loadTemplateCatalogFromDashboardCatalog();
-        
-      }
-      // In case of no device 
-      if (!(this.templateDetails?.input) || !(this.templateDetails?.input?.devices) || !(this.templateDetails?.input?.devices?.length > 0)) {
-        this.deviceFormValid = true;
-      } else {
-        this.deviceFormValid = false;
-      }
-      this.appList = (await this.appService.list({ pageSize: 2000 })).data;
-      this.isMSEnabled =  this.applicationBinaryService.isMicroserviceEnabled(this.appList);
-    });
-    this.templateCatalogSetupService.welcomeTemplateData.subscribe(welcomeTemplateData => {
-      this.welcomeTemplateData = welcomeTemplateData;
-    });
-    
+    this.templateCatalogSetupService.templateData.pipe(distinctUntilChanged()).subscribe(async currentData => {
+        this.isFormValid = this.appConfigForm?.form.valid;
+        if (currentData && currentData.templateId !== this.templateId) {
+          this.templateId = currentData.templateId;
+          this.templateSelected = "Default Template";
+          this.templateDetails = currentData;
+          this.pluginDetailsArray = cloneDeep(this.templateDetails?.plugins);
+          this.microserviceArray = cloneDeep(this.templateDetails?.microservices);
+          this.loadTemplateCatalogFromDashboardCatalog();
+        }
+        // In case of no device 
+        if (!(this.templateDetails?.input) || !(this.templateDetails?.input?.devices) || !(this.templateDetails?.input?.devices?.length > 0)) {
+          this.deviceFormValid = true;
+        } else {
+          this.deviceFormValid = false;
+        }
+        if(!this.appList || this.appList.length === 0) {
+          this.appList = await this.templateCatalogSetupService.getAppList();
+          this.isMSEnabled =  this.applicationBinaryService.isMicroserviceEnabled(this.appList);
+        }
+      });
+  
+      this.templateCatalogSetupService.welcomeTemplateData.subscribe(welcomeTemplateData => {
+        this.welcomeTemplateData = welcomeTemplateData;
+      });
   }
 
   ngAfterViewInit() {
@@ -272,8 +275,6 @@ async saveAppChanges(app) {
     this.progressModal = this.modalService.show(ProgressIndicatorModalComponent, { class: 'c8y-wizard', initialState: { message } });
   }
 
-  
-
   hideProgressModalDialog() {
     this.progressModal.hide();
   }
@@ -311,7 +312,6 @@ async saveAppChanges(app) {
     this.templateCatalogSetupService.dynamicDashboardTemplate.next(event.item);
     this.loadTemplateDetails(event.item,index);
   }
-
 
   loadTemplateCatalogFromDashboardCatalog() {
     this.templateCatalogFromDCService.getTemplateCatalog()
