@@ -539,7 +539,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
               deviceFieldNotField = true;
             } 
             else if (this.templateDetails.dashboards[dd].isDeviceRequired === true && this.templateDetails.dashboards[dd].linkWithDashboard === dashboard.id) {
-              // this.templateDetails.dashboards[dd].devices = dashboard.devices;
+              this.templateDetails.dashboards[dd].devices = dashboard.devices;
                deviceFieldNotField = true;
            }  else if (this.templateDetails.dashboards[dd].isDeviceRequired === true && this.templateDetails.dashboards[dd].linkWithDashboard !== dashboard.id && !dashboard.name) {
                 deviceFieldNotField = false;
@@ -571,7 +571,7 @@ else {
             deviceFieldNotField = true;
           } 
           else if (this.templateDetails.dashboards[dd].isDeviceRequired === true && this.templateDetails.dashboards[dd].linkWithDashboard === dashboard.id) {
-            // this.templateDetails.dashboards[dd].devices = dashboard.devices;
+            this.templateDetails.dashboards[dd].devices = dashboard.devices;
              deviceFieldNotField = true;
          } else if (this.templateDetails.dashboards[dd].isDeviceRequired === true && this.templateDetails.dashboards[dd].linkWithDashboard !== dashboard.id && !dashboard.name) {
               deviceFieldNotField = false;
@@ -732,6 +732,13 @@ configureCustomDashboard(){
 
 removeCustomDashboard(i){
   this.templateDetails.dashboards.splice(i,1);
+}
+
+onSelectOfLinkingDashbord(linkDashboard, dashboardIndex, dashboard) {
+  this.templateDetails.dashboards[dashboardIndex].defaultLinkedDashboard = linkDashboard.title;
+  console.log('title', linkDashboard.title, 'index', dashboardIndex);
+
+  // let findDashboardOfSource = this.templateDetails.dashboards.find(dashboardItem => dashboardItem.title === )
 }
   
   }

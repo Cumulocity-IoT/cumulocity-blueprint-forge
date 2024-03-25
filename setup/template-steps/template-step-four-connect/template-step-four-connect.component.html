@@ -27,13 +27,13 @@
                       <div class="list-group-item d-flex">
                         <div class="list-item-body text-left">
                           <div class="heading-align">
-                            <label for="group-details label-name">Dashboard Name</label>
+                            <label for="group-details" class="label-name">Dashboard Name</label>
                             <label for="group-details"></label>
-                            <label for="group-details label-configure">Link/Configure
+                            <label for="group-details" class="label-configure">Link/Configure
                               Dashboard</label>
-                            <label for="group-details label-template">Dashboard
+                            <label for="group-details" class="label-template">Dashboard
                               Template</label>
-                            <label for="group-details label-simulator">Simulator
+                            <label for="group-details" class="label-simulator">Simulator
                               Configuration</label>
                           </div>
 
@@ -147,7 +147,7 @@
                                             *dropdownMenu>
                                             <li *ngFor="let linkDashboard of dashboard.linkDashboards; let sl = index;">
                                               <button type="button"
-                                                (click)="onSelectOfLinkingDashbord(linkDashboard.title, i)">
+                                                (click)="onSelectOfLinkingDashbord(linkDashboard, dashboard, i)">
                                                 {{linkDashboard.title}}
                                               </button>
                                             </li>
