@@ -74,6 +74,11 @@ export interface MicroserviceDetails {
 }
 
 export interface Dashboards {
+    dynamicDashboardArray: any;
+    input: any;
+    previewBinaryId: any;
+    preview: any;
+    dynamicDashboardAssigned: boolean;
     simulatorFileExists: boolean;
     fileName: string;
     defaultLinkedDashboard: string;
@@ -109,7 +114,7 @@ export interface Dashboards {
     templateType?: number;
     basicConfig?: WidgetDetail[];
     isConfigRequred?: boolean;
-    linkDashboards?: any
+    linkDashboards?: any;
 }
 export interface DashboardWidgets {
     id?: string;

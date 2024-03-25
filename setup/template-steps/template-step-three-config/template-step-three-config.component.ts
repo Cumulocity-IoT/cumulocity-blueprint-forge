@@ -347,9 +347,9 @@ async saveAppChanges(app) {
           this.templateDetails.dashboards.forEach(item => {
             if (item.linkWithDashboard) {
               findMatchedIdObject = this.templateDetails.dashboards.find(match => match.id === item.linkWithDashboard);
-              item.defaultLinkedDashboard =  findMatchedIdObject.title;
+              // item.defaultLinkedDashboard =  findMatchedIdObject.title ? findMatchedIdObject.title :  "";
             } else {
-              item.defaultLinkedDashboard =  "";
+              // item.defaultLinkedDashboard =  "";
             }
           })
         
@@ -420,7 +420,7 @@ async saveAppChanges(app) {
                 this.templateDetails[index].preview = this.templateCatalogFromDCService.getGithubURL(this.templateDetails[index].preview);
             }
             this.updateDepedencies(index);
-            this.templateCatalogSetupService.dynamicDashboardTemplateDetails.next(this.templateDetails[index]);
+            // this.templateCatalogSetupService.dynamicDashboardTemplateDetails.next(this.templateDetails[index]);
             
         });
     }
@@ -483,7 +483,7 @@ sortDashboardsByTitle(sortableArray) {
 
 onSelectOfLinkingDashbord(title, dashboardIndex) {
   const disableButton = <HTMLElement>document.getElementById("dashboardTemplates-"+dashboardIndex);
-  this.templateDetails.dashboards[dashboardIndex].defaultLinkedDashboard = title;
+  // this.templateDetails.dashboards[dashboardIndex].defaultLinkedDashboard = title;
   if (title === 'Unconfigure') {
     disableButton.classList.add("disable-dashboard-templates");
   } else {
@@ -492,7 +492,7 @@ onSelectOfLinkingDashbord(title, dashboardIndex) {
 }
 
 updateDashboardTemplateSelected (title, index) {
-  this.templateDetails.dashboards[index].dashboardTemplateSelected = title;
+  // this.templateDetails.dashboards[index].dashboardTemplateSelected = title;
 }
 
 

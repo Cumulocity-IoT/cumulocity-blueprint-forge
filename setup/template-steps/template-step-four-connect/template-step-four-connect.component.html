@@ -147,7 +147,7 @@
                                             *dropdownMenu>
                                             <li *ngFor="let linkDashboard of dashboard.linkDashboards; let sl = index;">
                                               <button type="button"
-                                                (click)="onSelectOfLinkingDashbord(linkDashboard, dashboard, i)">
+                                                (click)="onSelectOfLinkingDashbord(linkDashboard, i, sl)">
                                                 {{linkDashboard.title}}
                                               </button>
                                             </li>
@@ -170,7 +170,7 @@
                                     [typeahead]="dashboard.dashboardTemplatesArray" id="dashboardTemplates-{{i}}"
                                     typeaheadOptionField="title" class="form-control" placeholder="Select Template"
                                     [typeaheadMinLength]="2"
-                                    (typeaheadOnSelect)="updateDashboardTemplateSelected($event, i)"
+                                    (typeaheadOnSelect)="assignSelectedDashboard(i, $event, 'noDevice')"
                                     [ngModelOptions]="{standalone: true}">
                                 </div>
                               </div>
@@ -181,7 +181,7 @@
                                   <input [(ngModel)]="dashboard.selectedDashboardName" [typeahead]="filterTemplates"
                                     typeaheadOptionField="title" class="form-control" placeholder="Select Template"
                                     [typeaheadMinLength]="2"
-                                    (typeaheadOnSelect)="assignSelectedDashboard(selectedDasboard, i, $event)"
+                                    (typeaheadOnSelect)="assignSelectedDashboard(i, $event, 'withDevice')"
                                     [ngModelOptions]="{standalone: true}">
                                 </div>
                               </div>

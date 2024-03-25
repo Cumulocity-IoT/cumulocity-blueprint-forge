@@ -53,8 +53,11 @@ export class TemplateCatalogSetupService {
     public dynamicDashboardTemplate = new BehaviorSubject<any>(undefined);
     dynamicDashboardTemplate$ = this.dynamicDashboardTemplate.asObservable();
 
-    public dynamicDashboardTemplateDetails =  new BehaviorSubject<any>(undefined);
+    public dynamicDashboardTemplateDetails =  new BehaviorSubject<any>([]);
     dynamicDashboardTemplateDetails$ = this.dynamicDashboardTemplateDetails.asObservable();
+
+    public dynamicPlugins =  new BehaviorSubject<any>([]);
+    dynamicPlugins$ = this.dynamicPlugins.asObservable();
 
     public indexOfDashboardToUpdateTemplate = new BehaviorSubject<any>(null); 
     indexOfDashboardToUpdateTemplate$ = this.indexOfDashboardToUpdateTemplate.asObservable();
