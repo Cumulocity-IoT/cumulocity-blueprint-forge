@@ -18,7 +18,8 @@
 import { HttpClient, HttpHeaders, HttpResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
-import { catchError, map } from "rxjs/operators";
+import { catchError,  map } from "rxjs/operators";
+import * as delay from "delay";
 import { has, get } from "lodash-es";
 import { ApplicationService, InventoryBinaryService, InventoryService } from "@c8y/ngx-components/api";
 import { CumulocityDashboard, TemplateCatalogEntry } from "./../builder/template-catalog/template-catalog.model";
@@ -64,6 +65,8 @@ export class TemplateCatalogSetupService {
     public templatesFromDashboardCatalog = new BehaviorSubject<Array<[]>>([]);
     templatesFromDashboardCatalog$ = this.templatesFromDashboardCatalog.asObservable();
 
+    private appList: any = [];
+    private isAppServiceCalled = false;
 
     constructor(private http: HttpClient, private inventoryService: InventoryService,
         private appService: ApplicationService,
@@ -236,5 +239,20 @@ export class TemplateCatalogSetupService {
 
     private generateRandomInteger(min, max): number {
         return Math.floor(Math.random() * Math.floor(max) + min);
+    }
+
+    async getAppList() {
+        if((!this.appList || this.appList.length === 0)) {
+            if(!this.isAppServiceCalled) {
+                this.isAppServiceCalled = true;
+                this.appList = (await this.appService.list({ pageSize: 2000 })).data;
+                return this.appList;
+            } else {
+                await delay(1000);
+                return await this.getAppList();
+            }
+        } else {
+            return this.appList;
+        }
     }
 }
