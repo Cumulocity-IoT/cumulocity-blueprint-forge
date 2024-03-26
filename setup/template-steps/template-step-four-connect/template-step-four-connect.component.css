@@ -3,7 +3,7 @@
     cursor: pointer;
 }
 .padd-bottom {
-    padding-bottom: 2%;
+    padding-bottom: 1.3%;
 }
 .title-width {
     width: 11%;
@@ -30,7 +30,7 @@
     width: 100%;
 }
 .heading-align {
-    margin-bottom: 2%;
+    margin-bottom: 1%;
     
 }
 .btn-xs-warning {
@@ -46,15 +46,15 @@
 }
 .download-file {
     width: 36%; 
-    font-size: x-large;
+    font-size: large;
     color: var(--brand-primary, var(--c8y-brand-primary));
 }
 .simulator-warning {
     margin-left: 10px; 
     color: #DC143C; 
     border: none; 
-    font-size: 25px !important; 
-    padding-bottom: 44%;
+    font-size: 18px !important; 
+    margin-top: -21px;
 }
 .flt-right {
     float: right;
@@ -69,19 +69,7 @@
 .dashboard-div-height {
     min-height: 300px;
 }
-.label-name {
-    font-weight: 550;
-}
-.label-configure {
-    margin-left: 16.5%; 
-    font-weight: 550;
-}
-.label-template {
-    margin-left: 18%; 
-    font-weight: 550;
-}
-.label-simulator {
-    margin-left: 7%; 
+.title-font {
     font-weight: 550;
 }
 .padd-0 {
@@ -105,4 +93,19 @@
 }
 .fl-rgt {
     float: right;
+}
+.heading-name {
+    width: 24.3%;
+}
+.heading-configure {
+    width: 29%;
+}
+.heading-template {
+    width: 17.4%;
+}
+.warning-mr {
+    margin-top: 4px;
+}
+.download-mr {
+    margin-top: 2px;
 }

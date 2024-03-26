@@ -74,6 +74,9 @@ export interface MicroserviceDetails {
 }
 
 export interface Dashboards {
+    originalIndex: number;
+    isSpin: boolean;
+    dynamicDashboardTemplate: any;
     dynamicDashboardArray: any;
     input: any;
     previewBinaryId: any;

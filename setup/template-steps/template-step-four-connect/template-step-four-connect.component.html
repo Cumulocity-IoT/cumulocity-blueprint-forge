@@ -26,15 +26,14 @@
                     <div class="list-group">
                       <div class="list-group-item d-flex">
                         <div class="list-item-body text-left">
-                          <div class="heading-align">
-                            <label for="group-details" class="label-name">Dashboard Name</label>
-                            <label for="group-details"></label>
-                            <label for="group-details" class="label-configure">Link/Configure
-                              Dashboard</label>
-                            <label for="group-details" class="label-template">Dashboard
-                              Template</label>
-                            <label for="group-details" class="label-simulator">Simulator
-                              Configuration</label>
+                          <div class="heading-align d-flex row padd-bottom" >
+                            <div for="group-details" class="col-sm-3 col-md-3 col-xs-12 title-font heading-name">Dashboard Name</div>
+                            <div for="group-details" class="col-sm-3 col-md-3 col-xs-12 title-font heading-configure">Link/Configure
+                              Dashboard</div>
+                            <div for="group-details" class="col-sm-2 col-md-2 col-xs-12 title-font heading-template">Dashboard
+                              Template</div>
+                            <div for="group-details" class="col-sm-2 col-md-2 col-xs-12 title-font">Simulator
+                              Configuration</div>
                           </div>
 
                           <div *ngFor="let dashboard of templateDetails?.dashboards; let i = index">
@@ -66,7 +65,7 @@
                                       title="Link with other dashboard. No need to connect device or simulate it. It will automatically be taken care using the linked dashboard"></i></button>
                                 </div>
 
-                                <c8y-loading *ngIf="isSpin"></c8y-loading>
+                                
                               </div>
 
                               <div *ngIf="fileUploadMessage" class="col-sm-4 col-xs-12 text-muted">
@@ -138,7 +137,8 @@
                                         <div class="dropdown wd-100" dropdown container="body">
 
                                           <button type="button" title="dropdown-toggle" dropdownToggle
-                                            class="btn btn-default dropdown-toggle c8y-dropdown wd-100">
+                                            class="btn btn-default dropdown-toggle c8y-dropdown wd-100 align-left"
+                                            >
                                             <span>{{dashboard.defaultLinkedDashboard}}</span> <span
                                               class="caret"></span>
                                           </button>
@@ -153,8 +153,9 @@
                                             </li>
                                           </ul>
                                         </div>
+                                       
                                       </div>
-
+                                      
 
 
 
@@ -170,7 +171,7 @@
                                     [typeahead]="dashboard.dashboardTemplatesArray" id="dashboardTemplates-{{i}}"
                                     typeaheadOptionField="title" class="form-control" placeholder="Select Template"
                                     [typeaheadMinLength]="2"
-                                    (typeaheadOnSelect)="assignSelectedDashboard(i, $event, 'noDevice')"
+                                    (typeaheadOnSelect)="assignSelectedDashboard(i, $event)"
                                     [ngModelOptions]="{standalone: true}">
                                 </div>
                               </div>
@@ -181,24 +182,28 @@
                                   <input [(ngModel)]="dashboard.selectedDashboardName" [typeahead]="filterTemplates"
                                     typeaheadOptionField="title" class="form-control" placeholder="Select Template"
                                     [typeaheadMinLength]="2"
-                                    (typeaheadOnSelect)="assignSelectedDashboard(i, $event, 'withDevice')"
+                                    (typeaheadOnSelect)="assignSelectedDashboard(i, $event)"
                                     [ngModelOptions]="{standalone: true}">
                                 </div>
                               </div>
-                              <div *ngIf="!dashboard.simulatorFileExists" class="col-md-1 col-sm-1">
+                              <div *ngIf="!dashboard.simulatorFileExists && dashboard.enableSimulator" class="col-md-1 col-sm-1">
                                 <button type="button" 
                                 class="btn btn-xs-warning simulator-warning" title="Simulator configuration file doesn't exist for the selected Dashboard Template">
-                                <i class="fa fa-warning"></i>
+                                <i class="fa fa-warning warning-mr"></i>
                                 </button>
-                                <i class="c8y-icon dlt-c8y-icon-download download-file"
+                                <i class="c8y-icon dlt-c8y-icon-download download-file download-mr"
                                 title="Download DTDL"></i>
                               </div>
                               <div class="col-sm-1 col-md-1">
                                 <button *ngIf="dashboard.isCustom && dashboard.isCustom == true" type="button" class="btn btn-dot fl-rgt" (click)="removeCustomDashboard(i)" title="Remove Dashboard">
                                   <i c8yIcon="minus-circle" class="icon-24 text-danger"></i>
                                 </button>
+                                <c8y-loading *ngIf="dashboard.isSpin"></c8y-loading>
                               </div>
+                              
                             </div>
+
+                            
                           </div>
                           <div class="col-xs-1 col-sm-1 col-md-1 flt-right">
                             <button type="button" class="btn btn-dot" (click)="configureCustomDashboard()" title="Add Dashboard">
