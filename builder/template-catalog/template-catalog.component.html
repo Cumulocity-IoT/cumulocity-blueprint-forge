@@ -42,7 +42,7 @@
                 </div>
             </div>
             <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 dflex-center">
-                <button class="btn btn-dot" title="Import Dashboard Template" [popover]="importPopover" popoverTitle="Import Dashboard Template"
+                <button class="btn btn-dot btn-default" title="Import Dashboard Template" [popover]="importPopover" popoverTitle="Import Dashboard Template"
                     placement="right" type="button"><i class="c8y-icon dlt-c8y-icon-upload"></i></button>
             </div>
             </div>
@@ -81,7 +81,7 @@
                             {{template?.description?template?.description:'No description available'}}
                         </div>
                         <div *ngIf="template.comingSoon==false" class="button-grp">
-                            <button type="button" class="btn btn-default btn-sm" style="width: 100%;"
+                            <button type="button" class="btn btn-default btn-sm btn-default-dark-theme" style="width: 100%;"
                                 (click)="onTemplateClicked(template)">Details</button>
                         </div>
                     </div>
