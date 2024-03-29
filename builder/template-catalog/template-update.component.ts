@@ -76,6 +76,9 @@ export class TemplateUpdateModalComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        if(this.dashboardConfig?.groupTemplate) {
+            this.groupTemplate = true;
+        }
         if(this.dashboardConfig?.templateType) {
             this.configureTemplateType(this.dashboardConfig?.templateType);
         }
