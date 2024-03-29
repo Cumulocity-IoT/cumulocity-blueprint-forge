@@ -36,10 +36,10 @@ import { SetupConfigService } from './../../setup-config.service';
 import { SetupWidgetConfigModalComponent } from '../../../setup/setup-widget-config-modal/setup-widget-config-modal.component';
 import { DOCUMENT } from '@angular/common';
 import { BrandingService } from '../../../builder/branding/branding.service';
-import { DomSanitizer } from '@angular/platform-browser';
 import {cloneDeep} from "lodash-es";
-import { WidgetCatalogService } from '../../../builder/widget-catalog/widget-catalog.service';
 import { TemplateCatalogEntry } from '../../../builder/template-catalog/template-catalog.model';
+
+
 @Component({
   selector: 'c8y-template-step-three-config',
   templateUrl: './template-step-three-config.component.html',
@@ -83,7 +83,8 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
     private appService: ApplicationService,
     @Inject(DOCUMENT) private document: Document, private brandingService: BrandingService,
     private renderer: Renderer2, private alertService: AlertService, 
-    private appStateService: AppStateService, protected setupConfigService: SetupConfigService
+    private appStateService: AppStateService, protected setupConfigService: SetupConfigService,
+    
   ) {
 
     super(stepper, step, setup, appState, alert, setupConfigService);

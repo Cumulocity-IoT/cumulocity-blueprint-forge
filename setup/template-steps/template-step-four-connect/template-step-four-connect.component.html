@@ -53,7 +53,7 @@
                                       title="Connect your dashboard with Device/Group or Type"></i></button>
 
                                   <button type="button" class="btn btn-default"
-                                    (click)="toggleToEnableSimulator($event, dashboard, i)"
+                                    (click)="simulatorCreateForDashboard($event, dashboard, i)"
                                     [ngStyle]="{'background-color': dashboard.enableSimulator? '#C5EDEA': none}">
                                     <span c8yIcon="c8y-simulator"
                                       title="Configure your simulator to connect with the Dashboard"></span></button>
@@ -89,10 +89,14 @@
                                         </div>
 
                                         <input type="text" class="form-control group-name-inp" placeholder="Group/Type Name"
-                                          />
+                                          [(ngModel)]="dashboard.simulatorGroupName"
+                                          (change)="checkAndGenerateLinks(dashboard)"
+                                          [ngModelOptions]="{standalone: true}"/>
 
-                                        <input type="text" class="form-control count-inp" placeholder="# of Devices"
-                                          />
+                                        <input type="number" class="form-control count-inp" placeholder="# of Devices"
+                                          [(ngModel)]="dashboard.simulatorNoOfDevices" min="1" max="5"
+                                          (change)="checkAndGenerateLinks(dashboard)"
+                                          [ngModelOptions]="{standalone: true}"/>
                                       </div>
 
                                       <div *ngIf="dashboard.enableDeviceOrGroup"
@@ -131,6 +135,7 @@
                                                 placement="right"></i></button></li>
                                         </ul>
                                       </div>
+                                      <ng-container #configWrapper></ng-container>
 
 
                                       <div *ngIf="dashboard.enableLink" class="col-sm-7 col-md-7 col-xs-12 pad-left">
@@ -227,8 +232,8 @@
     </div>
   </div>
 
-
-  <c8y-template-setup-stepper-buttons [formValid]="deviceFormValid ? true : false" [index]="stepper.selectedIndex"
+  <!-- [formValid]="deviceFormValid ? true : false" -->
+  <c8y-template-setup-stepper-buttons [formValid]="true" [index]="stepper.selectedIndex"
     (onNext)="configureApp(currentApp)" (onBack)="back()">
   </c8y-template-setup-stepper-buttons>
   <div class="alerts">
