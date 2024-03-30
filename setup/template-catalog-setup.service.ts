@@ -39,17 +39,12 @@ export class TemplateCatalogSetupService {
     private preprodBranchPath = "?ref=preprod";
     pkgVersion: any;
     private isFallBackActive = false;
-    public templateData = new BehaviorSubject<TemplateBlueprintDetails>(undefined);
-    templateData$ = this.templateData.asObservable();
 
-    public welcomeTemplateData = new BehaviorSubject<TemplateCatalogEntry>(undefined);
-    welcomeTemplateData$ = this.welcomeTemplateData.asObservable();
+    public welcomeTemplateData: any = [];
 
     public blankTemplate = new BehaviorSubject(false);
     blankTemplate$ = this.blankTemplate.asObservable();
 
-    public welcomeTemplateSelected = new BehaviorSubject("Default Template");
-    welcomeTemplateSelected$ = this.welcomeTemplateSelected.asObservable();
 
     public dynamicDashboardTemplate = new BehaviorSubject<any>(undefined);
     dynamicDashboardTemplate$ = this.dynamicDashboardTemplate.asObservable();

@@ -100,6 +100,8 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
   templatesFromDC: any;
   pluginsForDynamic: any = [];
 
+  private templateId: string ="";
+
   constructor(
     public stepper: C8yStepper,
     protected step: CdkStep,
@@ -131,6 +133,31 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     this.app.subscribe(app => {
       this.currentApp = app;
     });
+
+    this.setup.data$.subscribe(async data => {
+      if (data.blueprintForge && data.blueprintForge != '') {
+        if (this.blueprintForge.templateDetail && this.templateId !== data.blueprintForge.templateDetail?.templateId) {
+          this.templateId = data.blueprintForge.templateDetail.templateId;
+          this.templateDetails = data.blueprintForge.templateDetail;
+          this.dashboardManipulations();
+          this.pluginDetailsArray = cloneDeep(this.templateDetails?.plugins);
+          this.microserviceArray = cloneDeep(this.templateDetails?.microservices);
+          this.loadTemplateCatalogFromDashboardCatalog();
+        }
+        this.isFormValid = this.appConfigForm?.form.valid;
+        // In case of no device 
+        if (!(this.templateDetails?.input) || !(this.templateDetails?.input?.devices) || !(this.templateDetails?.input?.devices?.length > 0)) {
+          this.deviceFormValid = true;
+        } else {
+          this.deviceFormValid = false;
+        }
+        if(!this.appList || this.appList.length === 0) {
+          this.appList = await this.templateCatalogSetupService.getAppList();
+          this.isMSEnabled =  this.applicationBinaryService.isMicroserviceEnabled(this.appList);
+        }
+        this.welcomeTemplateData = this.templateCatalogSetupService.welcomeTemplateData;;
+      }
+    });
     
     this.templateCatalogSetupService.blankTemplate.subscribe(value => {
       if (value) {
@@ -139,6 +166,8 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       }
     });
   }
+
+  
   ngAfterViewInit(): void {
     console.log('After view init called');
     this.verifyStepCompleted();
@@ -146,7 +175,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
 
   ngOnInit() {
     this.simulatorSelected = false;
-    this.templateCatalogSetupService.templateData.subscribe(async currentData => {
+   /*  this.templateCatalogSetupService.templateData.subscribe(async currentData => {
       this.isFormValid = this.appConfigForm?.form.valid;
       if (currentData) {
         this.templateDetails = currentData;
@@ -166,7 +195,7 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
     });
     this.templateCatalogSetupService.welcomeTemplateData.subscribe(welcomeTemplateData => {
       this.welcomeTemplateData = welcomeTemplateData;
-    });
+    }); */
    
     this.templateCatalogSetupService.templatesFromDashboardCatalog.subscribe(filterTemplates => this.filterTemplates = filterTemplates);
     
@@ -361,7 +390,8 @@ export class TemplateStepFourConnectComponent extends TemplateSetupStep implemen
       let templateDetailsData;
       let  dashboardTemplates;
       if (db.welcomeTemplates) {
-        this.templateCatalogSetupService.welcomeTemplateSelected.subscribe(value => this.templateSelected = value);
+        //this.templateCatalogSetupService.welcomeTemplateSelected.subscribe(value => this.templateSelected = value);
+        this.templateSelected = this.blueprintForge.selectedWelcomeTemplate;
          dashboardTemplates =  this.welcomeTemplateData.find(dashboardTemplate => dashboardTemplate.dashboardName === this.templateSelected);
           if (dashboardTemplates && this.templateSelected === 'Default Template') {
             templateDetailsData = await (await this.loadTemplateDetails(db.dashboard)).toPromise();

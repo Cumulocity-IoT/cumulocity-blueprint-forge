@@ -25,6 +25,8 @@ export interface BlueprintForge {
     plugins?: PluginDetails[];
     microservices?: MicroserviceDetails[];
     dashboards: Dashboards[];
+    templateDetail: TemplateBlueprintDetails;
+    selectedWelcomeTemplate?: string;
 }
 export interface TemplateBlueprintEntry {
     templateId: string;

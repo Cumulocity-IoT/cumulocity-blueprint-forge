@@ -31,7 +31,7 @@ import { TemplateCatalogEntry } from './../../../builder/template-catalog/templa
   styleUrls: ['./template-step-one.component.css'],
   host: { class: 'd-contents' }
 })
-export class TemplateStepOneComponent extends TemplateSetupStep implements OnInit, AfterViewInit {
+export class TemplateStepOneComponent extends TemplateSetupStep implements OnInit {
 
 
   public templates: Array<TemplateBlueprintEntry> = [];
@@ -56,10 +56,6 @@ export class TemplateStepOneComponent extends TemplateSetupStep implements OnIni
     this.loadTemplateCatalog();
   }
 
-  ngAfterViewInit() {
-    this.verifyStepCompleted();
-
-  }
   loadTemplateCatalog() {
     this.templateCatalogSetupService.getTemplateCatalog()
       .pipe(catchError(err => {
@@ -68,7 +64,7 @@ export class TemplateStepOneComponent extends TemplateSetupStep implements OnIni
       }))
       .subscribe((catalog: any) => {
         this.templates = this.templates.concat(catalog[0]);
-        this.templateCatalogSetupService.welcomeTemplateData.next(catalog[1]);
+        this.templateCatalogSetupService.welcomeTemplateData = catalog[1];
         this.filterTemplates = (this.templates ? this.templates : []);
         this.filterTemplates.forEach(template => {
           if (template.thumbnail && template?.thumbnail != '') {

@@ -25,7 +25,7 @@ import { TemplateCatalogModalComponent } from '../../../builder/template-catalog
 import { Observable } from 'rxjs';
 import { distinctUntilChanged, first, tap } from "rxjs/operators";
 import { ApplicationService, IApplication } from '@c8y/client';
-import { Dashboards } from './../../template-setup.model';
+import { Dashboards, TemplateBlueprintDetails } from './../../template-setup.model';
 import { ApplicationBinaryService } from '../../../builder/application-binary.service';
 import { TemplateCatalogService } from '../../../builder/template-catalog/template-catalog.service';
 import * as delay from "delay";
@@ -46,9 +46,9 @@ import { TemplateCatalogEntry } from '../../../builder/template-catalog/template
   styleUrls: ['./template-step-three-config.component.css'],
   host: { class: 'd-contents' }
 })
-export class TemplateStepThreeConfigComponent extends TemplateSetupStep implements OnInit, AfterViewInit {
+export class TemplateStepThreeConfigComponent extends TemplateSetupStep{
 
-  templateDetails: any;
+  templateDetails: TemplateBlueprintDetails;
   private appList = [];
   @ViewChild("appConfigForm", { static: false }) appConfigForm: NgForm;
 
@@ -64,7 +64,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
   deviceFormValid: boolean;
   dashboardName: any;
   templateSelected: string;
-  isMSEnabled: boolean = false;
+ // isMSEnabled: boolean = false;
   blankTemplateDashboard: boolean;
   welcomeTemplateData: TemplateCatalogEntry;
   isPreviewLoading: boolean;
@@ -98,19 +98,16 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
     this.app.subscribe(app => {
       this.currentApp = app;
     });
-  }
 
-  ngOnInit() {
-    this.templateCatalogSetupService.templateData.pipe(distinctUntilChanged()).subscribe(async currentData => {
-        this.isFormValid = this.appConfigForm?.form.valid;
-        if (currentData && currentData.templateId !== this.templateId) {
-          this.templateId = currentData.templateId;
+    this.setup.data$.subscribe(async data => {
+      if (data.blueprintForge && data.blueprintForge != '') {
+        if (this.blueprintForge.templateDetail && this.templateId !== data.blueprintForge.templateDetail?.templateId) {
+          this.templateId = data.blueprintForge.templateDetail.templateId;
           this.templateSelected = "Default Template";
-          this.templateDetails = currentData;
+          this.templateDetails = data.blueprintForge.templateDetail;
           this.pluginDetailsArray = cloneDeep(this.templateDetails?.plugins);
           this.microserviceArray = cloneDeep(this.templateDetails?.microservices);
         }
-        // In case of no device 
         if (!(this.templateDetails?.input) || !(this.templateDetails?.input?.devices) || !(this.templateDetails?.input?.devices?.length > 0)) {
           this.deviceFormValid = true;
         } else {
@@ -118,29 +115,22 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep implemen
         }
         if(!this.appList || this.appList.length === 0) {
           this.appList = await this.templateCatalogSetupService.getAppList();
-          this.isMSEnabled =  this.applicationBinaryService.isMicroserviceEnabled(this.appList);
         }
-      });
-  
-      this.templateCatalogSetupService.welcomeTemplateData.subscribe(welcomeTemplateData => {
-        this.welcomeTemplateData = welcomeTemplateData;
-      });
-  }
-
-  ngAfterViewInit() {
-    this.verifyStepCompleted();
+        this.welcomeTemplateData = this.templateCatalogSetupService.welcomeTemplateData;;
+      }
+    });
   }
 
   syncDashboardFlag(event, index) {
     this.templateDetails.dashboards[index].selected = event.target.checked;
   }
   
-  syncPluginFlag(event, index) {
+ /*  syncPluginFlag(event, index) {
     this.templateDetails.plugins[index].selected = event.target.checked;
-  }
-  syncMicroserviceFlag(event, index) {
+  } */
+ /*  syncMicroserviceFlag(event, index) {
     this.templateDetails.microservices[index].selected = event.target.checked;
-  }
+  } */
 
    async updateAppConfiguration(app: any) {
     if (this.currentApp.name !== this.newAppName ||
@@ -209,7 +199,7 @@ async saveAppChanges(app) {
     }
 
     savingAlert.update('Application saved!', 'success');
-    savingAlert.close(1500);
+    savingAlert.close(5000);
     
   } catch (e) {
     savingAlert.update('Unable to save!\nCheck browser console for details', 'danger');
@@ -228,7 +218,8 @@ async saveAppChanges(app) {
     await basicConfigurationRef.content.event.subscribe(async data => {
       if (data && data.isConfirm) {
         this.templateDetails.dashboards[index].basicConfig = data.basicConfigParams;
-        this.templateCatalogSetupService.templateData.next(this.templateDetails);
+        this.blueprintForge.templateDetail = this.templateDetails;
+        //this.templateCatalogSetupService.templateData.next(this.templateDetails);
       }
     });
   }
@@ -269,7 +260,6 @@ async saveAppChanges(app) {
 
   assignDashboardName(selectedTemplate) {
     this.templateSelected = selectedTemplate.dashboardName;
-    this.templateCatalogSetupService.welcomeTemplateSelected.next(this.templateSelected);
+    this.blueprintForge.selectedWelcomeTemplate = this.templateSelected;
   }
-
 }
