@@ -42,6 +42,7 @@ import { ProgressIndicatorModalComponent } from "../../../builder/utils/progress
 import { ProgressIndicatorService } from "../../../builder/utils/progress-indicator-modal/progress-indicator.service";
 import { WidgetCatalogService } from "../../../builder/widget-catalog/widget-catalog.service";
 import {
+  Dashboards,
   MicroserviceDetails,
   PluginDetails,
   TemplateBlueprintDetails,
@@ -86,7 +87,7 @@ export class TemplateStepFourConnectComponent
   currentApp: IApplication;
   templateDetailsData: any;
   isFormValid = false;
-  deviceFormValid: boolean;
+ // deviceFormValid: boolean;
   assetButtonText: String = "Select Device";
   groupTemplateInDashboard: boolean;
   dashboardName: any;
@@ -98,7 +99,6 @@ export class TemplateStepFourConnectComponent
   enableSimulator: boolean;
   enableDeviceOrGroup: boolean;
   enableLik: boolean;
-  simulatorModelContent: any;
   blankTemplateDashboard: boolean;
   isSpin: boolean = false;
   fileUploadMessage: string;
@@ -108,8 +108,8 @@ export class TemplateStepFourConnectComponent
   dynamicDashboardValueToUpdate: any;
   filterTemplates: any;
   dashboardTemplateSelected: any;
-  linkDashboards: any;
-  linkDashboardsCopy: any;
+  //linkDashboards: any;
+  // linkDashboardsCopy: any;
   storeDefaultDashboardName: string;
   fileName: string = "Select File";
   simulatorConfigFiles: any[];
@@ -117,8 +117,7 @@ export class TemplateStepFourConnectComponent
   pluginDetailsArray: any;
   microserviceArray: any;
   templatesFromDC: any;
-  pluginsForDynamic: any = [];
-  filterChildsDependent: import("c:/Democenter/cumulocity-blueprint-forge/setup/template-setup.model").Dashboards[];
+  filterChildsDependent:Dashboards[];
 
   private templateId: string ="";
 
@@ -169,18 +168,18 @@ export class TemplateStepFourConnectComponent
         if (this.blueprintForge.templateDetail && this.templateId !== data.blueprintForge.templateDetail?.templateId) {
           this.templateId = data.blueprintForge.templateDetail.templateId;
           this.templateDetails = data.blueprintForge.templateDetail;
-          this.dashboardManipulations();
+          this.prepareDashboardList();
           this.pluginDetailsArray = cloneDeep(this.templateDetails?.plugins);
           this.microserviceArray = cloneDeep(this.templateDetails?.microservices);
-          this.loadTemplateCatalogFromDashboardCatalog();
+          this.loadTemplatesFromDashboardCatalog();
         }
         this.isFormValid = this.appConfigForm?.form.valid;
         // In case of no device 
-        if (!(this.templateDetails?.input) || !(this.templateDetails?.input?.devices) || !(this.templateDetails?.input?.devices?.length > 0)) {
+       /*  if (!(this.templateDetails?.input) || !(this.templateDetails?.input?.devices) || !(this.templateDetails?.input?.devices?.length > 0)) {
           this.deviceFormValid = true;
         } else {
           this.deviceFormValid = false;
-        }
+        } */
         if(!this.appList || this.appList.length === 0) {
           this.appList = await this.templateCatalogSetupService.getAppList();
           this.isMSEnabled =  this.applicationBinaryService.isMicroserviceEnabled(this.appList);
@@ -198,61 +197,30 @@ export class TemplateStepFourConnectComponent
   }
 
   
-  ngAfterViewInit(): void {
+/*   ngAfterViewInit(): void {
     console.log("After view init called");
     this.verifyStepCompleted();
-  }
+  } */
 
   ngOnInit() {
     this.simulatorSelected = false;
-    this.templateCatalogSetupService.templateData.subscribe(
-      async (currentData) => {
-        this.isFormValid = this.appConfigForm?.form.valid;
-        if (currentData) {
-          this.templateDetails = currentData;
-          this.dashboardManipulations();
-          this.pluginDetailsArray = cloneDeep(this.templateDetails?.plugins);
-          this.microserviceArray = cloneDeep(
-            this.templateDetails?.microservices
-          );
-          this.loadTemplateCatalogFromDashboardCatalog();
-        }
-        // In case of no device
-        if (
-          !this.templateDetails?.input ||
-          !this.templateDetails?.input?.devices ||
-          !(this.templateDetails?.input?.devices?.length > 0)
-        ) {
-          this.deviceFormValid = true;
-        } else {
-          this.deviceFormValid = false;
-        }
-        this.appList = (await this.appService.list({ pageSize: 2000 })).data;
-        this.isMSEnabled = this.applicationBinaryService.isMicroserviceEnabled(
-          this.appList
-        );
-      }
-    );
-    this.templateCatalogSetupService.welcomeTemplateData.subscribe(
-      (welcomeTemplateData) => {
-        this.welcomeTemplateData = welcomeTemplateData;
-      }
-    );
-
-    this.templateCatalogSetupService.templatesFromDashboardCatalog.subscribe(
-      (filterTemplates) => (this.filterTemplates = filterTemplates)
-    );
+   
+    this.filterChildsDependent = [];
   }
 
   async simulatorCreateForDashboard(event, dashboard, index) {
-    this.checkForSimulatorConfig(dashboard, index);
-    this.indexOfDashboardUpdatedFromDC = index;
-    this.simulatorSelected = true;
+    if(!dashboard.simulatorConfigFiles || dashboard.simulatorConfigFiles.length  === 0) {
+      this.checkForSimulatorConfig(dashboard, index);
+    }
+    
+   // this.indexOfDashboardUpdatedFromDC = index;
+  //  this.simulatorSelected = true;
     dashboard.enableSimulator = true;
     dashboard.enableLink = false;
     dashboard.enableDeviceOrGroup = false;
-    if (dashboard.enableSimulator) {
-      this.loadSimulatorConfigFiles(dashboard);
+    this.loadSimulatorConfigFiles(dashboard);
+   /*  if (dashboard.enableSimulator) {
+    //  this.loadSimulatorConfigFiles(dashboard);
     } else {
       this.fileUploadMessage = null;
       dashboard.name = null;
@@ -278,12 +246,12 @@ export class TemplateStepFourConnectComponent
             this.templateDetails.dashboards[dd].devices = dashboard.devices;
           }
         }
-      }
+      } 
       this.deviceFormValid = false;
-    }
+    }*/
   }
 
-  async loadTemplateDetails(dbDashboard): Promise<Observable<any>> {
+  private async loadTemplateDetails(dbDashboard): Promise<Observable<any>> {
     return this.catalogService.getTemplateDetails(dbDashboard).pipe(
       catchError((err) => {
         return this.catalogService.getTemplateDetailsFallBack(dbDashboard);
@@ -291,14 +259,17 @@ export class TemplateStepFourConnectComponent
     );
   }
 
-  async loadTemplateDetailsFromDC(template: any, index?): Promise<void> {
+  private async loadTemplateDetailsFromDC(template: any, index?): Promise<void> {
     this.templateDetails.dashboards[index].isSpin = true;
     if (template.availability && template.availability === "SHARED") {
-      this.templateDetails = null;
-      this.templateDetails[index] = cloneDeep(template.templateDetails);
-      if (
-        this.templateDetails[index].preview ||
-        this.templateDetails[index].previewBinaryId
+      let currentDashboardTemplate = cloneDeep(template.templateDetails);;
+      this.templateDetails.dashboards[index].dynamicDashboardArray =
+            cloneDeep(currentDashboardTemplate);
+     /*  this.templateDetails = null;
+      this.templateDetails[index] = cloneDeep(template.templateDetails); */
+      /* if (
+        currentDashboardTemplate.preview ||
+        currentDashboardTemplate.previewBinaryId
       ) {
         this.isPreviewLoading = true;
         this.templateCatalogFromDCService
@@ -313,8 +284,8 @@ export class TemplateStepFourConnectComponent
                 URL.createObjectURL(blb)
               ) as any;
           });
-      }
-      this.updateDepedencies(index);
+      } */
+     // this.updateDepedencies(index);
     } else {
       this.templateCatalogFromDCService
         .getTemplateDetails(template.dashboard)
@@ -329,14 +300,13 @@ export class TemplateStepFourConnectComponent
           })
         )
         .subscribe((templateDetails) => {
+          let currentDashboardTemplate = templateDetails;
           this.templateDetails.dashboards[index].isSpin = false;
-          this.templateDetails[index] = null;
-          this.templateDetails[index] = templateDetails;
+          /* this.templateDetails[index] = null;
+          this.templateDetails[index] = templateDetails; */
           this.templateDetails.plugins.length = 0;
           this.templateDetails.plugins = cloneDeep(this.pluginDetailsArray);
-          const pluginDependencies = this.templateDetails[
-            index
-          ]?.input?.dependencies.filter(
+          const pluginDependencies: any = currentDashboardTemplate?.input?.dependencies.filter(
             (pluginDep) => pluginDep.type === "plugin"
           );
           this.templateDetails.plugins =
@@ -359,9 +329,7 @@ export class TemplateStepFourConnectComponent
           this.templateDetails.microservices = cloneDeep(
             this.microserviceArray
           );
-          const microserviceDependencies = this.templateDetails[
-            index
-          ]?.input?.dependencies.filter(
+          const microserviceDependencies: any = currentDashboardTemplate?.input?.dependencies.filter(
             (microserviceDep) => microserviceDep.type === "microservice"
           );
           this.templateDetails.microservices =
@@ -380,25 +348,28 @@ export class TemplateStepFourConnectComponent
               []
             );
 
-          if (this.templateDetails[index].preview) {
+          /* if (this.templateDetails[index].preview) {
             this.templateDetails[index].preview =
               this.templateCatalogFromDCService.getGithubURL(
                 this.templateDetails[index].preview
               );
-          }
-          this.updateDepedencies(index);
+          } */
+        //  this.updateDepedencies(index);
           this.templateDetails.dashboards[index].dynamicDashboardArray =
-            cloneDeep(this.templateDetails[index]);
-          this.pluginsForDynamic = this.pluginsForDynamic.concat(
+            cloneDeep(currentDashboardTemplate);
+          let pluginsForDynamic =  this.templateDetails.dashboards[index].dynamicDashboardArray.input.dependencies;
+         /*  this.pluginsForDynamic = this.pluginsForDynamic.concat(
             this.templateDetails.dashboards[index].dynamicDashboardArray.input
               .dependencies
-          );
-          this.templateCatalogSetupService.dynamicPlugins.next(
+          ); */
+          this.templateDetails.plugins = this.templateDetails.plugins.concat(pluginsForDynamic);
+         /*  this.templateCatalogSetupService.dynamicPlugins.next(
             this.pluginsForDynamic
-          );
-          this.templateCatalogSetupService.dynamicDashboardTemplateDetails.next(
+          ); */
+          
+         /*  this.templateCatalogSetupService.dynamicDashboardTemplateDetails.next(
             this.templateDetails.dashboards
-          );
+          ); */
         });
     }
   }
@@ -418,9 +389,9 @@ export class TemplateStepFourConnectComponent
       return;
     }
 
-    this.templateCatalogSetupService.dynamicPlugins.subscribe((value) => {
+   /*  this.templateCatalogSetupService.dynamicPlugins.subscribe((value) => {
       this.templateDetails.plugins = this.templateDetails.plugins.concat(value);
-    });
+    }); */
 
     this.templateDetails.plugins = this.templateDetails.plugins.reduce(
       (accumulator, current) => {
@@ -440,12 +411,14 @@ export class TemplateStepFourConnectComponent
     let configDataDashboards = this.templateDetails.dashboards.filter(
       (item) => item.selected === true
     );
-    let configDataPlugins = this.templateDetails.plugins.filter(
+    let configDataPlugins = this.templateDetails.plugins;
+    let configDataMicroservices = this.templateDetails.microservices;
+    /* let configDataPlugins = this.templateDetails.plugins.filter(
       (item) => item.selected === true
     );
     let configDataMicroservices = this.templateDetails.microservices.filter(
       (item) => item.selected === true
-    );
+    ); */
 
     // create Dashboard and install dependencies
     // Also connect with the devices selected
@@ -576,9 +549,6 @@ export class TemplateStepFourConnectComponent
           }
         });
       }
-      this.appDataService.isGroupDashboardFromSimulator.subscribe(
-        (value) => (this.groupTemplateFromSimulator = value)
-      );
 
       // 1. normal dashboard : isGroupDashboard: false
       // 2. normal but device or group without folder: isGroupDashboard: false
@@ -589,21 +559,22 @@ export class TemplateStepFourConnectComponent
         this.groupTemplate = false;
       }
 
+      if (db.enableSimulator) {
+        await this.simulatorFileGeneration(db);
+      }
       if (
-        index === this.indexOfDashboardUpdatedFromDC ||
-        db.dynamicDashboardAssigned
-      ) {
-        this.templateCatalogSetupService.dynamicDashboardTemplate.subscribe(
+        db.dynamicDashboardArray &&
+        db.dynamicDashboardArray.input &&  db.dynamicDashboardAssigned
+      )
+      {
+       /*  this.templateCatalogSetupService.dynamicDashboardTemplate.subscribe(
           (value) => {
             this.dynamicDashboardValueToUpdate = value[index];
-            this.dynamicDashboardValueToUpdate
-              ? (this.dynamicDashboardValueToUpdate.titleAssigned =
-                  value[index]?.title)
-              : null;
+            this.dynamicDashboardValueToUpdate    ? (this.dynamicDashboardValueToUpdate.titleAssigned =   value[index]?.title)  : null;
           }
-        );
+        ); */
 
-        this.templateCatalogSetupService.dynamicDashboardTemplateDetails.subscribe(
+       /*  this.templateCatalogSetupService.dynamicDashboardTemplateDetails.subscribe(
           (value) => {
             if (
               value[index] &&
@@ -620,11 +591,20 @@ export class TemplateStepFourConnectComponent
                 value[index].dynamicDashboardArray.simulatorDTDL;
             }
           }
-        );
+        ); */
+        
+        templateDetailsData.input.devices = db.devices;
+        db.dynamicDashboardArray.input.dependencies;
+          templateDetailsData.input.dependencies =
+            db.dynamicDashboardArray.input.dependencies;
+          templateDetailsData.input.images =
+            db.dynamicDashboardArray.input.images;
+          templateDetailsData.widgets =
+            db.dynamicDashboardArray.widgets;
+          templateDetailsData.simulatorDTDL =
+            db.dynamicDashboardArray.simulatorDTDL;
       }
-      if (db.enableSimulator) {
-        await this.simulatorFileGeneration(db);
-      }
+     
       if (
         db.title !== "Instruction" &&
         db.title !== "Welcome" &&
@@ -678,7 +658,6 @@ export class TemplateStepFourConnectComponent
       });
     }
     this.hideProgressModalDialog();
-    sessionStorage.removeItem("templateURL");
     if (this.blankTemplateDashboard) {
       this.setup.steps[2].completed = true;
       this.setup.stepCompleted(2);
@@ -830,11 +809,7 @@ export class TemplateStepFourConnectComponent
             )?.id;
             const targetDashboardId = dashboards.find(
               (db) =>
-                db.name === dbLinks.targetDashboardName ||
-                db.name.trim() ===
-                  this.dynamicDashboardValueToUpdate?.titleAssigned
-                    .split("-")[0]
-                    .trim()
+                db.name === dbLinks.targetDashboardName 
             )?.id;
             if (updatableDashboardId && targetDashboardId) {
               const updatableDashboardObj = (
@@ -866,9 +841,10 @@ export class TemplateStepFourConnectComponent
     }
   }
 
+  //TODO Refactor
   openDeviceSelectorDialog(dashboard, templateType: number, index) {
-    this.indexOfDashboardUpdatedFromDC = index;
-    this.simulatorSelected = false;
+   // this.indexOfDashboardUpdatedFromDC = index;
+   // this.simulatorSelected = false;
     dashboard.simulatorGroupName = "";
     dashboard.simulatorNoOfDevices = "";
     switch (templateType) {
@@ -906,18 +882,20 @@ export class TemplateStepFourConnectComponent
             },
           ];
 
-          let deviceFieldNotField;
-          if (!this.simulatorSelected) {
+       //   let deviceFieldNotField;
+       //   if (!this.simulatorSelected) {
             for (
               let dd = 0;
               dd < this.templateDetails.dashboards.length;
               dd++
             ) {
-              if (
+              /* if (
                 this.templateDetails.dashboards[dd].isDeviceRequired === false
               ) {
                 deviceFieldNotField = true;
-              } else if (
+              } else 
+               */
+              if (
                 this.templateDetails.dashboards[dd].isDeviceRequired === true &&
                 this.templateDetails.dashboards[dd].linkWithDashboard ===
                   dashboard.id
@@ -928,8 +906,8 @@ export class TemplateStepFourConnectComponent
                   : this.templateDetails.dashboards[dd].devices;
                 this.templateDetails.dashboards[dd].defaultLinkedDashboard =
                   dashboard.title;
-                deviceFieldNotField = true;
-              } else if (
+              //  deviceFieldNotField = true;
+              } /* else if (
                 this.templateDetails.dashboards[dd].isDeviceRequired === true &&
                 this.templateDetails.dashboards[dd].linkWithDashboard !==
                   dashboard.id &&
@@ -937,11 +915,13 @@ export class TemplateStepFourConnectComponent
               ) {
                 deviceFieldNotField = false;
                 break;
-              }
+              } */
             }
-            this.deviceFormValid = deviceFieldNotField;
+           // this.deviceFormValid = deviceFieldNotField;
+            this.generateLinkingDashboards();
           }
-        }
+          
+       // }
       );
     } else {
       this.deviceSelectorModalRef.content.onDeviceSelected.subscribe(
@@ -959,18 +939,19 @@ export class TemplateStepFourConnectComponent
             },
           ];
 
-          let deviceFieldNotField;
-          if (!this.simulatorSelected) {
+       //   let deviceFieldNotField;
+        //  if (!this.simulatorSelected) {
             for (
               let dd = 0;
               dd < this.templateDetails.dashboards.length;
               dd++
             ) {
-              if (
+              /* if (
                 this.templateDetails.dashboards[dd].isDeviceRequired === false
               ) {
                 deviceFieldNotField = true;
-              } else if (
+              } else */ 
+              if (
                 this.templateDetails.dashboards[dd].isDeviceRequired === true &&
                 this.templateDetails.dashboards[dd].linkWithDashboard ===
                   dashboard.id
@@ -981,19 +962,19 @@ export class TemplateStepFourConnectComponent
                   : this.templateDetails.dashboards[dd].devices;
                 this.templateDetails.dashboards[dd].defaultLinkedDashboard =
                   dashboard.title;
-                deviceFieldNotField = true;
-              } else if (
+               // deviceFieldNotField = true;
+              }/*  else if (
                 this.templateDetails.dashboards[dd].isDeviceRequired === true &&
                 this.templateDetails.dashboards[dd].linkWithDashboard !==
                   dashboard.id &&
                 !dashboard.name
               ) {
-                deviceFieldNotField = false;
+              //  deviceFieldNotField = false;
                 break;
-              }
+              } */
             }
-            this.deviceFormValid = deviceFieldNotField;
-          }
+          //  this.deviceFormValid = deviceFieldNotField;
+        //  }
           this.generateLinkingDashboards();
         }
       );
@@ -1016,7 +997,7 @@ export class TemplateStepFourConnectComponent
     this.checkForSimulatorConfig(event.item, index);
     this.templateDetails.dashboards[index].dynamicDashboardTemplate =
       event.item;
-    this.templateCatalogSetupService.dynamicDashboardTemplate.next(event.item);
+  //  this.templateCatalogSetupService.dynamicDashboardTemplate.next(event.item);
     this.loadTemplateDetailsFromDC(event.item, index);
   }
 
@@ -1036,7 +1017,7 @@ export class TemplateStepFourConnectComponent
     }
   }
 
-  loadTemplateCatalogFromDashboardCatalog() {
+  private loadTemplatesFromDashboardCatalog() {
     this.templateCatalogFromDCService
       .getTemplateCatalog()
       .pipe(
@@ -1049,15 +1030,15 @@ export class TemplateStepFourConnectComponent
       )
       .subscribe(
         (catalog: any) => {
-          this.templatesFromDC = catalog;
-          this.filterTemplates = this.templatesFromDC
-            ? this.templatesFromDC
+        //  this.templatesFromDC = catalog;
+          this.filterTemplates = catalog
+            ? catalog
             : [];
 
-          const templateDetailsCopy = cloneDeep(
+          /* const templateDetailsCopy = cloneDeep(
             this.templateDetails.dashboards
-          );
-          let dashboardToUpdateForTemplate = templateDetailsCopy.find(
+          ); */
+         /*  let dashboardToUpdateForTemplate = templateDetailsCopy.find(
             (dashboard) =>
               (!dashboard.isSimulatorConfigExist &&
                 dashboard.isDeviceRequired) ||
@@ -1065,28 +1046,26 @@ export class TemplateStepFourConnectComponent
                 dashboard.linkWithDashboard === "" &&
                 dashboard.isDeviceRequired)
           );
-          dashboardToUpdateForTemplate
-            ? (dashboardToUpdateForTemplate.title =
-                dashboardToUpdateForTemplate.title)
-            : null;
-          this.filterTemplates?.map(
+          dashboardToUpdateForTemplate  ? (dashboardToUpdateForTemplate.title =  dashboardToUpdateForTemplate.title)  : null;
+ */
+         /*  this.filterTemplates?.map(
             (template) => (template.title = template.title.split("-")[0])
-          );
-          this.filterTemplates = this.sortDashboardsByTitle(
+          ); */
+         /*  this.filterTemplates = this.sortDashboardsByTitle(
             this.filterTemplates
-          );
-          this.templateCatalogSetupService.templatesFromDashboardCatalog.next(
+          ); */
+          /* this.templateCatalogSetupService.templatesFromDashboardCatalog.next(
             this.filterTemplates
-          );
+          ); */
           let findMatchedIdObject;
           this.templateDetails.dashboards.forEach((item, index) => {
             // Dashboard templates dynamic array
-            this.templateCatalogSetupService.dynamicDashboardTemplate.next(
+            /* this.templateCatalogSetupService.dynamicDashboardTemplate.next(
               dashboardToUpdateForTemplate
                 ? dashboardToUpdateForTemplate
                 : item.title
-            );
-            item.dashboardTemplatesArray = this.templatesFromDC
+            ); */
+           /*  item.dashboardTemplatesArray = this.templatesFromDC
               ? this.templatesFromDC
               : [];
             item.dashboardTemplatesArray = item.dashboardTemplatesArray.filter(
@@ -1094,7 +1073,7 @@ export class TemplateStepFourConnectComponent
             );
             item.dashboardTemplatesArray = this.sortDashboardsByTitle(
               item.dashboardTemplatesArray
-            );
+            ); */
 
             if (item.linkWithDashboard) {
               findMatchedIdObject = this.templateDetails.dashboards.find(
@@ -1114,7 +1093,7 @@ export class TemplateStepFourConnectComponent
             }
           });
 
-          this.loadTemplateDetails(dashboardToUpdateForTemplate);
+        //  this.loadTemplateDetails(dashboardToUpdateForTemplate);
         },
         (error) => {
           this.alertService.danger(
@@ -1124,7 +1103,7 @@ export class TemplateStepFourConnectComponent
       );
   }
 
-  dashboardManipulations() {
+  private prepareDashboardList() {
     // Sort based on group dashboard flag
     const storedTemplateDashboards = cloneDeep(this.templateDetails.dashboards);
     let commonDashboards = [];
@@ -1151,60 +1130,56 @@ export class TemplateStepFourConnectComponent
     );
     this.templateDetails.dashboards = commonDashboards.concat(functionalDashboards);
     this.templateDetails.dashboards.push(helpAndSupport);
-    this.templateDetails.dashboards.forEach((dashboard, index) => {
-      dashboard.enableSimulator = false;
-      dashboard.enableDeviceOrGroup = true;
-      dashboard.enableLink = false;
 
-      this.linkDashboards = cloneDeep(this.templateDetails.dashboards);
-      this.linkDashboards = this.linkDashboards.filter(
+   /*  this.linkDashboards = cloneDeep(this.templateDetails.dashboards);
+    this.linkDashboards = this.linkDashboards.filter(
         (item) =>
           item.title != "Welcome" &&
           item.title !== "Help and Support" &&
           item.title !== "Instruction" &&
           ((item.devices && item.devices[0]?.reprensentation.id !== null) ||
             (item.simulatorGroupName && item.simulatorNoOfDevices))
-      );
-      this.linkDashboardsCopy = cloneDeep(this.linkDashboards);
-      let findMatchedTitle;
+    ); */
+    this.templateDetails.dashboards.forEach((dashboard, index) => {
+      dashboard.enableSimulator = false;
+      dashboard.enableDeviceOrGroup = true;
+      dashboard.enableLink = false;
+  
+      /* let linkDashboardsCopy = cloneDeep(this.linkDashboards);
+      linkDashboardsCopy =  this.linkDashboardsCopy.filter( copyDashboard =>  copyDashboard.title !== dashboard.title); */
+      //let findMatchedTitle;
       if (
         dashboard.title != "Instruction" &&
         dashboard.title != "Help and Support" &&
         dashboard.title != "Welcome"
       ) {
-        this.linkDashboards = cloneDeep(this.linkDashboardsCopy);
-        dashboard.linkDashboards = this.linkDashboards;
-        findMatchedTitle = dashboard.linkDashboards.findIndex(
+      //  this.linkDashboards = [];
+        dashboard.linkDashboards = [];
+       /*  findMatchedTitle = dashboard.linkDashboards.findIndex(
           (titleObject) => titleObject.title === dashboard.title
         );
         if (findMatchedTitle >= 0) {
           dashboard.linkDashboards.splice(findMatchedTitle, 1);
-        }
+        } */
       }
 
       if (dashboard.linkWithDashboard) {
         dashboard.enableLink = true;
         dashboard.enableSimulator = dashboard.enableDeviceOrGroup = false;
-        dashboard.findMatchedLink = this.templateDetails.dashboards.find(
+       /*  dashboard.findMatchedLink = this.templateDetails.dashboards.find(
           (matchedItem) => dashboard.linkWithDashboard === matchedItem.id
-        );
-        dashboard.dashboardTemplateSelected = dashboard.title;
-        dashboard.selectedDashboardName = dashboard.title;
+        ); */
+            
       } else if (
-        !dashboard.linkWithDashboard &&
-        dashboard.isGroupDashboard &&
+       // dashboard.isGroupDashboard &&
         dashboard.enableSimulator
       ) {
         this.loadSimulatorConfigFiles(dashboard);
-        dashboard.selectedDashboardName = dashboard.title;
-        dashboard.fileName = "Select File";
       }
+
       dashboard.selectedDashboardName = dashboard.title;
       dashboard.dashboardTemplateSelected = dashboard.title;
-      dashboard.defaultLinkedDashboard =
-        !dashboard.linkDashboards || dashboard.linkDashboards.length === 0
-          ? "Select Link"
-          : dashboard.defaultLinkedDashboard;
+      dashboard.defaultLinkedDashboard ="Select Link";
     });
   }
 
@@ -1228,6 +1203,7 @@ export class TemplateStepFourConnectComponent
 
     dashboard.simulatorConfigFiles = SimulatorConfigFiles;
   }
+
   linkOtherDashboard(dashboard) {
     dashboard.enableLink = true;
     dashboard.enableSimulator = false;
@@ -1291,8 +1267,8 @@ export class TemplateStepFourConnectComponent
   }
 
   generateLinkingDashboards() {
-    this.linkDashboards = cloneDeep(this.templateDetails.dashboards);
-    this.linkDashboards = this.linkDashboards.filter(
+    let linkDashboards: any = cloneDeep(this.templateDetails.dashboards);
+    linkDashboards = linkDashboards.filter(
       (item) =>
         item.title != "Welcome" &&
         item.title !== "Help and Support" &&
@@ -1300,22 +1276,23 @@ export class TemplateStepFourConnectComponent
         ((item.devices && item.devices[0]?.reprensentation.id !== null) ||
           (item.simulatorGroupName && item.simulatorNoOfDevices))
     );
-    this.linkDashboardsCopy = cloneDeep(this.linkDashboards);
-    let findMatchedTitle;
+   // let findMatchedTitle;
     this.templateDetails.dashboards.forEach((dashboardItem) => {
       if (
         dashboardItem.title != "Instruction" &&
         dashboardItem.title != "Help and Support" &&
         dashboardItem.title != "Welcome"
       ) {
-        this.linkDashboards = cloneDeep(this.linkDashboardsCopy);
-        dashboardItem.linkDashboards = this.linkDashboards;
-        findMatchedTitle = dashboardItem.linkDashboards.findIndex(
+
+        let linkDashboardsCopy = cloneDeep(linkDashboards);
+        linkDashboardsCopy =  linkDashboardsCopy.filter( copyDashboard =>  copyDashboard.title !== dashboardItem.title); 
+        dashboardItem.linkDashboards = linkDashboardsCopy;
+        /* findMatchedTitle = dashboardItem.linkDashboards.findIndex(
           (titleObject) => titleObject.title === dashboardItem.title
         );
         if (findMatchedTitle >= 0) {
           dashboardItem.linkDashboards.splice(findMatchedTitle, 1);
-        }
+        } */
       }
       dashboardItem.dashboardTemplateSelected = dashboardItem.title;
       dashboardItem.defaultLinkedDashboard =
@@ -1342,11 +1319,10 @@ export class TemplateStepFourConnectComponent
     this.templateDetails.dashboards.splice(i, 1);
   }
 
-  onSelectOfLinkingDashbord(linkDashboard, dashboardIndex, linkDashboardIndex) {
+  onSelectOfLinkingDashboard(linkDashboard, dashboardIndex, linkDashboardIndex) {
     this.templateDetails.dashboards[dashboardIndex].defaultLinkedDashboard =
       linkDashboard.title;
-    this.templateDetails.dashboards[dashboardIndex].devices =
-      this.linkDashboards[linkDashboardIndex].devices;
+    this.templateDetails.dashboards[dashboardIndex].devices = linkDashboard.devices;
   }
 
   sortDashboardsByTitle(sortableArray) {
@@ -1392,35 +1368,33 @@ export class TemplateStepFourConnectComponent
     );
     const validJson = this.isValidJson(fileInput);
     if (validJson) {
-      this.simulatorConfigService.processFileInput(validJson);
-      console.log(
+      this.simulatorConfigService.processFileInput(validJson, dashboard.simulatorGroupName);
+     /*  console.log(
         "dashboard.simulatorFiles[0].fileContent",
         dashboard.simulatorConfigFiles[0].fileContent
-      );
+      ); */
       let isGroup = true;
-      await this.simulatorConfigService.saveSimulatorConfiguration(
+      let content =  await this.simulatorConfigService.saveSimulatorConfiguration(
         dashboard.simulatorGroupName,
         dashboard.simulatorNoOfDevices,
         dashboard.simulatorConfigFiles[0].fileContent,
         isGroup
       );
-      this.simulatorConfigService.onSaveSimulatorService.subscribe(
-        (content) => {
+      if(content)
+      {
           this.currentApp.applicationBuilder.simulators = content.simulators;
-          this.simulatorModelContent = content;
-          dashboard.name = this.simulatorModelContent?.deviceId;
+          dashboard.name = content?.deviceId;
           dashboard.devices = [
             {
               type: "Temperature Sensor",
               placeholder: "device01",
               reprensentation: {
-                id: this.simulatorModelContent?.deviceId,
-                name: this.simulatorModelContent?.deviceName,
+                id: content?.deviceId,
+                name: content?.deviceName,
               },
             },
           ];
         }
-      );
     }
   }
 

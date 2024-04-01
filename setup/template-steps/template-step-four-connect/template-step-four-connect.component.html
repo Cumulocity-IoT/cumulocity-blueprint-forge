@@ -152,7 +152,7 @@
                                             *dropdownMenu>
                                             <li *ngFor="let linkDashboard of dashboard.linkDashboards; let sl = index;">
                                               <button type="button"
-                                                (click)="onSelectOfLinkingDashbord(linkDashboard, i, sl)">
+                                                (click)="onSelectOfLinkingDashboard(linkDashboard, i, sl)">
                                                 {{linkDashboard.title}}
                                               </button>
                                             </li>
@@ -173,7 +173,7 @@
                               <div *ngIf="dashboard.enableLink" class="col-md-2 col-sm-3 set-margin">
                                 <div *ngIf="!dashboard.isHidden" class="dropdown wd-100" dropdown container="body">
                                   <input [(ngModel)]="dashboard.dashboardTemplateSelected"
-                                    [typeahead]="dashboard.dashboardTemplatesArray" id="dashboardTemplates-{{i}}"
+                                    [typeahead]="filterTemplates" id="dashboardTemplates-{{i}}"
                                     typeaheadOptionField="title" class="form-control" placeholder="Select Template"
                                     [typeaheadMinLength]="2"
                                     (typeaheadOnSelect)="assignSelectedDashboard(i, $event)"

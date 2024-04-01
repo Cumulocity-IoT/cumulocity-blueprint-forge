@@ -52,16 +52,13 @@ export class TemplateCatalogSetupService {
     public dynamicDashboardTemplateDetails =  new BehaviorSubject<any>([]);
     dynamicDashboardTemplateDetails$ = this.dynamicDashboardTemplateDetails.asObservable();
 
-    public dynamicPlugins =  new BehaviorSubject<any>([]);
+/*     public dynamicPlugins =  new BehaviorSubject<any>([]);
     dynamicPlugins$ = this.dynamicPlugins.asObservable();
-
+ */
     public indexOfDashboardToUpdateTemplate = new BehaviorSubject<any>(null); 
     indexOfDashboardToUpdateTemplate$ = this.indexOfDashboardToUpdateTemplate.asObservable();
 
     public searchDashboardTemplate$ = new BehaviorSubject<string>('');
-
-    public templatesFromDashboardCatalog = new BehaviorSubject<Array<[]>>([]);
-    templatesFromDashboardCatalog$ = this.templatesFromDashboardCatalog.asObservable();
 
     private appList: any = [];
     private isAppServiceCalled = false;

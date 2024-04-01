@@ -68,8 +68,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep{
   blankTemplateDashboard: boolean;
   welcomeTemplateData: TemplateCatalogEntry;
   isPreviewLoading: boolean;
-  pluginDetailsArray: any;
-  microserviceArray: any;
   private templateId = "";
 
   constructor(
@@ -105,9 +103,8 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep{
         if (this.blueprintForge.templateDetail && this.templateId !== data.blueprintForge.templateDetail?.templateId) {
           this.templateId = data.blueprintForge.templateDetail.templateId;
           this.templateSelected = "Default Template";
+          this.blueprintForge.selectedWelcomeTemplate = this.templateSelected;
           this.templateDetails = data.blueprintForge.templateDetail;
-          this.pluginDetailsArray = cloneDeep(this.templateDetails?.plugins);
-          this.microserviceArray = cloneDeep(this.templateDetails?.microservices);
         }
         if (!(this.templateDetails?.input) || !(this.templateDetails?.input?.devices) || !(this.templateDetails?.input?.devices?.length > 0)) {
           this.deviceFormValid = true;

@@ -66,8 +66,8 @@ export class SimulatorConfigService extends SimulationStrategyConfigComponent {
   isMSExist: boolean = false;
   groupName: string | undefined;
   
-  public onSaveSimulatorService =  new BehaviorSubject<any>(undefined);
-  onSaveSimulatorService$ = this.onSaveSimulatorService.asObservable();
+/*   public onSaveSimulatorService =  new BehaviorSubject<any>(undefined);
+  onSaveSimulatorService$ = this.onSaveSimulatorService.asObservable(); */
   deviceType: string| undefined;
   isConfigFileError: boolean = false;
   config: DtdlSimulationModel;
@@ -125,7 +125,7 @@ export class SimulatorConfigService extends SimulationStrategyConfigComponent {
     // get simulator Name from strategy's deviceName field
     console.log('newConfig value', this.newConfig);
     if (metadata.hideSimulatorName) {
-        this.simulatorName = this.newConfig.deviceName;
+        this.simulatorName = this.groupName;
     }
     let device;
     this.isGroup = isGroup;
@@ -189,9 +189,8 @@ export class SimulatorConfigService extends SimulationStrategyConfigComponent {
         config: this.newConfig,
         lastUpdated: new Date().toISOString(),
         serverSide: (runOnServer ? true : false),
-        started : null
+        started : true
     };
-        newSimulatorObject.started = true;
     
     simulators.push(newSimulatorObject);
     appServiceData.applicationBuilder.simulators = simulators;
@@ -221,7 +220,7 @@ export class SimulatorConfigService extends SimulationStrategyConfigComponent {
         deviceName: this.newConfig.deviceName,
         simulators: simulators
     }
-    this.onSaveSimulatorService.next(blueprintForgeDeviceDetails);
+   return (blueprintForgeDeviceDetails);
   }
 
 
@@ -263,20 +262,20 @@ private async AddGroupAndDevices() {
   return group;
 }
 
-processFileInput(validJson) {
+processFileInput(validJson, simulatorName) {
   this.selectedStrategyFactory = this.simulationStrategiesService.strategiesByName.get(validJson.type);
           if (this.selectedStrategyFactory === undefined) {
               this.isConfigFileError = true;
           } else {
               this.configFromFile = validJson.config;
-              this.simulatorName = validJson.name;
+              this.simulatorName = simulatorName;
               // if (this.enableSimulator) {
               //     this.wizard.selectStep('device');
               // }
           }
 }
 
-checkIntervalValidation() {
+private checkIntervalValidation() {
   let serverSide;
   this.runOnServer$.subscribe((val) => {
       serverSide = val;
