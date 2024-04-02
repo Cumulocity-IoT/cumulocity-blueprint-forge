@@ -229,7 +229,6 @@ export class TemplateStepFourConnectComponent
       let currentDashboardTemplate = cloneDeep(template.templateDetails);;
       this.templateDetails.dashboards[index].dynamicDashboardArray =
             cloneDeep(currentDashboardTemplate);
-     
     } else {
       this.templateCatalogFromDCService
         .getTemplateDetails(template.dashboard)
@@ -294,7 +293,8 @@ export class TemplateStepFourConnectComponent
       
           this.templateDetails.dashboards[index].dynamicDashboardArray =
             cloneDeep(currentDashboardTemplate);
-          let pluginsForDynamic =  this.templateDetails.dashboards[index].dynamicDashboardArray.input.dependencies;
+          this.loadSimulatorConfigFiles(this.templateDetails.dashboards[index]);
+            let pluginsForDynamic =  this.templateDetails.dashboards[index].dynamicDashboardArray.input.dependencies;
          
           this.templateDetails.plugins = this.templateDetails.plugins.concat(pluginsForDynamic);
         
@@ -417,9 +417,18 @@ export class TemplateStepFourConnectComponent
           ).toPromise();
         }
       } else {
-        templateDetailsData = await (
-          await this.loadTemplateDetails(db.dashboard)
-        ).toPromise();
+
+        if(db.dynamicDashboardArray && db.dynamicDashboardTemplate) {
+          templateDetailsData = db.dynamicDashboardArray;
+          db.dashboard = db.dynamicDashboardTemplate.dashboard;
+        } 
+        else 
+        {
+          templateDetailsData = await (
+            await this.loadTemplateDetails(db.dashboard)
+          ).toPromise();
+        }
+       
       }
 
       const dashboardConfiguration = {
@@ -435,7 +444,6 @@ export class TemplateStepFourConnectComponent
       };
 
       this.progressIndicatorService.setProgress(40);
-      templateDetailsData.input.devices = db.devices;
       if (
         db.title !== "Instruction" &&
         db.title !== "Welcome" &&
@@ -481,22 +489,24 @@ export class TemplateStepFourConnectComponent
       if (db.enableSimulator) {
         await this.simulatorFileGeneration(db);
       }
-      if (
+      templateDetailsData.input.devices = db.devices;
+     /*  if (
         db.dynamicDashboardArray &&
         db.dynamicDashboardArray.input &&  db.dynamicDashboardAssigned
       )
       {
+        templateDetailsData.dashboard = db.dashboard;
+        templateDetailsData.title = db.title;
         templateDetailsData.input.devices = db.devices;
-        db.dynamicDashboardArray.input.dependencies;
-          templateDetailsData.input.dependencies =
-            db.dynamicDashboardArray.input.dependencies;
-          templateDetailsData.input.images =
-            db.dynamicDashboardArray.input.images;
-          templateDetailsData.widgets =
-            db.dynamicDashboardArray.widgets;
-          templateDetailsData.simulatorDTDL =
-            db.dynamicDashboardArray.simulatorDTDL;
-      }
+        templateDetailsData.input.dependencies =
+          db.dynamicDashboardArray.input.dependencies;
+        templateDetailsData.input.images =
+          db.dynamicDashboardArray.input.images;
+        templateDetailsData.widgets =
+          db.dynamicDashboardArray.widgets;
+        templateDetailsData.simulatorDTDL =
+          db.dynamicDashboardArray.simulatorDTDL;
+      } */
      
       if (
         db.title !== "Instruction" &&
@@ -978,19 +988,27 @@ export class TemplateStepFourConnectComponent
 
   async loadSimulatorConfigFiles(dashboard) {
     let templateDetailsData;
-    templateDetailsData = await (
-      await this.loadTemplateDetails(dashboard.dashboard)
-    ).toPromise();
+    let simulatorConfigFile = "";
+    let simulatorFileName = ""
+    if(dashboard && dashboard.dynamicDashboardArray) {
+      simulatorConfigFile = dashboard.dynamicDashboardArray.simulatorDTDL[0]?.simulatorFile;
+      simulatorFileName = dashboard.dynamicDashboardArray.simulatorDTDL[0]?.simulatorFileName;
+    } else {
+      templateDetailsData = await (
+        await this.loadTemplateDetails(dashboard.dashboard)
+      ).toPromise();
+      simulatorConfigFile = templateDetailsData.simulatorDTDL[0]?.simulatorFile;
+      simulatorFileName = templateDetailsData.simulatorDTDL[0]?.simulatorFileName;
+    }
 
     const SimulatorConfigFiles = [];
     let currentSimulatorData;
     currentSimulatorData = await (
-      await this.loadTemplateDetails(
-        templateDetailsData.simulatorDTDL[0].simulatorFile
-      )
+      await this.loadTemplateDetails(simulatorConfigFile)
     ).toPromise();
+    
     SimulatorConfigFiles.push({
-      fileName: templateDetailsData.simulatorDTDL[0].simulatorFileName,
+      fileName: simulatorFileName,
       fileContent: currentSimulatorData,
     });
 
@@ -1006,19 +1024,6 @@ export class TemplateStepFourConnectComponent
   connectActualDeviceOrGroup(dashboard) {
     dashboard.enableDeviceOrGroup = true;
     dashboard.enableSimulator = dashboard.enableLink = false;
-  }
-
-  private isValidJson(input: any) {
-    try {
-      if (input) {
-        const o = JSON.parse(input);
-        if (o && (o.constructor === Object || o.constructor === Array)) {
-          console.log("o constructor value", o.constructor);
-          return o;
-        }
-      }
-    } catch (e) {}
-    return false;
   }
 
   async updateDepedencies(index) {
@@ -1148,25 +1153,19 @@ export class TemplateStepFourConnectComponent
   }
 
   async simulatorFileGeneration(dashboard) {
-    // Testing
-
-    const fileInput = JSON.stringify(
-      dashboard.simulatorConfigFiles[0].fileContent
-    );
-    const validJson = this.isValidJson(fileInput);
-    if (validJson) {
-      this.simulatorConfigService.processFileInput(validJson, dashboard.simulatorGroupName);
       let isGroup = true;
-      let content =  await this.simulatorConfigService.saveSimulatorConfiguration(
+      let content =  await this.simulatorConfigService.generateSimulatorFromConfiguration(
         dashboard.simulatorGroupName,
         dashboard.simulatorNoOfDevices,
         dashboard.simulatorConfigFiles[0].fileContent,
-        isGroup
+        isGroup,
+        dashboard.simulatorGroupName,
       );
-      if(content)
+      if(content && content.status == 0)
       {
           this.currentApp.applicationBuilder.simulators = content.simulators;
           dashboard.name = content?.deviceId;
+          dashboard.templateType = 1;
           dashboard.devices = [
             {
               type: "Temperature Sensor",
@@ -1178,7 +1177,12 @@ export class TemplateStepFourConnectComponent
             },
           ];
         }
-    }
+      else {
+        if(content && content.status) {
+          this.alertService.danger(content.message);
+        }
+      }
+    
   }
 
   checkAndGenerateLinks(dashboard) {

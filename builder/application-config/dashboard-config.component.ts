@@ -263,7 +263,6 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
                     dashboards.splice(i, 1);
                     application.applicationBuilder.dashboards = [...dashboards];
                 }
-                await this.inventoryService.delete(dashboardIDToDelete);
                 this.filteredDashboardList = application.applicationBuilder.dashboards;
                 this.prepareDashboardHierarchy(application);
                 this.delayedAppUpdateSubject.next({
@@ -274,6 +273,7 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
                 if (application.applicationBuilder.dashboards.length === 0) {
                     this.autoLockDashboard = false;
                 }
+                await this.inventoryService.delete(dashboardIDToDelete);
                 this.cd.detectChanges();
                 // TODO?
                 // this.tabs.refresh();
@@ -670,11 +670,12 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
                     id: this.appBuilderObject.id,
                     applicationBuilder: this.appBuilderObject.applicationBuilder
                 } as any);
-                await this.inventoryService.delete(dashboard.id);
                 if (this.appBuilderObject.applicationBuilder.dashboards.length === 0) {
                     this.autoLockDashboard = false;
                 }
                 this.cd.detectChanges();
+                await this.inventoryService.delete(dashboard.id);
+               
                 // TODO?
                 // this.tabs.refresh();
             }
