@@ -1239,9 +1239,23 @@ export class TemplateStepFourConnectComponent
           },
           []
         );
-          appBuilderDashboards = commonDashboards.concat(functionalDashboards);
-          appBuilderDashboards.push(helpAndSupport);
-          app.applicationBuilder.dashboards = appBuilderDashboards;
+
+        if (commonDashboards && commonDashboards.length > 0) {
+          appBuilderDashboards = commonDashboards;
+        }
+        if (functionalDashboards && functionalDashboards.length > 0) {
+          if (appBuilderDashboards && appBuilderDashboards.length > 0) {
+            appBuilderDashboards = appBuilderDashboards.concat(functionalDashboards);
+          } else {
+            appBuilderDashboards = functionalDashboards;
+          }
+        }
+          if (helpAndSupport) {
+            appBuilderDashboards.push(helpAndSupport);
+          }
+          if (appBuilderDashboards && appBuilderDashboards.length > 0) {
+            app.applicationBuilder.dashboards = appBuilderDashboards;
+          }
           await this.appService.update({
             id: app.id,
             applicationBuilder: app.applicationBuilder
