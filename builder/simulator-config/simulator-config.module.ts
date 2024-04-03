@@ -70,7 +70,7 @@ class DeviceSimulatorConfigNavigation implements NavigatorNodeFactory {
         EditSimulatorModalComponent
     ],
     providers: [
-        SimulatorConfigService
+        SimulatorConfigService,
     ]
 })
 export class SimulatorConfigModule {

@@ -31,7 +31,6 @@ export class AppDataService {
     forceUpdate = false;
     refreshAppForDashboard = new BehaviorSubject<void>(undefined);
     disableToggleForSimulator = new BehaviorSubject<string>(undefined);
-    isGroupDashboardFromSimulator = new BehaviorSubject<boolean>(false);
 
     constructor(private appService: ApplicationService) {
     }

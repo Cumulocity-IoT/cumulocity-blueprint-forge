@@ -25,6 +25,8 @@ export interface BlueprintForge {
     plugins?: PluginDetails[];
     microservices?: MicroserviceDetails[];
     dashboards: Dashboards[];
+    templateDetail: TemplateBlueprintDetails;
+    selectedWelcomeTemplate?: string;
 }
 export interface TemplateBlueprintEntry {
     templateId: string;
@@ -83,6 +85,7 @@ export interface Dashboards {
     preview: any;
     dynamicDashboardAssigned: boolean;
     simulatorFileExists: boolean;
+    dtdlFileExists: boolean;
     fileName: string;
     defaultLinkedDashboard: string;
     findMatchedLink: Dashboards;

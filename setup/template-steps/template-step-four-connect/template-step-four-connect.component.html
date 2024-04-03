@@ -32,19 +32,14 @@
                               Dashboard</div>
                             <div for="group-details" class="col-sm-2 col-md-2 col-xs-12 title-font heading-template">Dashboard
                               Template</div>
-                            <div for="group-details" class="col-sm-2 col-md-2 col-xs-12 title-font">Simulator
-                              Configuration</div>
+                            <div for="group-details" class="col-sm-2 col-md-2 col-xs-12 title-font"></div>
                           </div>
 
                           <div *ngFor="let dashboard of templateDetails?.dashboards; let i = index">
                             <div class="d-flex row padd-bottom"
                               *ngIf="dashboard.title !== 'Instruction' && dashboard.title !== 'Welcome' && dashboard.title !== 'Help and Support'">
                               <span translate class="col-sm-1 col-xs-12 title-width">{{dashboard.title}}</span>
-                              <!-- <div class="col-sm-3 col-xs-12 text-muted">
-                                Please choose Device/Group or Simulator
-                              </div> -->
                               <div class="col-sm-2 col-xs-12 text-muted sim-width">
-
                                 <div class="btn-group" role="group">
                                   <button type="button" class="btn btn-default"
                                     (click)="connectActualDeviceOrGroup(dashboard)"
@@ -53,7 +48,7 @@
                                       title="Connect your dashboard with Device/Group or Type"></i></button>
 
                                   <button type="button" class="btn btn-default"
-                                    (click)="toggleToEnableSimulator($event, dashboard, i)"
+                                    (click)="simulatorCreateForDashboard($event, dashboard, i)"
                                     [ngStyle]="{'background-color': dashboard.enableSimulator? '#C5EDEA': none}">
                                     <span c8yIcon="c8y-simulator"
                                       title="Configure your simulator to connect with the Dashboard"></span></button>
@@ -64,14 +59,11 @@
                                     <i c8yIcon="link"
                                       title="Link with other dashboard. No need to connect device or simulate it. It will automatically be taken care using the linked dashboard"></i></button>
                                 </div>
-
-                                
                               </div>
 
                               <div *ngIf="fileUploadMessage" class="col-sm-4 col-xs-12 text-muted">
                                 {{fileUploadMessage}}
                               </div>
-
 
                               <div class="col-sm-4 col-xs-12 text-muted">
                                 <div class="col-md-12 col-sm-12 pad-left">
@@ -89,10 +81,14 @@
                                         </div>
 
                                         <input type="text" class="form-control group-name-inp" placeholder="Group/Type Name"
-                                          />
+                                          [(ngModel)]="dashboard.simulatorGroupName"
+                                          (change)="checkAndGenerateLinks(dashboard)"
+                                          [ngModelOptions]="{standalone: true}"/>
 
-                                        <input type="text" class="form-control count-inp" placeholder="# of Devices"
-                                          />
+                                        <input type="number" class="form-control count-inp" placeholder="# of Devices"
+                                          [(ngModel)]="dashboard.simulatorNoOfDevices" min="1" max="5"
+                                          (change)="checkAndGenerateLinks(dashboard)"
+                                          [ngModelOptions]="{standalone: true}"/>
                                       </div>
 
                                       <div *ngIf="dashboard.enableDeviceOrGroup"
@@ -131,6 +127,7 @@
                                                 placement="right"></i></button></li>
                                         </ul>
                                       </div>
+                                      <ng-container #configWrapper></ng-container>
 
 
                                       <div *ngIf="dashboard.enableLink" class="col-sm-7 col-md-7 col-xs-12 pad-left">
@@ -147,7 +144,7 @@
                                             *dropdownMenu>
                                             <li *ngFor="let linkDashboard of dashboard.linkDashboards; let sl = index;">
                                               <button type="button"
-                                                (click)="onSelectOfLinkingDashbord(linkDashboard, i, sl)">
+                                                (click)="onSelectOfLinkingDashboard(linkDashboard, i, sl)">
                                                 {{linkDashboard.title}}
                                               </button>
                                             </li>
@@ -168,7 +165,7 @@
                               <div *ngIf="dashboard.enableLink" class="col-md-2 col-sm-3 set-margin">
                                 <div *ngIf="!dashboard.isHidden" class="dropdown wd-100" dropdown container="body">
                                   <input [(ngModel)]="dashboard.dashboardTemplateSelected"
-                                    [typeahead]="dashboard.dashboardTemplatesArray" id="dashboardTemplates-{{i}}"
+                                    [typeahead]="filterTemplates" id="dashboardTemplates-{{i}}"
                                     typeaheadOptionField="title" class="form-control" placeholder="Select Template"
                                     [typeaheadMinLength]="2"
                                     (typeaheadOnSelect)="assignSelectedDashboard(i, $event)"
@@ -186,12 +183,19 @@
                                     [ngModelOptions]="{standalone: true}">
                                 </div>
                               </div>
-                              <div *ngIf="!dashboard.simulatorFileExists && dashboard.enableSimulator" class="col-md-1 col-sm-1">
-                                <button type="button" 
+                              <div class="col-md-1 col-sm-1 warning-width" >
+                                <button *ngIf="!dashboard.simulatorFileExists && dashboard.enableSimulator" type="button" 
                                 class="btn btn-xs-warning simulator-warning" title="Simulator configuration file doesn't exist for the selected Dashboard Template">
                                 <i class="fa fa-warning warning-mr"></i>
                                 </button>
-                                <i class="c8y-icon dlt-c8y-icon-download download-file download-mr"
+                                <button *ngIf="dashboard.simulatorFileExists && dashboard.enableSimulator" type="button" 
+                                class="btn btn-xs-warning simulator-ok" title="Simulator configuration mapped successfully">
+                                <i class="dlt-c8y-icon-ok"></i>
+                                </button>
+                                
+                              </div>
+                              <div>
+                                <i *ngIf="!dashboard.simulatorFileExists && dashboard.enableSimulator && dashboard.dtdlFileExists" class="c8y-icon dlt-c8y-icon-download download-file download-mr"
                                 title="Download DTDL"></i>
                               </div>
                               <div class="col-sm-1 col-md-1">
@@ -227,8 +231,8 @@
     </div>
   </div>
 
-
-  <c8y-template-setup-stepper-buttons [formValid]="deviceFormValid ? true : false" [index]="stepper.selectedIndex"
+  <!-- [formValid]="deviceFormValid ? true : false" -->
+  <c8y-template-setup-stepper-buttons [formValid]="true" [index]="stepper.selectedIndex"
     (onNext)="configureApp(currentApp)" (onBack)="back()">
   </c8y-template-setup-stepper-buttons>
   <div class="alerts">

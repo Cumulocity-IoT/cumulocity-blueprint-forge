@@ -25,6 +25,8 @@ const DEFAULT_CONFIG: BlueprintForge = {
   plugins: [],
   dashboards: [],
   microservices: [],
+  templateDetail: undefined,
+  selectedWelcomeTemplate: undefined
 };
 
 export abstract class TemplateSetupStep {
@@ -44,8 +46,8 @@ export abstract class TemplateSetupStep {
   }
 
   verifyStepCompleted() {
-     this.blueprintForge = this.setupConfigService.stepCompleted(this.stepper, this.step, this.setup);
-     if(!this.blueprintForge) { this.blueprintForge = DEFAULT_CONFIG;}
+    /*  this.blueprintForge = this.setupConfigService.stepCompleted(this.stepper, this.step, this.setup);
+     if(!this.blueprintForge) { this.blueprintForge = DEFAULT_CONFIG;} */
   }
   async next(stepIndex?) {
     this.pending = true;
