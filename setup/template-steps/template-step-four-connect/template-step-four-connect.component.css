@@ -104,8 +104,18 @@
     width: 17.4%;
 }
 .warning-mr {
-    margin-top: 4px;
+    margin-top: 11px;
 }
 .download-mr {
-    margin-top: 2px;
+    margin-top: 3px;
+}
+.simulator-ok {
+    margin-left: 10px; 
+    color: green; 
+    border: none; 
+    font-size: 18px; 
+    margin-top: -2px;
+}
+.warning-width {
+    width: 5%;
 }

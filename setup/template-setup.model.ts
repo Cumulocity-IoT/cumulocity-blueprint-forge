@@ -85,6 +85,7 @@ export interface Dashboards {
     preview: any;
     dynamicDashboardAssigned: boolean;
     simulatorFileExists: boolean;
+    dtdlFileExists: boolean;
     fileName: string;
     defaultLinkedDashboard: string;
     findMatchedLink: Dashboards;

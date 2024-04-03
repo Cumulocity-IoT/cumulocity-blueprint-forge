@@ -118,7 +118,6 @@ export class TemplateStepFourConnectComponent
   microserviceArray: any;
   templatesFromDC: any;
   filterChildsDependent:Dashboards[];
-
   private templateId: string ="";
 
   constructor(
@@ -174,12 +173,6 @@ export class TemplateStepFourConnectComponent
           this.loadTemplatesFromDashboardCatalog();
         }
         this.isFormValid = this.appConfigForm?.form.valid;
-        // In case of no device 
-       /*  if (!(this.templateDetails?.input) || !(this.templateDetails?.input?.devices) || !(this.templateDetails?.input?.devices?.length > 0)) {
-          this.deviceFormValid = true;
-        } else {
-          this.deviceFormValid = false;
-        } */
         if(!this.appList || this.appList.length === 0) {
           this.appList = await this.templateCatalogSetupService.getAppList();
           this.isMSEnabled =  this.applicationBinaryService.isMicroserviceEnabled(this.appList);
@@ -199,7 +192,6 @@ export class TemplateStepFourConnectComponent
 
   ngOnInit() {
     this.simulatorSelected = false;
-   
     this.filterChildsDependent = [];
   }
 
@@ -207,8 +199,6 @@ export class TemplateStepFourConnectComponent
     if(!dashboard.simulatorConfigFiles || dashboard.simulatorConfigFiles.length  === 0) {
       this.checkForSimulatorConfig(dashboard, index);
     }
-    
-
     dashboard.enableSimulator = true;
     dashboard.enableLink = false;
     dashboard.enableDeviceOrGroup = false;
@@ -312,10 +302,10 @@ export class TemplateStepFourConnectComponent
       return;
     }
     const currentHost = window.location.host.split(":")[0];
-    if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
-      this.alert.warning("Installation isn't supported when running Application on localhost.");
-      return;
-    }
+    // if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
+    //   this.alert.warning("Installation isn't supported when running Application on localhost.");
+    //   return;
+    // }
 
 
     this.templateDetails.plugins = this.templateDetails.plugins.reduce(
@@ -539,7 +529,11 @@ export class TemplateStepFourConnectComponent
       overallProgress = overallProgress + eachRemoteProgress;
       this.progressIndicatorService.setOverallProgress(overallProgress);
     }
-    await this.processDashboardLinks();
+    const appBuilderApp: any = await (
+      await this.appDataService.getAppDetails(this.currentApp.id + "")
+    ).toPromise();
+    await this.processDashboardLinks(appBuilderApp);
+    this.storeLatestSortedOrderinApp(appBuilderApp);
     await this.progressIndicatorService.setProgress(95);
     overallProgress = overallProgress + eachRemoteProgress;
     this.progressIndicatorService.setOverallProgress(overallProgress);
@@ -680,16 +674,14 @@ export class TemplateStepFourConnectComponent
   }
 
   //Processing dashboardlinks for dashboard navigations
-  private async processDashboardLinks() {
+  private async processDashboardLinks(app) {
     if (
       this.templateDetails.dashboardLinks &&
       this.templateDetails.dashboardLinks.length > 0
     ) {
       if (this.currentApp.id) {
         this.progressIndicatorService.setMessage(`Updating Dashboard links`);
-        const app: any = await (
-          await this.appDataService.getAppDetails(this.currentApp.id + "")
-        ).toPromise();
+       
         if (
           app.applicationBuilder &&
           app.applicationBuilder?.dashboards &&
@@ -834,6 +826,8 @@ export class TemplateStepFourConnectComponent
         }
       );
     }
+
+
   }
 
   hideProgressModalDialog() {
@@ -869,6 +863,7 @@ export class TemplateStepFourConnectComponent
     } else {
       this.templateDetails.dashboards[index].simulatorFileExists = false;
     }
+    this.templateDetails.dashboards[index].dtdlFileExists = true ? templateDetailsData.dtdl : false;
   }
 
   private loadTemplatesFromDashboardCatalog() {
@@ -918,8 +913,9 @@ export class TemplateStepFourConnectComponent
       );
   }
 
-  private prepareDashboardList() {
-    // Sort based on group dashboard flag
+  private async prepareDashboardList() {
+
+    // Revert back sort based on original index to create the application in original order
     const storedTemplateDashboards = cloneDeep(this.templateDetails.dashboards);
     let commonDashboards = [];
     let functionalDashboards = [];
@@ -934,15 +930,15 @@ export class TemplateStepFourConnectComponent
       }
     });
 
-    functionalDashboards = functionalDashboards.reduce(
-      (acc, element) => {
-        if (element.isGroupDashboard) {
-          return [element, ...acc];
-        }
-        return [...acc, element];
-      },
-      []
-    );
+      functionalDashboards = functionalDashboards.reduce(
+        (acc, element) => {
+          if (element.isGroupDashboard) {
+            return [element, ...acc];
+          }
+          return [...acc, element];
+        },
+        []
+      );
     this.templateDetails.dashboards = commonDashboards.concat(functionalDashboards);
     this.templateDetails.dashboards.push(helpAndSupport);
 
@@ -1146,10 +1142,8 @@ export class TemplateStepFourConnectComponent
       }
     }
   }
-
   async simulatorFileGeneration(dashboard) {
     // Testing
-
     const fileInput = JSON.stringify(
       dashboard.simulatorConfigFiles[0].fileContent
     );
@@ -1189,7 +1183,7 @@ export class TemplateStepFourConnectComponent
           type: "Temperature Sensor",
           placeholder: "device01",
           reprensentation: {
-            id: dashboard.simulatorGroupName,
+            id: "dummy_id",
             name: dashboard.simulatorGroupName,
           },
         },
@@ -1211,4 +1205,44 @@ export class TemplateStepFourConnectComponent
       this.generateLinkingDashboards();
     }
   }
+
+  private async storeLatestSortedOrderinApp(app) {
+    if (
+      app.applicationBuilder &&
+      app.applicationBuilder?.dashboards &&
+      app.applicationBuilder?.dashboards.length > 0
+    ) {
+      let appBuilderDashboards = [];
+      let commonDashboards = [];
+        let functionalDashboards = [];
+        let helpAndSupport;
+        app.applicationBuilder.dashboards.forEach(dashboard => {
+          if (dashboard.name === 'Instruction' || dashboard.name === 'Welcome') {
+            commonDashboards.push(dashboard);
+          } else if (dashboard.name && dashboard.name !== 'Help and Support'){
+            functionalDashboards.push(dashboard);
+          } else if (dashboard.name === 'Help and Support') {
+            helpAndSupport = dashboard;
+          }
+        });
+        functionalDashboards = functionalDashboards.reduce(
+          (acc, element) => {
+            if (!element.groupTemplate) {
+              return [element, ...acc];
+            }
+            return [...acc, element];
+          },
+          []
+        );
+          appBuilderDashboards = commonDashboards.concat(functionalDashboards);
+          appBuilderDashboards.push(helpAndSupport);
+          app.applicationBuilder.dashboards = appBuilderDashboards;
+          await this.appService.update({
+            id: app.id,
+            applicationBuilder: app.applicationBuilder
+        } as any);
+
+    }
+  }
+
 }
