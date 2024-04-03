@@ -132,7 +132,12 @@ export class SimulatorConfigService extends SimulationStrategyConfigComponent {
                     },
                     c8y_SupportedOperations: [
                         "c8y_Connection_status"
-                    ]
+                    ],
+                    c8y_Position: {
+                        "lng": 8.6512,
+                        "alt": 0,
+                        "lat": 49.8728
+                    }
                 })).data;
                 this.deviceName = simulatorName;
                 this.deviceId = device.id;
@@ -165,7 +170,7 @@ export class SimulatorConfigService extends SimulationStrategyConfigComponent {
             runOnServer = val;
         });
         this.newConfig.serverSide = (runOnServer ? true : false);
-        
+
         const newSimulatorObject = {
             id: simulatorId,
             name: simulatorName,
@@ -193,11 +198,6 @@ export class SimulatorConfigService extends SimulationStrategyConfigComponent {
             });
         }
 
-        /* if (isFirstSimulator) {
-            this.simulatorManagerService.initialize();
-            this.simSvc.startOperationListener();
-        } */
-       
         await this.simSvc.checkForSimulatorConfigChanges();
         blueprintForgeDeviceDetails = {
             deviceId: this.newConfig.deviceId,
@@ -208,7 +208,6 @@ export class SimulatorConfigService extends SimulationStrategyConfigComponent {
         }
         return (blueprintForgeDeviceDetails);
     }
-
 
     private async verifySimulatorMicroServiceStatus() {
         this.isMSCheckSpin = true;
@@ -239,7 +238,12 @@ export class SimulatorConfigService extends SimulationStrategyConfigComponent {
                 },
                 c8y_SupportedOperations: [
                     "c8y_Connection_status"
-                ]
+                ],
+                c8y_Position: {
+                    "lng": 8.6512,
+                    "alt": 0,
+                    "lat": 49.8728
+                }
             };
             await this.inventoryService.childAssetsCreate(childManageObject, group.id);
         }
