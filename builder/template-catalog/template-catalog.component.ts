@@ -74,7 +74,9 @@ export class TemplateCatalogModalComponent implements OnInit {
 
     public assetButtonText = "Device/Asset";
 
-    private groupTemplate = false;
+    groupTemplate = false;
+
+    simulatorChecked = false;
 
     private appList = [];
 
