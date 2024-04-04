@@ -76,26 +76,26 @@ export interface MicroserviceDetails {
 }
 
 export interface Dashboards {
+    name: string;
+    simulatorNoOfDevices: number;
+    simulatorGroupName: string;
     isSpin: boolean;
-    dynamicDashboardTemplate: any;
-    dynamicDashboardArray: any;
+    dynamicDashboardTemplate?: any;
+    dynamicDashboardArray?: any;
     input: any;
     previewBinaryId: any;
     preview: any;
-    dynamicDashboardAssigned: boolean;
-    simulatorFileExists: boolean;
-    dtdlFileExists: boolean;
-    fileName: string;
-    defaultLinkedDashboard: string;
-    findMatchedLink: Dashboards;
-    selectedDashboardName: string;
+    dynamicDashboardAssigned?: boolean;
+    simulatorFileExists?: boolean;
+    dtdlFileExists?: boolean;
+    defaultLinkedDashboard?: string;
+    findMatchedLink?: Dashboards;
+    selectedDashboardName?: string;
     id: string;
-    dashboardTemplatesArray: any;
     dashboardTemplateSelected: any;
     enableLink?: boolean;
     enableDeviceOrGroup?: boolean;
     enableSimulator?: boolean;
-    isSimulator: boolean;
     welcomeTemplates: any;
     title: string;
     icon: string;

@@ -116,10 +116,9 @@ export class SimulatorConfigService extends SimulationStrategyConfigComponent {
             simulatorName = groupName;
         }
         let device;
-        if (!this.deviceId) {
             if (isGroup) {
                 // Create Group and Devices
-                device = await this.AddGroupAndDevices(simulatorName, groupName, groupName);
+                device = await this.AddGroupAndDevices(simulatorName, groupName);
                 this.deviceName = groupName;
                 this.deviceId = device.id;
             } else {
@@ -143,7 +142,6 @@ export class SimulatorConfigService extends SimulationStrategyConfigComponent {
                 this.deviceId = device.id;
             }
 
-        }
         const appId = this.appIdService.getCurrentAppId();
         let appServiceData;
         if (appId) {
@@ -221,7 +219,7 @@ export class SimulatorConfigService extends SimulationStrategyConfigComponent {
         this.isMSCheckSpin = false;
     }
 
-    private async AddGroupAndDevices(simulatorName: string, groupName:string, deviceType: string) {
+    private async AddGroupAndDevices(simulatorName: string, groupName:string, deviceType?: string) {
         let group = null;
         group = (await this.inventoryService.create({
             c8y_IsDeviceGroup: {},

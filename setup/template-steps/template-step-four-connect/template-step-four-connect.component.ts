@@ -95,7 +95,6 @@ export class TemplateStepFourConnectComponent
   templateSelected: string;
   isMSEnabled: boolean = false;
   welcomeTemplateData: any;
-  simulatorSelected: boolean;
   enableSimulator: boolean;
   enableDeviceOrGroup: boolean;
   enableLik: boolean;
@@ -111,7 +110,6 @@ export class TemplateStepFourConnectComponent
   //linkDashboards: any;
   // linkDashboardsCopy: any;
   storeDefaultDashboardName: string;
-  fileName: string = "Select File";
   simulatorConfigFiles: any[];
   isPreviewLoading: boolean;
   pluginDetailsArray: any;
@@ -119,6 +117,8 @@ export class TemplateStepFourConnectComponent
   templatesFromDC: any;
   filterChildsDependent:Dashboards[];
   private templateId: string ="";
+  blankDashboardURL: any;
+  formValid: boolean = false;
 
   constructor(
     public stepper: C8yStepper,
@@ -177,7 +177,8 @@ export class TemplateStepFourConnectComponent
           this.appList = await this.templateCatalogSetupService.getAppList();
           this.isMSEnabled =  this.applicationBinaryService.isMicroserviceEnabled(this.appList);
         }
-        this.welcomeTemplateData = this.templateCatalogSetupService.welcomeTemplateData;;
+        this.welcomeTemplateData = this.templateCatalogSetupService.welcomeTemplateData;
+        this.formValidation('onload');
       }
     });
 
@@ -191,7 +192,6 @@ export class TemplateStepFourConnectComponent
 
 
   ngOnInit() {
-    this.simulatorSelected = false;
     this.filterChildsDependent = [];
   }
 
@@ -388,38 +388,39 @@ export class TemplateStepFourConnectComponent
 
       let templateDetailsData;
       let dashboardTemplates;
-      if (db.welcomeTemplates) {
-        this.templateSelected = this.blueprintForge.selectedWelcomeTemplate;
-        dashboardTemplates = this.welcomeTemplateData.find(
-          (dashboardTemplate) =>
-            dashboardTemplate.dashboardName === this.templateSelected
-        );
-        if (
-          dashboardTemplates &&
-          this.templateSelected === "Default Template"
-        ) {
-          templateDetailsData = await (
-            await this.loadTemplateDetails(db.dashboard)
-          ).toPromise();
+        if (db.welcomeTemplates) {
+          this.templateSelected = this.blueprintForge.selectedWelcomeTemplate;
+          dashboardTemplates = this.welcomeTemplateData.find(
+            (dashboardTemplate) =>
+              dashboardTemplate.dashboardName === this.templateSelected
+          );
+          if (
+            dashboardTemplates &&
+            this.templateSelected === "Default Template"
+          ) {
+            templateDetailsData = await (
+              await this.loadTemplateDetails(db.dashboard)
+            ).toPromise();
+          } else {
+            templateDetailsData = await (
+              await this.loadTemplateDetails(dashboardTemplates.dashboard)
+            ).toPromise();
+          }
         } else {
-          templateDetailsData = await (
-            await this.loadTemplateDetails(dashboardTemplates.dashboard)
-          ).toPromise();
+  
+          if(db.dynamicDashboardArray && db.dynamicDashboardTemplate) {
+            templateDetailsData = db.dynamicDashboardArray;
+            db.dashboard = db.dynamicDashboardTemplate.dashboard;
+          } 
+          else 
+          {
+            templateDetailsData = await (
+              await this.loadTemplateDetails(db.dashboard)
+            ).toPromise();
+          }
+         
         }
-      } else {
-
-        if(db.dynamicDashboardArray && db.dynamicDashboardTemplate) {
-          templateDetailsData = db.dynamicDashboardArray;
-          db.dashboard = db.dynamicDashboardTemplate.dashboard;
-        } 
-        else 
-        {
-          templateDetailsData = await (
-            await this.loadTemplateDetails(db.dashboard)
-          ).toPromise();
-        }
-       
-      }
+      
 
       const dashboardConfiguration = {
         dashboardId: "12598412",
@@ -476,10 +477,13 @@ export class TemplateStepFourConnectComponent
         this.groupTemplate = false;
       }
 
-      if (db.enableSimulator) {
+      if (db.enableSimulator && db.simulatorFileExists) {
         await this.simulatorFileGeneration(db);
       }
-      templateDetailsData.input.devices = db.devices;
+
+        templateDetailsData.input.devices = db.devices;
+      console.log('templatedetails data', templateDetailsData);
+      
      /*  if (
         db.dynamicDashboardArray &&
         db.dynamicDashboardArray.input &&  db.dynamicDashboardAssigned
@@ -774,6 +778,7 @@ export class TemplateStepFourConnectComponent
               },
             },
           ];
+          this.formValidation('onchange', dashboard);
 
        
             for (
@@ -814,6 +819,8 @@ export class TemplateStepFourConnectComponent
               },
             },
           ];
+          
+          this.formValidation('onchange', dashboard);
             for (
               let dd = 0;
               dd < this.templateDetails.dashboards.length;
@@ -890,10 +897,12 @@ export class TemplateStepFourConnectComponent
       .subscribe(
         (catalog: any) => {
         //  this.templatesFromDC = catalog;
+        
           this.filterTemplates = catalog
             ? catalog
             : [];
-
+            this.blankDashboardURL = this.filterTemplates.find(urlObject => urlObject.title === 'Blank Dashboard');
+            console.log('this.blankDashboardURL', this.blankDashboardURL);
           let findMatchedIdObject;
           this.templateDetails.dashboards.forEach((item, index) => {
             if (item.linkWithDashboard) {
@@ -985,7 +994,7 @@ export class TemplateStepFourConnectComponent
   async loadSimulatorConfigFiles(dashboard) {
     let templateDetailsData;
     let simulatorConfigFile = "";
-    let simulatorFileName = ""
+    let simulatorFileName = "";
     if(dashboard && dashboard.dynamicDashboardArray) {
       simulatorConfigFile = dashboard.dynamicDashboardArray.simulatorDTDL[0]?.simulatorFile;
       simulatorFileName = dashboard.dynamicDashboardArray.simulatorDTDL[0]?.simulatorFileName;
@@ -993,8 +1002,10 @@ export class TemplateStepFourConnectComponent
       templateDetailsData = await (
         await this.loadTemplateDetails(dashboard.dashboard)
       ).toPromise();
-      simulatorConfigFile = templateDetailsData.simulatorDTDL[0]?.simulatorFile;
+      if (templateDetailsData && templateDetailsData.simulatorDTDL && templateDetailsData.simulatorDTDL.length > 0) {
+        simulatorConfigFile = templateDetailsData.simulatorDTDL[0]?.simulatorFile;
       simulatorFileName = templateDetailsData.simulatorDTDL[0]?.simulatorFileName;
+      }
     }
 
     const SimulatorConfigFiles = [];
@@ -1015,11 +1026,13 @@ export class TemplateStepFourConnectComponent
     dashboard.enableLink = true;
     dashboard.enableSimulator = false;
     dashboard.enableDeviceOrGroup = false;
+    this.formValidation('onchange', dashboard);
   }
 
   connectActualDeviceOrGroup(dashboard) {
     dashboard.enableDeviceOrGroup = true;
     dashboard.enableSimulator = dashboard.enableLink = false;
+    this.formValidation('onchange', dashboard);
   }
 
   async updateDepedencies(index) {
@@ -1099,15 +1112,22 @@ export class TemplateStepFourConnectComponent
     this.bsModalRef.content.onSave.subscribe((response) => {
       response.dashboardTemplateSelected = "Blank Dashboard";
       response.selectedDashboardName = "Blank Dashboard";
+      response.dashboard = this.blankDashboardURL.dashboard;
       this.templateDetails.dashboards.push(response);
+      this.formValidation('onchange', response.dashboard);
+      this.loadTemplatesForCustomDashboard();
+      this.generateLinkingDashboards();
+      console.log('dashboards after custom dashboard assigned', this.templateDetails.dashboards);
     });
   }
 
   removeCustomDashboard(i) {
     this.templateDetails.dashboards.splice(i, 1);
+    this.formValidation('onload');
   }
 
-  onSelectOfLinkingDashboard(linkDashboard, dashboardIndex, linkDashboardIndex) {
+  onSelectOfLinkingDashboard(linkDashboard, dashboardIndex, dashboard) {
+    this.formValidation('onchange', dashboard);
     this.templateDetails.dashboards[dashboardIndex].defaultLinkedDashboard =
       linkDashboard.title;
     this.templateDetails.dashboards[dashboardIndex].devices = linkDashboard.devices;
@@ -1181,6 +1201,7 @@ export class TemplateStepFourConnectComponent
   }
 
   checkAndGenerateLinks(dashboard) {
+    this.formValidation('onchange', dashboard);
     if (dashboard.simulatorGroupName && dashboard.simulatorNoOfDevices) {
       // Assign some data to take care of link, only for UI purpose at this stage
       dashboard.devices = [
@@ -1264,4 +1285,69 @@ export class TemplateStepFourConnectComponent
     }
   }
 
+
+
+  private loadTemplatesForCustomDashboard() {
+    this.templateCatalogFromDCService
+      .getTemplateCatalog()
+      .pipe(
+        catchError((err) => {
+          console.log(
+            "Dashboard Catalog: Error in primary endpoint! using fallback..."
+          );
+          return this.templateCatalogFromDCService.getTemplateCatalogFallBack();
+        })
+      )
+      .subscribe(
+        (catalog: any) => {
+          console.log('catalog from custom', catalog);
+        },
+        (error) => {
+          this.alertService.danger(
+            "There is some technical error! Please try after sometime."
+          );
+        }
+      );
+  }
+
+  formValidation( type: string, dashboard?) {
+    let formValid;
+    if (type === 'onchange') {
+      if (dashboard.enableSimulator && (!dashboard.simulatorGroupName || !dashboard.simulatorNoOfDevices)) {
+        formValid = false;
+      } else if (dashboard.enableDeviceOrGroup && !dashboard.name) {
+        formValid = false;
+      } else if (dashboard.enableLink && (!dashboard.defaultLinkedDashboard ||  dashboard.defaultLinkedDashboard === 'Select Link' || !dashboard.dashboardTemplateSelected)) {
+        formValid = false;
+      } else if ((dashboard.isGroupDashboard && !dashboard.selectedDashboardName) || (!dashboard.enableLink && !dashboard.selectedDashboardName)) {
+        formValid = false;
+      } else {
+        formValid = true;
+      }
+    }
+    
+
+    if (type === 'onload') {
+      if (this.templateDetails && this.templateDetails.dashboards) {
+        this.templateDetails.dashboards.forEach(dashboard => {
+          if (dashboard.isDeviceRequired) {
+            if (dashboard.enableSimulator && (!dashboard.simulatorGroupName || !dashboard.simulatorNoOfDevices)) {
+              formValid = false;
+            } else if (dashboard.enableDeviceOrGroup && !dashboard.name) {
+              formValid = false;
+            } else if (dashboard.enableLink && (!dashboard.defaultLinkedDashboard ||  dashboard.defaultLinkedDashboard === 'Select Link' || !dashboard.dashboardTemplateSelected)) {
+              formValid = false;
+            } else if ((dashboard.isGroupDashboard && !dashboard.selectedDashboardName) || (!dashboard.enableLink && !dashboard.selectedDashboardName)) {
+              formValid = false;
+            } else {
+              formValid = true;
+            }
+          }
+        })
+      }
+      
+    }
+    this.formValid = formValid;
+  }
+  
 }
