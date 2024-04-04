@@ -149,14 +149,7 @@ export class TemplateStepFourConnectComponent
   ) {
     super(stepper, step, setup, appState, alert, setupConfigService);
     this.app = this.appStateService.currentApplication.pipe(
-      tap((app: IApplication & { applicationBuilder: any }) => {
-        this.newAppName = app.name;
-        this.newAppContextPath = app.contextPath;
-        this.newAppIcon =
-          app.applicationBuilder && app.applicationBuilder.icon
-            ? app.applicationBuilder.icon
-            : "flash";
-      })
+     
     );
     this.app.subscribe((app) => {
       this.currentApp = app;
