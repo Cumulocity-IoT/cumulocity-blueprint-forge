@@ -337,9 +337,8 @@ export class TemplateCatalogModalComponent implements OnInit {
             let content = await this.simulatorConfigService.generateSimulatorFromConfiguration(this.simGrpAssetName, this.simNoOfDevices, this.simulatorFileContent, this.groupTemplate, '');
             if (content && content.status == 0) {
                 console.log("content:", content);
-                this.app.applicationBuilder.simulators = content.simulators;
-                // dashboard.name = content?.deviceId;
-                // dashboard.templateType = 1;
+                // this.app.applicationBuilder.simulators = content.simulators;
+                this.app=content.app;
                 console.log("devices:",this.templateDetails);
                 // this.templateDetails.input.devices = [
                 //     {
