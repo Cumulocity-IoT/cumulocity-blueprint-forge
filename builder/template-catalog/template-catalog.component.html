@@ -165,9 +165,14 @@
                         </div>
                         <div *ngIf="simulatorChecked">
                             <label for="device"><span>Simulate - Type: {{device.type}}</span></label>
-                            <div class="form-group">
-                                <input type="text" class="form-control" placeholder="Group/Type Name"/>
-                                <input type="number" class="form-control" placeholder="# of devices" min="1"/>
+                            <div class="form-group d-flex">
+                                <input type="text" name="simGrpAssetName" class="form-control" [placeholder]="groupTemplate?'Group/Type Name':'Device/Asset Name'" [(ngModel)]="simGrpAssetName"/>
+                                <input *ngIf="groupTemplate" type="number" name="simNoOfDevices" class="form-control" placeholder="# of devices" min="1" max="5" [(ngModel)]="simNoOfDevices"/>
+                            </div>
+                            <div>
+                                <label for="device"><span>Simulator Config File</span></label>
+                                <input type="file" name="simFileList" accept=".json" id="simulatorFile" aria-describedby="simulatorinput" class="form-control"
+                                    (change)="onSimulatorFileSelected($event.target.files)" />
                             </div>
                         </div>
                     </div>
