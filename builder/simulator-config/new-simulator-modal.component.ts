@@ -56,9 +56,6 @@ export class NewSimulatorModalComponent implements OnInit{
     simulatorsNameList:string[]=[];
     appSubscription:Subscription;
     isduplicateSmulatorName:boolean=false;
-    isBlueprintSimulator: boolean = false;
-    simulatorConfigFiles: any[];
-    selectedFile: string;
     @ViewChild(WizardComponent, { static: true }) wizard: WizardComponent;
 
     @ViewChild("configWrapper", { read: ViewContainerRef, static: true }) configWrapper: ViewContainerRef;
@@ -78,10 +75,6 @@ export class NewSimulatorModalComponent implements OnInit{
     isMSCheckSpin: boolean = false;
     isCSVSimulator: boolean = false;
     showWarning: boolean;
-    fileLength: Number;
-    enableSimulator: boolean;
-    fileName: string = 'Select File';
-    public onSave: Subject<any>;
 
     constructor(
         private simSvc: SimulatorWorkerAPI, private alertService: AlertService,
@@ -92,45 +85,10 @@ export class NewSimulatorModalComponent implements OnInit{
         private simulatorConfigService: SimulatorConfigService,private modalService: BsModalService,
         private simulatorManagerService: SimulatorManagerService,public appDataService: AppDataService,
         private modalOptions: ModalOptions
-    ) {
-        this.onSave = new Subject();
-        
-     }
+    ) { }
     async ngOnInit(): Promise<void> {
         this.appDataService.forceUpdate = true;
-        await this.getAppDetails(this.appId);    
-        if(this.isBlueprintSimulator) {
-            const modalData = this.modalOptions.initialState;
-            const fileInput = JSON.stringify(this.modalOptions.initialState.simulatorConfigFiles[0].fileContent);
-            const validJson = this.isValidJson(fileInput);
-            if (modalData.fileLength ===  1) {
-                //If only one Simulator Config File
-                this.isConfigFileUploading = true;
-                if (validJson) {
-                this.processFileInput(validJson);
-                }
-            } else if (Number(modalData.fileLength) > 1) {
-                //If multiple
-                this.wizard.selectStep('select-dtdl');
-            }
-            
-          /*   const validJson = this.isValidJson(input);
-            this.isConfigFileUploading = true; */
-            /* if (validJson) {
-                this.selectedStrategyFactory = this.simulationStrategiesService.strategiesByName.get(validJson.type);
-                if (this.selectedStrategyFactory === undefined) {
-                    this.isConfigFileError = true;
-                } else {
-                    this.configFromFile = validJson.config;
-                    this.simulatorName = validJson.name;
-                    this.wizard.selectStep('device');
-                }
-            } */
-            ;
-
-            // If multiple
-            // this.wizard.selectStep('select-dtdl');
-        }        
+        await this.getAppDetails(this.appId);            
     }
     //Getting application details
     async getAppDetails(appId:string){
@@ -303,10 +261,6 @@ export class NewSimulatorModalComponent implements OnInit{
             serverSide: (runOnServer ? true : false),
             started : null
         };
-        if (this.isBlueprintSimulator) {
-            newSimulatorObject.started = true;
-        } 
-        
         simulators.push(newSimulatorObject);
         appServiceData.applicationBuilder.simulators = simulators;
 
@@ -338,12 +292,7 @@ export class NewSimulatorModalComponent implements OnInit{
         }
         // We could just wait for them to refresh, but it's nicer to instantly refresh
         await this.simSvc.checkForSimulatorConfigChanges();
-        let blueprintForgeDeviceDetails = {
-            deviceId: this.newConfig.deviceId,
-            deviceName: this.newConfig.deviceName,
-            simulators: simulators
-        }
-        this.onSave.next(blueprintForgeDeviceDetails);
+
         this.bsModalRef.hide();
     }
     getSelectedDevice(device: any) {
@@ -409,7 +358,6 @@ export class NewSimulatorModalComponent implements OnInit{
             if (input) {
                 const o = JSON.parse(input);
                 if (o && (o.constructor === Object || o.constructor === Array)) {
-                    console.log('o constructor value', o.constructor);
                     return o;
                 }
             }
@@ -478,20 +426,6 @@ export class NewSimulatorModalComponent implements OnInit{
                 } else {
                     this.configFromFile = validJson.config;
                     this.simulatorName = validJson.name;
-                    if (this.enableSimulator) {
-                        this.wizard.selectStep('device');
-                    }
                 }
-    }
-
-    updateConfigurationFile() {
-        let matchedConfigValue = JSON.parse(JSON.stringify(this.modalOptions.initialState.simulatorConfigFiles)).find(element => element.fileName === this.fileName);
-        const fileInput = JSON.stringify(matchedConfigValue.fileContent)
-        const validJson = this.isValidJson(fileInput);
-        this.isConfigFileUploading = true;
-                if (validJson) {
-                this.processFileInput(validJson);
-                }
-
     }
 }

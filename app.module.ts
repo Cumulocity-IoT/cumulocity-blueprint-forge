@@ -117,8 +117,7 @@ import { ConfigureCustomDashboardModalComponent } from './setup/template-steps/t
           setupId: 'blueprintForgeApplcationTemplate',
           priority: 30
         }
-      ] as SetupStep[]),
-    //   { provide: HOOK_SIMULATION_STRATEGY_FACTORY, useClass: DtdlSimulationStrategyFactory, multi: true },
+      ] as SetupStep[])
   ],
 })
 export class AppModule extends HybridAppModule {

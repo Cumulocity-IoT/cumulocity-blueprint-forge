@@ -32,12 +32,12 @@ import { DtdlSimulationModel } from '../../builder/simulator/simulator-config';
 import * as _ from 'lodash';
 
 @Injectable({ providedIn: 'root' })
-export class SimulatorConfigService extends SimulationStrategyConfigComponent {
+export class SimulatorConfigService  {
     isCSVSimulator: boolean;
     isMSCheckSpin: boolean;
-    deviceId: string | undefined;
+    // deviceId: string | undefined;
    // isGroup: boolean = false;
-    deviceName: string | undefined;
+  //  deviceName: string | undefined;
     isBlueprintSimulator: any;
     numberOfDevice: number | 0;
 
@@ -49,15 +49,15 @@ export class SimulatorConfigService extends SimulationStrategyConfigComponent {
         private simSvc: SimulatorWorkerAPI,
         public simulationStrategiesService: SimulationStrategiesService
     ) {
-        super();
+     //   super();
     }
 
     runOnServerSource: BehaviorSubject<any> = new BehaviorSubject(null);
     runOnServer$: Observable<any> = this.runOnServerSource.asObservable();
  
-    newConfig: any;
+//    newConfig: any;
     isMSExist: boolean = false;
-    config: DtdlSimulationModel;
+  //  config: DtdlSimulationModel;
 
     setRunOnServer(runOnServer: any) {
         this.runOnServerSource.next(runOnServer);
@@ -71,6 +71,7 @@ export class SimulatorConfigService extends SimulationStrategyConfigComponent {
             status: 0,
             message: "Success"
         }
+        let newConfig:any = {};
         let selectedStrategyFactory: SimulationStrategyFactory;
         let simulatorName = "";
         let validJson : any;
@@ -102,26 +103,26 @@ export class SimulatorConfigService extends SimulationStrategyConfigComponent {
             this.setRunOnServer(true);
         } else { await this.verifySimulatorMicroServiceStatus(); }
 
-        if (metadata.configComponent != null) {
-            this.newConfig = {}
-            this.initializeConfig(simulatorConfigFileContent.config);
-            this.newConfig = simulatorConfigFileContent.config;
-            this.runOnServer$.subscribe((val) => {
+   //     if (metadata.configComponent != null) {
+            newConfig = {}
+       //     this.initializeConfig(simulatorConfigFileContent.config);
+            newConfig = simulatorConfigFileContent.config;
+            /* this.runOnServer$.subscribe((val) => {
                 this.checkIntervalValidation();
-            });
-        }
+            }); */
+     //   }
 
         // get simulator Name from strategy's deviceName field
         if (metadata.hideSimulatorName) {
             simulatorName = groupName;
         }
         let device;
-        if (!this.deviceId) {
+        let deviceName;
             if (isGroup) {
                 // Create Group and Devices
-                device = await this.AddGroupAndDevices(simulatorName, groupName, groupName);
-                this.deviceName = groupName;
-                this.deviceId = device.id;
+                device = await this.AddGroupAndDevices(simulatorName, groupName);
+                deviceName = groupName;
+//                this.deviceId = device.id;
             } else {
                 // createDevice
                 device = (await this.inventoryService.create({
@@ -132,13 +133,17 @@ export class SimulatorConfigService extends SimulationStrategyConfigComponent {
                     },
                     c8y_SupportedOperations: [
                         "c8y_Connection_status"
-                    ]
+                    ],
+                    c8y_Position: {
+                        "lng": 8.6512,
+                        "alt": 0,
+                        "lat": 49.8728
+                    }
                 })).data;
-                this.deviceName = simulatorName;
-                this.deviceId = device.id;
+                deviceName = simulatorName;
+  //              this.deviceId = device.id;
             }
 
-        }
         const appId = this.appIdService.getCurrentAppId();
         let appServiceData;
         if (appId) {
@@ -148,29 +153,29 @@ export class SimulatorConfigService extends SimulationStrategyConfigComponent {
         const simulators = appServiceData.applicationBuilder.simulators || [];
        // const isFirstSimulator = (simulators && simulators.length > 0 ? false : true);
         const simulatorId = Math.floor(Math.random() * 1000000);
-        this.newConfig.deviceId = this.deviceId;
+        newConfig.deviceId = device?.id;
 
 
         // Added by darpan to sync device id in alternateConfigs
-        if (this.newConfig.alternateConfigs && this.newConfig.alternateConfigs.operations &&
-            this.newConfig.alternateConfigs.operations.length > 0) {
-            this.newConfig.alternateConfigs.operations.forEach(ops => {
-                ops.deviceId = this.deviceId;
+        if (newConfig.alternateConfigs && newConfig.alternateConfigs.operations &&
+            newConfig.alternateConfigs.operations.length > 0) {
+            newConfig.alternateConfigs.operations.forEach(ops => {
+                ops.deviceId = device?.id;
             });
         }
-        this.newConfig.deviceName = this.deviceName;
-        this.newConfig.isGroup = isGroup;
+        newConfig.deviceName = deviceName;
+        newConfig.isGroup = isGroup;
         let runOnServer;
         this.runOnServer$.subscribe((val) => {
             runOnServer = val;
         });
-        this.newConfig.serverSide = (runOnServer ? true : false);
-        
+        newConfig.serverSide = (runOnServer ? true : false);
+
         const newSimulatorObject = {
             id: simulatorId,
             name: simulatorName,
             type: metadata.name,
-            config: this.newConfig,
+            config: newConfig,
             lastUpdated: new Date().toISOString(),
             serverSide: (runOnServer ? true : false),
             started: true
@@ -193,22 +198,16 @@ export class SimulatorConfigService extends SimulationStrategyConfigComponent {
             });
         }
 
-        /* if (isFirstSimulator) {
-            this.simulatorManagerService.initialize();
-            this.simSvc.startOperationListener();
-        } */
-       
         await this.simSvc.checkForSimulatorConfigChanges();
         blueprintForgeDeviceDetails = {
-            deviceId: this.newConfig.deviceId,
-            deviceName: this.newConfig.deviceName,
+            deviceId: newConfig.deviceId,
+            deviceName: newConfig.deviceName,
             simulators: simulators,
             status: 0,
             message: "Success"
         }
         return (blueprintForgeDeviceDetails);
     }
-
 
     private async verifySimulatorMicroServiceStatus() {
         this.isMSCheckSpin = true;
@@ -222,7 +221,7 @@ export class SimulatorConfigService extends SimulationStrategyConfigComponent {
         this.isMSCheckSpin = false;
     }
 
-    private async AddGroupAndDevices(simulatorName: string, groupName:string, deviceType: string) {
+    private async AddGroupAndDevices(simulatorName: string, groupName:string, deviceType?: string) {
         let group = null;
         group = (await this.inventoryService.create({
             c8y_IsDeviceGroup: {},
@@ -239,14 +238,19 @@ export class SimulatorConfigService extends SimulationStrategyConfigComponent {
                 },
                 c8y_SupportedOperations: [
                     "c8y_Connection_status"
-                ]
+                ],
+                c8y_Position: {
+                    "lng": 8.6512,
+                    "alt": 0,
+                    "lat": 49.8728
+                }
             };
             await this.inventoryService.childAssetsCreate(childManageObject, group.id);
         }
         return group;
     }
 
-    private checkIntervalValidation() {
+    /* private checkIntervalValidation() {
         let serverSide;
         this.runOnServer$.subscribe((val) => {
             serverSide = val;
@@ -256,16 +260,16 @@ export class SimulatorConfigService extends SimulationStrategyConfigComponent {
                 this.newConfig.intervalInvalid = false;
             }
         });
-    }
+    } */
 
-    initializeConfig(existingConfig?: DtdlSimulationModel) {
+    i/* nitializeConfig(existingConfig?: DtdlSimulationModel) {
         let c: DtdlSimulationModel = {
             deviceId: "",
             matchingValue: "default",
             interval: 30,
             alternateConfigs: undefined
         };
-        this.checkAlternateConfigs(c);
+    //    this.checkAlternateConfigs(c);
         if (existingConfig) {
             c.alternateConfigs = _.cloneDeep(existingConfig.alternateConfigs);
         } else {
@@ -277,8 +281,8 @@ export class SimulatorConfigService extends SimulationStrategyConfigComponent {
         this.config.modalSize = "modal-md";
         this.config.generationType = 'measurement'
         this.config.headerPresent = false;
-        this.checkIntervalValidation();
-    }
+     //   this.checkIntervalValidation();
+    } */
 
     private isValidJson(input: any) {
         try {
