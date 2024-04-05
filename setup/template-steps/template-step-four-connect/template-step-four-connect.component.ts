@@ -475,7 +475,6 @@ export class TemplateStepFourConnectComponent
       }
 
         templateDetailsData.input.devices = db.devices;
-      console.log('templatedetails data', templateDetailsData);
       
      /*  if (
         db.dynamicDashboardArray &&
@@ -874,6 +873,10 @@ export class TemplateStepFourConnectComponent
       this.templateDetails.dashboards[index].simulatorFileExists = false;
     }
     this.templateDetails.dashboards[index].dtdlFileExists = true ? templateDetailsData.dtdl : false;
+    if (templateDetailsData.dtdl) {
+      this.templateDetails.dashboards[index].dtdlURL = templateDetailsData.dtdl;
+    }
+    
   }
 
   private loadTemplatesFromDashboardCatalog() {
@@ -1019,6 +1022,9 @@ export class TemplateStepFourConnectComponent
     dashboard.enableLink = true;
     dashboard.enableSimulator = false;
     dashboard.enableDeviceOrGroup = false;
+    if (!dashboard.linkDashboards || dashboard.linkDashboards?.length === 0) {
+      this.generateLinkingDashboards();
+    }
     this.formValidation('onchange', dashboard);
   }
 
@@ -1107,9 +1113,8 @@ export class TemplateStepFourConnectComponent
       response.selectedDashboardName = "Blank Dashboard";
       response.dashboard = this.blankDashboardURL.dashboard;
       this.templateDetails.dashboards.push(response);
-      this.formValidation('onchange', response.dashboard);
       this.loadTemplatesForCustomDashboard();
-      this.generateLinkingDashboards();
+      this.formValidation('onchange', response.dashboard);
       console.log('dashboards after custom dashboard assigned', this.templateDetails.dashboards);
     });
   }
@@ -1120,10 +1125,10 @@ export class TemplateStepFourConnectComponent
   }
 
   onSelectOfLinkingDashboard(linkDashboard, dashboardIndex, dashboard) {
-    this.formValidation('onchange', dashboard);
     this.templateDetails.dashboards[dashboardIndex].defaultLinkedDashboard =
       linkDashboard.title;
     this.templateDetails.dashboards[dashboardIndex].devices = linkDashboard.devices;
+    this.formValidation('onchange', dashboard);
   }
 
   sortDashboardsByTitle(sortableArray) {
@@ -1342,5 +1347,13 @@ export class TemplateStepFourConnectComponent
     }
     this.formValid = formValid;
   }
+
+  downloadDTDL(dashboardIndex) {
+    const dtdlLink = document.createElement("a");
+    dtdlLink.href = this.catalogService.getGithubURL(this.templateDetails.dashboards[dashboardIndex].dtdlURL);;
+    document.body.appendChild(dtdlLink);
+    dtdlLink.click();
+    document.body.removeChild(dtdlLink);
+}
   
 }

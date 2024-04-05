@@ -197,8 +197,8 @@
                                 
                               </div>
                               <div>
-                                <i *ngIf="!dashboard.simulatorFileExists && dashboard.enableSimulator && dashboard.dtdlFileExists" class="c8y-icon dlt-c8y-icon-download download-file download-mr"
-                                title="Download DTDL"></i>
+                                <i *ngIf="!dashboard.simulatorFileExists && dashboard.enableSimulator && dashboard.dtdlFileExists" class="c8y-icon dlt-c8y-icon-download download-file download-mr pointer-icon"
+                                title="Download DTDL" (click)="downloadDTDL(i)"></i>
                               </div>
                               <div class="col-sm-1 col-md-1">
                                 <button *ngIf="dashboard.isCustom && dashboard.isCustom == true" type="button" class="btn btn-dot fl-rgt" (click)="removeCustomDashboard(i)" title="Remove Dashboard">

@@ -76,6 +76,7 @@ export interface MicroserviceDetails {
 }
 
 export interface Dashboards {
+    dtdlURL: any;
     name: string;
     simulatorNoOfDevices: number;
     simulatorGroupName: string;

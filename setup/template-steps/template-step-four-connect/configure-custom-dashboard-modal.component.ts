@@ -50,7 +50,7 @@ export class ConfigureCustomDashboardModalComponent{
             isCustom: true,
             isDeviceRequired: true,
             enableDeviceOrGroup: true,
- 
+            defaultLinkedDashboard: 'Select Link'
         };
         this.onSave.next(response);
         this.bsModalRef.hide();

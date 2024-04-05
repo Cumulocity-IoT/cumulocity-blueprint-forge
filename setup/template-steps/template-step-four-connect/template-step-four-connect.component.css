@@ -119,3 +119,6 @@
 .warning-width {
     width: 5%;
 }
+.pointer-icon {
+    cursor: pointer;
+}
