@@ -60,6 +60,7 @@ import { cloneDeep } from "lodash-es";
 import { DomSanitizer } from "@angular/platform-browser";
 import { ConfigureCustomDashboardModalComponent } from "./configure-custom-dashboard-modal.component";
 import { SimulatorConfigService } from "../../../builder/simulator-config/simulator-config.service";
+import { AlertMessageModalComponent } from "../../../builder/utils/alert-message-modal/alert-message-modal.component";
 @Component({
   selector: "c8y-template-step-four-connect",
   templateUrl: "./template-step-four-connect.component.html",
@@ -285,7 +286,8 @@ export class TemplateStepFourConnectComponent
     }
   }
 
-  async configureApp(app: any) {
+
+  async validateAndConfigure(app) {
     const isAnyStepPending = this.setup.steps.some(
       (step, index) =>
         index !== this.setup.steps.length - 1 && step.completed === false
@@ -294,6 +296,41 @@ export class TemplateStepFourConnectComponent
       this.next();
       return;
     }
+    let simulatorWarningPopup;
+    const alertMessage = {
+      title: 'No Simulator Configuration',
+      description: `Simulator Configuration doesn't exist for the dashboard template selected. Simulators, devices, or groups won't be created. Do you want to continue?`,
+      type: 'warning',
+      alertType: 'confirm', //info|confirm,
+      confirmPrimary: true //confirm Button is primary
+  }
+
+  this.templateDetails.dashboards.forEach(dashboard => {
+    if (dashboard.simulatorFileExists === false) {
+      simulatorWarningPopup = true;
+      return;
+    } else {
+      simulatorWarningPopup = false;
+    }
+  });
+  if (simulatorWarningPopup) {
+    const simulatorDialofRef = this.alertModalDialog(alertMessage);
+    await simulatorDialofRef.content.event.subscribe(async data => {
+      if (data && data.isConfirm) {
+        console.log('Continue creating the application');
+        this.configureApp(app);
+      } else {
+        return;
+      }
+    });
+  } else {
+    this.configureApp(app);
+  }
+  
+  }
+
+  async configureApp(app: any) {
+   
     const currentHost = window.location.host.split(":")[0];
     // if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
     //   this.alert.warning("Installation isn't supported when running Application on localhost.");
@@ -414,7 +451,7 @@ export class TemplateStepFourConnectComponent
          
         }
       
-
+        
       const dashboardConfiguration = {
         dashboardId: "12598412",
         dashboardName: db.title,
@@ -856,6 +893,7 @@ export class TemplateStepFourConnectComponent
     this.templateDetails.dashboards[index].dynamicDashboardTemplate =
       event.item;
     this.loadTemplateDetailsFromDC(event.item, index);
+    console.log('Dashboards after selecting templates', this.templateDetails.dashboards);
   }
 
   async checkForSimulatorConfig(event, index) {
@@ -1025,13 +1063,13 @@ export class TemplateStepFourConnectComponent
     if (!dashboard.linkDashboards || dashboard.linkDashboards?.length === 0) {
       this.generateLinkingDashboards();
     }
-    this.formValidation('onchange', dashboard);
+    this.formValidation('onload', dashboard);
   }
 
   connectActualDeviceOrGroup(dashboard) {
     dashboard.enableDeviceOrGroup = true;
     dashboard.enableSimulator = dashboard.enableLink = false;
-    this.formValidation('onchange', dashboard);
+    this.formValidation('onload', dashboard);
   }
 
   async updateDepedencies(index) {
@@ -1094,7 +1132,13 @@ export class TemplateStepFourConnectComponent
         dashboardItem.linkDashboards = linkDashboardsCopy;
         
       }
-      dashboardItem.dashboardTemplateSelected = dashboardItem.title;
+      let dashboardExistInDC = this.filterTemplates.find(template => template.title === dashboardItem.title);
+      if (dashboardExistInDC) {
+        dashboardItem.dashboardTemplateSelected = dashboardItem.title;
+      } else {
+        dashboardItem.dashboardTemplateSelected = "Blank Dashboard";
+      }
+      
       dashboardItem.defaultLinkedDashboard =
         !dashboardItem.linkDashboards ||
         dashboardItem.linkDashboards.length === 0
@@ -1114,7 +1158,7 @@ export class TemplateStepFourConnectComponent
       response.dashboard = this.blankDashboardURL.dashboard;
       this.templateDetails.dashboards.push(response);
       this.loadTemplatesForCustomDashboard();
-      this.formValidation('onchange', response.dashboard);
+      this.formValidation('onload', response.dashboard);
       console.log('dashboards after custom dashboard assigned', this.templateDetails.dashboards);
     });
   }
@@ -1128,7 +1172,7 @@ export class TemplateStepFourConnectComponent
     this.templateDetails.dashboards[dashboardIndex].defaultLinkedDashboard =
       linkDashboard.title;
     this.templateDetails.dashboards[dashboardIndex].devices = linkDashboard.devices;
-    this.formValidation('onchange', dashboard);
+    this.formValidation('onload', dashboard);
   }
 
   sortDashboardsByTitle(sortableArray) {
@@ -1199,7 +1243,7 @@ export class TemplateStepFourConnectComponent
   }
 
   checkAndGenerateLinks(dashboard) {
-    this.formValidation('onchange', dashboard);
+    this.formValidation('onload', dashboard);
     if (dashboard.simulatorGroupName && dashboard.simulatorNoOfDevices) {
       // Assign some data to take care of link, only for UI purpose at this stage
       dashboard.devices = [
@@ -1227,6 +1271,9 @@ export class TemplateStepFourConnectComponent
         }
       }
       this.generateLinkingDashboards();
+      this.formValidation('onload', dashboard);
+    } else {
+      this.formValidation('onload', dashboard);
     }
   }
 
@@ -1331,12 +1378,16 @@ export class TemplateStepFourConnectComponent
           if (dashboard.isDeviceRequired) {
             if (dashboard.enableSimulator && (!dashboard.simulatorGroupName || !dashboard.simulatorNoOfDevices)) {
               formValid = false;
+              return;
             } else if (dashboard.enableDeviceOrGroup && !dashboard.name) {
               formValid = false;
+              return;
             } else if (dashboard.enableLink && (!dashboard.defaultLinkedDashboard ||  dashboard.defaultLinkedDashboard === 'Select Link' || !dashboard.dashboardTemplateSelected)) {
               formValid = false;
+              return;
             } else if ((dashboard.isGroupDashboard && !dashboard.selectedDashboardName) || (!dashboard.enableLink && !dashboard.selectedDashboardName)) {
               formValid = false;
+              return;
             } else {
               formValid = true;
             }
@@ -1354,6 +1405,10 @@ export class TemplateStepFourConnectComponent
     document.body.appendChild(dtdlLink);
     dtdlLink.click();
     document.body.removeChild(dtdlLink);
+}
+
+private alertModalDialog(message: any): BsModalRef {
+  return this.modalService.show(AlertMessageModalComponent, { class: 'c8y-wizard', initialState: { message } });
 }
   
 }

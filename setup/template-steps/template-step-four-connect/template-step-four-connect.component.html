@@ -169,7 +169,7 @@
                                     typeaheadOptionField="title" class="form-control" placeholder="Select Template"
                                     [typeaheadMinLength]="2"
                                     (typeaheadOnSelect)="assignSelectedDashboard(i, $event)"
-                                    (typeaheadNoResults)="formValidation('onchange', dashboard)"
+                                    (typeaheadNoResults)="formValidation('onload', dashboard)"
                                     [ngModelOptions]="{standalone: true}">
                                 </div>
                               </div>
@@ -181,7 +181,7 @@
                                     typeaheadOptionField="title" class="form-control" placeholder="Select Template"
                                     [typeaheadMinLength]="2"
                                     (typeaheadOnSelect)="assignSelectedDashboard(i, $event)"
-                                    (typeaheadNoResults)="formValidation('onchange', dashboard)"
+                                    (typeaheadNoResults)="formValidation('onload', dashboard)"
                                     [ngModelOptions]="{standalone: true}">
                                 </div>
                               </div>
@@ -233,9 +233,9 @@
     </div>
   </div>
 
-  <!-- [formValid]="deviceFormValid ? true : false" -->
+  <!-- [formValid]="deviceFormValid ? true : false" configureApp(currentApp)-->
   <c8y-template-setup-stepper-buttons [formValid]="formValid" [index]="stepper.selectedIndex"
-    (onNext)="configureApp(currentApp)" (onBack)="back()">
+    (onNext)="validateAndConfigure(currentApp)" (onBack)="back()">
   </c8y-template-setup-stepper-buttons>
   <div class="alerts">
     <c8y-alert-outlet></c8y-alert-outlet>

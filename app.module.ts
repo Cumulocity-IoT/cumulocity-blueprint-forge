@@ -49,6 +49,7 @@ import { TemplateStepFourConnectComponent } from './setup/template-steps/templat
 import { WizardModule } from './wizard/wizard.module';
 import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 import { ConfigureCustomDashboardModalComponent } from './setup/template-steps/template-step-four-connect/configure-custom-dashboard-modal.component';
+import { AlertMessageModalModule } from './builder/utils/alert-message-modal/alert-message-modal.module';
 @NgModule({
   declarations: [
     TemplateStepOneComponent, 
@@ -81,6 +82,7 @@ import { ConfigureCustomDashboardModalComponent } from './setup/template-steps/t
     BsDropdownModule.forRoot(),
     WizardModule,
     TypeaheadModule.forRoot(),
+    AlertMessageModalModule
   ],
   providers: [
     TemplateCatalogSetupService,SetupConfigService,
