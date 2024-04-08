@@ -294,7 +294,7 @@ export class TemplateStepFourConnectComponent
     );
     if (!isAnyStepPending) {
       this.next();
-      return;
+      return false;
     }
     let simulatorWarningPopup;
     const alertMessage = {
@@ -305,14 +305,15 @@ export class TemplateStepFourConnectComponent
       confirmPrimary: true //confirm Button is primary
   }
 
-  this.templateDetails.dashboards.forEach(dashboard => {
-    if (dashboard.simulatorFileExists === false) {
+  for (let ts=0; ts < this.templateDetails.dashboards.length; ts++) {
+    if (this.templateDetails.dashboards[ts].simulatorFileExists === false) {
       simulatorWarningPopup = true;
-      return;
+      break;
     } else {
       simulatorWarningPopup = false;
     }
-  });
+  }
+
   if (simulatorWarningPopup) {
     const simulatorDialofRef = this.alertModalDialog(alertMessage);
     await simulatorDialofRef.content.event.subscribe(async data => {
@@ -320,7 +321,7 @@ export class TemplateStepFourConnectComponent
         console.log('Continue creating the application');
         this.configureApp(app);
       } else {
-        return;
+        return false;
       }
     });
   } else {
@@ -332,10 +333,10 @@ export class TemplateStepFourConnectComponent
   async configureApp(app: any) {
    
     const currentHost = window.location.host.split(":")[0];
-    // if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
-    //   this.alert.warning("Installation isn't supported when running Application on localhost.");
-    //   return;
-    // }
+    if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
+      this.alert.warning("Installation isn't supported when running Application on localhost.");
+      return;
+    }
 
 
     this.templateDetails.plugins = this.templateDetails.plugins.reduce(
@@ -451,7 +452,7 @@ export class TemplateStepFourConnectComponent
          
         }
       
-        
+
       const dashboardConfiguration = {
         dashboardId: "12598412",
         dashboardName: db.title,
@@ -807,7 +808,7 @@ export class TemplateStepFourConnectComponent
               },
             },
           ];
-          this.formValidation('onchange', dashboard);
+          
 
        
             for (
@@ -828,6 +829,7 @@ export class TemplateStepFourConnectComponent
                   dashboard.title;
               } 
             }
+            this.formValidation('onload', dashboard);
             this.generateLinkingDashboards();
           }
           
@@ -849,7 +851,7 @@ export class TemplateStepFourConnectComponent
             },
           ];
           
-          this.formValidation('onchange', dashboard);
+          
             for (
               let dd = 0;
               dd < this.templateDetails.dashboards.length;
@@ -868,6 +870,7 @@ export class TemplateStepFourConnectComponent
                   dashboard.title;
               }
             }
+            this.formValidation('onload', dashboard);
           this.generateLinkingDashboards();
         }
       );
@@ -1029,7 +1032,7 @@ export class TemplateStepFourConnectComponent
     let templateDetailsData;
     let simulatorConfigFile = "";
     let simulatorFileName = "";
-    if(dashboard && dashboard.dynamicDashboardArray) {
+    if(dashboard && dashboard.dynamicDashboardArray && dashboard.dynamicDashboardArray.simulatorDTDL && dashboard.dynamicDashboardArray.simulatorDTDL.length > 0) {
       simulatorConfigFile = dashboard.dynamicDashboardArray.simulatorDTDL[0]?.simulatorFile;
       simulatorFileName = dashboard.dynamicDashboardArray.simulatorDTDL[0]?.simulatorFileName;
     } else {
@@ -1158,7 +1161,7 @@ export class TemplateStepFourConnectComponent
       response.dashboard = this.blankDashboardURL.dashboard;
       this.templateDetails.dashboards.push(response);
       this.loadTemplatesForCustomDashboard();
-      this.formValidation('onload', response.dashboard);
+      this.formValidation('onload', response);
       console.log('dashboards after custom dashboard assigned', this.templateDetails.dashboards);
     });
   }
@@ -1360,7 +1363,7 @@ export class TemplateStepFourConnectComponent
     if (type === 'onchange') {
       if (dashboard.enableSimulator && (!dashboard.simulatorGroupName || !dashboard.simulatorNoOfDevices)) {
         formValid = false;
-      } else if (dashboard.enableDeviceOrGroup && !dashboard.name) {
+      } else if ((dashboard.enableDeviceOrGroup) && (!dashboard.devices || dashboard.devices.length === 0)) {
         formValid = false;
       } else if (dashboard.enableLink && (!dashboard.defaultLinkedDashboard ||  dashboard.defaultLinkedDashboard === 'Select Link' || !dashboard.dashboardTemplateSelected)) {
         formValid = false;
@@ -1374,25 +1377,27 @@ export class TemplateStepFourConnectComponent
 
     if (type === 'onload') {
       if (this.templateDetails && this.templateDetails.dashboards) {
-        this.templateDetails.dashboards.forEach(dashboard => {
-          if (dashboard.isDeviceRequired) {
-            if (dashboard.enableSimulator && (!dashboard.simulatorGroupName || !dashboard.simulatorNoOfDevices)) {
+
+        for(let ts = 0; ts < this.templateDetails.dashboards.length; ts++) {
+          if (this.templateDetails.dashboards[ts].isDeviceRequired) {
+            if (this.templateDetails.dashboards[ts].enableSimulator && (!this.templateDetails.dashboards[ts].simulatorGroupName || !this.templateDetails.dashboards[ts].simulatorNoOfDevices)) {
               formValid = false;
-              return;
-            } else if (dashboard.enableDeviceOrGroup && !dashboard.name) {
+              break;
+            } else if ((this.templateDetails.dashboards[ts].enableDeviceOrGroup)  && (!this.templateDetails.dashboards[ts].devices || this.templateDetails.dashboards[ts].devices.length === 0)) {
               formValid = false;
-              return;
-            } else if (dashboard.enableLink && (!dashboard.defaultLinkedDashboard ||  dashboard.defaultLinkedDashboard === 'Select Link' || !dashboard.dashboardTemplateSelected)) {
+              break;
+            } else if (this.templateDetails.dashboards[ts].enableLink && (!this.templateDetails.dashboards[ts].defaultLinkedDashboard ||  this.templateDetails.dashboards[ts].defaultLinkedDashboard === 'Select Link' || !this.templateDetails.dashboards[ts].dashboardTemplateSelected)) {
               formValid = false;
-              return;
-            } else if ((dashboard.isGroupDashboard && !dashboard.selectedDashboardName) || (!dashboard.enableLink && !dashboard.selectedDashboardName)) {
+              break;
+            } else if ((this.templateDetails.dashboards[ts].isGroupDashboard && !this.templateDetails.dashboards[ts].selectedDashboardName) || (!this.templateDetails.dashboards[ts].enableLink && !this.templateDetails.dashboards[ts].selectedDashboardName)) {
               formValid = false;
-              return;
+              break;
             } else {
               formValid = true;
             }
           }
-        })
+        }
+        
       }
       
     }
