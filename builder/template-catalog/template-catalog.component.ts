@@ -35,7 +35,7 @@ import { AccessRightsService } from "../../builder/access-rights.service";
 import { ProgressIndicatorService } from "../../builder/utils/progress-indicator-modal/progress-indicator.service";
 import { ApplicationBinaryService } from "../../builder/application-binary.service";
 import { AlertMessageModalComponent } from "../utils/alert-message-modal/alert-message-modal.component";
-
+import { SimulatorConfigService } from "../../builder/simulator-config/simulator-config.service";
 
 enum TemplateCatalogStep {
     CATALOG,
@@ -74,7 +74,12 @@ export class TemplateCatalogModalComponent implements OnInit {
 
     public assetButtonText = "Device/Asset";
 
-    private groupTemplate = false;
+    groupTemplate = false;
+
+    simulatorChecked = false;
+    simGrpAssetName='';
+    simNoOfDevices;
+    simulatorFileContent;
 
     private appList = [];
 
@@ -121,7 +126,8 @@ export class TemplateCatalogModalComponent implements OnInit {
         private alertService: AlertService, private widgetCatalogService: WidgetCatalogService,
         private applicationBinaryService: ApplicationBinaryService, private sanitizer: DomSanitizer,
         private accessRightsService: AccessRightsService, private progressIndicatorService: ProgressIndicatorService, 
-        private invService: InventoryService, private pluginsService: PluginsService) {
+        private invService: InventoryService, private pluginsService: PluginsService,
+        private simulatorConfigService: SimulatorConfigService) {
         this.onSave = new Subject();
         this.onCancel = new Subject();
     }
@@ -327,6 +333,34 @@ export class TemplateCatalogModalComponent implements OnInit {
         if(this.templateDetails.input.devices && this.templateDetails.input.devices.length > 1){
             this.groupTemplate = false;
         }
+        if (this.simulatorChecked) {
+            let content = await this.simulatorConfigService.generateSimulatorFromConfiguration(this.simGrpAssetName, this.simNoOfDevices, this.simulatorFileContent, this.groupTemplate, '');
+            if (content && content.status == 0) {
+                // this.app.applicationBuilder.simulators = content.simulators;
+                this.app=content.app;
+                // this.templateDetails.input.devices = [
+                //     {
+                //         type: "Temperature Sensor",
+                //         placeholder: "DeviceTarget0",
+                //         reprensentation: {
+                //             id: content?.deviceId,
+                //             name: content?.deviceName,
+                //         },
+                //     },
+                // ];
+                for(let device of this.templateDetails.input.devices){
+                    device.reprensentation={
+                        id: content?.deviceId,
+                        name: content?.deviceName,
+                    };
+                }
+            }
+            else {
+                if (content && content.status) {
+                    this.alertService.danger(content.message);
+                }
+            }
+        }
         await this.catalogService.createDashboard(this.app, this.dashboardConfiguration, this.selectedTemplate, this.templateDetails, this.groupTemplate);
 
         this.hideProgressModalDialog();
@@ -465,13 +499,25 @@ export class TemplateCatalogModalComponent implements OnInit {
         if (!this.templateDetails.input.devices || this.templateDetails.input.devices.length === 0) {
             return true;
         }
-
-        for (let device of this.templateDetails.input.devices) {
-            if (!device.reprensentation) {
-                return false;
+        if (!this.simulatorChecked) {
+            for (let device of this.templateDetails.input.devices) {
+                if (!device.reprensentation) {
+                    return false;
+                }
             }
         }
-
+        else if(this.simulatorChecked){
+            if(!this.groupTemplate){
+                if(!this.simGrpAssetName){
+                    return false;
+                }
+            }
+            else if(this.groupTemplate){
+                if(!this.simGrpAssetName || !this.simNoOfDevices){
+                    return false;
+                }
+            }
+        }
         return true;
     }
 
@@ -556,6 +602,11 @@ export class TemplateCatalogModalComponent implements OnInit {
     async onFileSelected(files: FileList){
         this.fileSelected = files.item(0);
         this.fileJson = JSON.parse(await( this.readFileContents(this.fileSelected)));
+    }
+
+    async onSimulatorFileSelected(files: FileList){
+        let file=files.item(0);
+        this.simulatorFileContent=JSON.parse(await(this.readFileContents(file)));
     }
 
     readFileContents(file: File): Promise<string> {

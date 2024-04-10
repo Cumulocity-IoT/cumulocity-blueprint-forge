@@ -1219,7 +1219,8 @@ export class TemplateStepFourConnectComponent
       );
       if(content && content.status == 0)
       {
-          this.currentApp.applicationBuilder.simulators = content.simulators;
+          // this.currentApp.applicationBuilder.simulators = content.simulators;
+          this.currentApp=content.app;
           dashboard.name = content?.deviceId;
           dashboard.templateType = 1;
           dashboard.devices = [

@@ -59,7 +59,8 @@ export class SimulatorConfigService {
         let blueprintForgeDeviceDetails = {
             deviceId: "",
             deviceName: "",
-            simulators: "",
+            // simulators: "",
+            app:{},
             status: 0,
             message: "Success"
         }
@@ -166,8 +167,8 @@ export class SimulatorConfigService {
 
         simulators.push(newSimulatorObject);
         appServiceData.applicationBuilder.simulators = simulators;
-
-        await this.appService.update({
+        
+        const app= await this.appService.update({
             id: appId,
             applicationBuilder: appServiceData.applicationBuilder
         } as any);
@@ -185,7 +186,7 @@ export class SimulatorConfigService {
         blueprintForgeDeviceDetails = {
             deviceId: newConfig.deviceId,
             deviceName: newConfig.deviceName,
-            simulators: simulators,
+            app: app.data,
             status: 0,
             message: "Success"
         }
