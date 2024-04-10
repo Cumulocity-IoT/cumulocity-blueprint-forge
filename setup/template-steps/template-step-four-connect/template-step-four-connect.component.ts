@@ -308,7 +308,6 @@ export class TemplateStepFourConnectComponent
 
   for (let ts=0; ts < this.templateDetails.dashboards.length; ts++) {
     if (this.templateDetails.dashboards[ts].enableSimulator && this.templateDetails.dashboards[ts].simulatorFileExists === false) {
-      console.log('dashboard value', this.templateDetails.dashboards[ts]);
       simulatorWarningPopup = true;
       break;
     } else {
@@ -320,7 +319,6 @@ export class TemplateStepFourConnectComponent
     const simulatorDialofRef = this.alertModalDialog(alertMessage);
     await simulatorDialofRef.content.event.subscribe(async data => {
       if (data && data.isConfirm) {
-        console.log('Continue creating the application');
         this.configureApp(app);
       } else {
         return false;
@@ -895,7 +893,6 @@ export class TemplateStepFourConnectComponent
     this.templateDetails.dashboards[index].dynamicDashboardTemplate =
       event.item;
     this.loadTemplateDetailsFromDC(event.item, index);
-    console.log('Dashboards after selecting templates', this.templateDetails.dashboards);
   }
 
   async checkForSimulatorConfig(event, index) {
@@ -938,7 +935,6 @@ export class TemplateStepFourConnectComponent
             ? catalog
             : [];
             this.blankDashboardURL = this.filterTemplates.find(urlObject => urlObject.title === 'Blank Dashboard');
-            console.log('this.blankDashboardURL', this.blankDashboardURL);
           let findMatchedIdObject;
           this.templateDetails.dashboards.forEach((item, index) => {
             if (item.linkWithDashboard) {
@@ -1046,15 +1042,17 @@ export class TemplateStepFourConnectComponent
 
     const SimulatorConfigFiles = [];
     let currentSimulatorData;
-    currentSimulatorData = await (
-      await this.loadTemplateDetails(simulatorConfigFile)
-    ).toPromise();
-    
-    SimulatorConfigFiles.push({
-      fileName: simulatorFileName,
-      fileContent: currentSimulatorData,
-    });
 
+    if (simulatorConfigFile) {
+      currentSimulatorData = await (
+        await this.loadTemplateDetails(simulatorConfigFile)
+      ).toPromise();
+
+      SimulatorConfigFiles.push({
+        fileName: simulatorFileName,
+        fileContent: currentSimulatorData,
+      });
+    }
     dashboard.simulatorConfigFiles = SimulatorConfigFiles;
   }
 
@@ -1161,7 +1159,6 @@ export class TemplateStepFourConnectComponent
       this.templateDetails.dashboards.push(response);
       this.loadTemplatesForCustomDashboard();
       this.formValidation('onload', response);
-      console.log('dashboards after custom dashboard assigned', this.templateDetails.dashboards);
     });
   }
 
@@ -1347,7 +1344,6 @@ export class TemplateStepFourConnectComponent
       )
       .subscribe(
         (catalog: any) => {
-          console.log('catalog from custom', catalog);
         },
         (error) => {
           this.alertService.danger(

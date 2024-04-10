@@ -10,6 +10,13 @@ Blueprint Forge provides a simple, coding-free way to build cumulocity applicati
 ## What's new?
 
 * **Multiple Welcome Templates:** Now user can select Welcome Dashboard while creating application. Choose from a variety of Welcome Templates tailored to your needs.
+* **Tailor Your Simulation:** Your Choice or Auto-Magic Based on Dashboard Pick.
+* **Link Device from Dashboard:** Link Device with a Click to Another Dashboard.
+* **Craft Your Dashboard:** Pick a Template, Fill it with Flair.
+* **New Custom Template:** Customize Devices, Choose Template, Go.
+* **Seamless DTDL Generation:** Mimic Real Devices, Anywhere, Anytime.
+* **Enhanced Dashboard Catalog:** Dashboards at Your Fingertips. Find Your Fit with Ease!
+* **Share Dashboards:** Share, Reuse, Shine. Your Custom Dashboards, Everywhere You Go, within Tenant or across Tenants.
 * **Various bug fixes**
 
 ## Features
@@ -22,6 +29,16 @@ Blueprint Forge provides a simple, coding-free way to build cumulocity applicati
 * **Support for Device group and Asset Type:** Link not just devices, user can also link Device Group and Asset type with the dashboard.
 * **Configure while creating:** User can configure the application while creating it.
 * **Custom Branding:** Provides flexibility and control over application’s look and feel. Now user can use color picker to choose millions of colors to customize branding. Header, Action bar and tab bar are also customizable. User can add his own branding by choosing different colors of his choice in the application. 
+* **Configure Simulator:** Configure the simulator as desired, or we can also auto-configure based on the selected dashboard template.
+* **Link Device from Dashboard:** Map devices from another dashboard by choosing the dashboard to link with.
+* **Select Dashboard Template:** Now you can choose a template for your dashboard, it will include all the details from the selected template.
+* **New Custom Template:** Add a custom template where you can customize which devices to link and also choose the dashboard template.
+* **Generate DTDL:** Generate DTDL files effortlessly based on existing device measurements and simulate real device behavior within the same or different tenants.
+* **Enhanced Dashboard Catalog:** Effortlessly find various dashboard templates tailored to your needs.
+With intuitive search functionality, selecting the perfect dashboard template has never been easier.
+* **Share Dashboards:** Effortlessly share and reuse your customized Dashboards within your own tenant or across different tenants.
+Now, easily add your personalized Dashboards to the catalog for seamless access.
+
 ## Installation
 
 ### Install Blueprint Forge
