@@ -81,11 +81,13 @@
                                         </div>
 
                                         <input type="text" class="form-control group-name-inp" placeholder="Group/Type Name"
+                                        required
                                           [(ngModel)]="dashboard.simulatorGroupName"
                                           (change)="checkAndGenerateLinks(dashboard)"
                                           [ngModelOptions]="{standalone: true}"/>
 
                                         <input type="number" class="form-control count-inp" placeholder="# of Devices"
+                                        required
                                           [(ngModel)]="dashboard.simulatorNoOfDevices" min="1" max="5"
                                           (change)="checkAndGenerateLinks(dashboard)"
                                           [ngModelOptions]="{standalone: true}"/>
@@ -170,7 +172,8 @@
                                     [typeaheadMinLength]="2"
                                     (typeaheadOnSelect)="assignSelectedDashboard(i, $event)"
                                     (typeaheadNoResults)="formValidation('onload', dashboard)"
-                                    [ngModelOptions]="{standalone: true}">
+                                    [ngModelOptions]="{standalone: true}"
+                                    required>
                                 </div>
                               </div>
 
@@ -182,7 +185,8 @@
                                     [typeaheadMinLength]="2"
                                     (typeaheadOnSelect)="assignSelectedDashboard(i, $event)"
                                     (typeaheadNoResults)="formValidation('onload', dashboard)"
-                                    [ngModelOptions]="{standalone: true}">
+                                    [ngModelOptions]="{standalone: true}"
+                                    required>
                                 </div>
                               </div>
                               <div class="col-md-1 col-sm-1 warning-width" >

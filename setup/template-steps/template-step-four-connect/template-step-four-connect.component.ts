@@ -307,7 +307,8 @@ export class TemplateStepFourConnectComponent
   }
 
   for (let ts=0; ts < this.templateDetails.dashboards.length; ts++) {
-    if (this.templateDetails.dashboards[ts].simulatorFileExists === false) {
+    if (this.templateDetails.dashboards[ts].enableSimulator && this.templateDetails.dashboards[ts].simulatorFileExists === false) {
+      console.log('dashboard value', this.templateDetails.dashboards[ts]);
       simulatorWarningPopup = true;
       break;
     } else {
@@ -328,17 +329,14 @@ export class TemplateStepFourConnectComponent
   } else {
     this.configureApp(app);
   }
-  
   }
 
   async configureApp(app: any) {
-   
     const currentHost = window.location.host.split(":")[0];
     if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
       this.alert.warning("Installation isn't supported when running Application on localhost.");
       return;
     }
-
 
     this.templateDetails.plugins = this.templateDetails.plugins.reduce(
       (accumulator, current) => {
