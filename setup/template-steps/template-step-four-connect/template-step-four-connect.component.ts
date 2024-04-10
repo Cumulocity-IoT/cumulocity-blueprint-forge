@@ -158,9 +158,10 @@ export class TemplateStepFourConnectComponent
 
     this.setup.data$.subscribe(async data => {
       if (data.blueprintForge && data.blueprintForge != '') {
-        if (this.blueprintForge.templateDetail && this.templateId !== data.blueprintForge.templateDetail?.templateId) {
-          this.templateId = data.blueprintForge.templateDetail.templateId;
-          this.templateDetails = data.blueprintForge.templateDetail;
+        const templateDetails = JSON.parse(sessionStorage.getItem("blueprintForge_ActiveTemplateDetails"));
+        if (templateDetails && this.templateId !== templateDetails?.templateId) {
+          this.templateId = templateDetails.templateId;
+          this.templateDetails = templateDetails;
           this.prepareDashboardList();
           this.pluginDetailsArray = cloneDeep(this.templateDetails?.plugins);
           this.microserviceArray = cloneDeep(this.templateDetails?.microservices);

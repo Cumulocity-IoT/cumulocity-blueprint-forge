@@ -25,7 +25,6 @@ const DEFAULT_CONFIG: BlueprintForge = {
   plugins: [],
   dashboards: [],
   microservices: [],
-  templateDetail: undefined,
   selectedWelcomeTemplate: undefined
 };
 

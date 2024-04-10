@@ -52,7 +52,8 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep {
     super(stepper, step, setup, appState, alert, setupConfigService);
     this.setup.data$.subscribe(data => {
       if (data.blueprintForge && data.blueprintForge != '') {
-        if (this.dataBlueprintForgeURL !== data.blueprintForge.templateURL || !this.blueprintForge?.templateDetail) {
+        const templateDetails = JSON.parse(sessionStorage.getItem("blueprintForge_ActiveTemplateDetails"));
+        if (this.dataBlueprintForgeURL !== data.blueprintForge.templateURL || !templateDetails) {
           this.templateDetails = null;
           this.dataBlueprintForgeURL = data.blueprintForge.templateURL;
           this.loadTemplateDetailsCatalog(this.dataBlueprintForgeURL);
@@ -86,8 +87,7 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep {
         } else {
           this.images = [];
         }
-      //  this.templateCatalogSetupService.templateData.next(this.templateDetails);
-        this.blueprintForge.templateDetail = this.templateDetails;
+        sessionStorage.setItem("blueprintForge_ActiveTemplateDetails", JSON.stringify(this.templateDetails));
       }, error => {
         this.alertService.danger("There is some technical error! Please try after sometime.");
       });

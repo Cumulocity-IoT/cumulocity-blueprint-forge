@@ -100,11 +100,12 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep{
 
     this.setup.data$.subscribe(async data => {
       if (data.blueprintForge && data.blueprintForge != '') {
-        if (this.blueprintForge.templateDetail && this.templateId !== data.blueprintForge.templateDetail?.templateId) {
-          this.templateId = data.blueprintForge.templateDetail.templateId;
+        const templateDetails = JSON.parse(sessionStorage.getItem("blueprintForge_ActiveTemplateDetails"));
+        if (templateDetails && this.templateId !== templateDetails?.templateId) {
+          this.templateId = templateDetails.templateId;
           this.templateSelected = "Default Template";
           this.blueprintForge.selectedWelcomeTemplate = this.templateSelected;
-          this.templateDetails = data.blueprintForge.templateDetail;
+          this.templateDetails = templateDetails;
         }
         if (!(this.templateDetails?.input) || !(this.templateDetails?.input?.devices) || !(this.templateDetails?.input?.devices?.length > 0)) {
           this.deviceFormValid = true;
@@ -216,8 +217,7 @@ async saveAppChanges(app) {
     await basicConfigurationRef.content.event.subscribe(async data => {
       if (data && data.isConfirm) {
         this.templateDetails.dashboards[index].basicConfig = data.basicConfigParams;
-        this.blueprintForge.templateDetail = this.templateDetails;
-        //this.templateCatalogSetupService.templateData.next(this.templateDetails);
+        sessionStorage.setItem("blueprintForge_ActiveTemplateDetails", JSON.stringify(this.templateDetails));
       }
     });
   }
