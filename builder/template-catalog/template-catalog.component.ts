@@ -373,8 +373,8 @@ export class TemplateCatalogModalComponent implements OnInit {
 //-----------------Update validation once logic is ready----------------------------
     isSaveButtonEnabled(): boolean {
         return this.templateDetails && this.isNameAvailable()
-            // && (!this.templateDetails.input.devices || this.templateDetails.input.devices.length === 0 || this.isDevicesSelected())
-            // && (!this.templateDetails.input.images || this.templateDetails.input.images.length === 0 || this.isImagesSelected());
+            && (!this.templateDetails.input.devices || this.templateDetails.input.devices.length === 0 || this.isDevicesSelected())
+            && (!this.templateDetails.input.images || this.templateDetails.input.images.length === 0 || this.isImagesSelected());
     }
 
     isCatalogDisplayed(): boolean {
@@ -502,13 +502,25 @@ export class TemplateCatalogModalComponent implements OnInit {
         if (!this.templateDetails.input.devices || this.templateDetails.input.devices.length === 0) {
             return true;
         }
-
-        for (let device of this.templateDetails.input.devices) {
-            if (!device.reprensentation) {
-                return false;
+        if (!this.simulatorChecked) {
+            for (let device of this.templateDetails.input.devices) {
+                if (!device.reprensentation) {
+                    return false;
+                }
             }
         }
-
+        else if(this.simulatorChecked){
+            if(!this.groupTemplate){
+                if(!this.simGrpAssetName){
+                    return false;
+                }
+            }
+            else if(this.groupTemplate){
+                if(!this.simGrpAssetName || !this.simNoOfDevices){
+                    return false;
+                }
+            }
+        }
         return true;
     }
 
