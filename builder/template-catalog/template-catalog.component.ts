@@ -336,10 +336,8 @@ export class TemplateCatalogModalComponent implements OnInit {
         if (this.simulatorChecked) {
             let content = await this.simulatorConfigService.generateSimulatorFromConfiguration(this.simGrpAssetName, this.simNoOfDevices, this.simulatorFileContent, this.groupTemplate, '');
             if (content && content.status == 0) {
-                console.log("content:", content);
                 // this.app.applicationBuilder.simulators = content.simulators;
                 this.app=content.app;
-                console.log("devices:",this.templateDetails);
                 // this.templateDetails.input.devices = [
                 //     {
                 //         type: "Temperature Sensor",
@@ -363,14 +361,13 @@ export class TemplateCatalogModalComponent implements OnInit {
                 }
             }
         }
-        console.log("templateDetails:",this.templateDetails);
         await this.catalogService.createDashboard(this.app, this.dashboardConfiguration, this.selectedTemplate, this.templateDetails, this.groupTemplate);
 
         this.hideProgressModalDialog();
         this.onSave.next(this.isReloadRequired);
         this.modalRef.hide();
     }
-//-----------------Update validation once logic is ready----------------------------
+
     isSaveButtonEnabled(): boolean {
         return this.templateDetails && this.isNameAvailable()
             && (!this.templateDetails.input.devices || this.templateDetails.input.devices.length === 0 || this.isDevicesSelected())
@@ -608,10 +605,8 @@ export class TemplateCatalogModalComponent implements OnInit {
     }
 
     async onSimulatorFileSelected(files: FileList){
-        console.log("files:",files);
         let file=files.item(0);
         this.simulatorFileContent=JSON.parse(await(this.readFileContents(file)));
-        console.log(this.simulatorFileContent);
     }
 
     readFileContents(file: File): Promise<string> {
