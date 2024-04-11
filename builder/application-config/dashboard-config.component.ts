@@ -109,6 +109,7 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
     forceUpdate = false;
     expandEventSubject: Subject<void> = new Subject<void>();
     isFilterActive: boolean = false;
+    simulators: [];
 
     constructor(
         private appIdService: AppIdService, private appService: ApplicationService, private appStateService: AppStateService,
@@ -132,6 +133,7 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
                 this.newAppName = app.name;
                 this.newAppContextPath = app.contextPath;
                 this.newAppIcon = app.applicationBuilder.icon;
+                this.simulators = app.applicationBuilder.simulators;
             })
         );
 
@@ -141,6 +143,7 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
                 if (this.forceUpdate) {
                     this.appDataService.forceUpdate = true;
                 }
+                app.applicationBuilder.simulators = [...this.simulators]
                 await this.appService.update(app);
                 this.appDataService.refreshAppForDashboard.next();
                 this.navigation.refresh();

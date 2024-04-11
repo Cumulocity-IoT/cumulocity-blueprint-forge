@@ -507,6 +507,9 @@ export class TemplateCatalogModalComponent implements OnInit {
             }
         }
         else if(this.simulatorChecked){
+            if(!this.simulatorFileContent) {
+                return false;
+            }
             if(!this.groupTemplate){
                 if(!this.simGrpAssetName){
                     return false;
