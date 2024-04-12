@@ -132,6 +132,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep{
   } */
 
    async updateAppConfiguration(app: any) {
+    sessionStorage.setItem("blueprintForge_ActiveTemplateDetails", JSON.stringify(this.templateDetails));
     if (this.currentApp.name !== this.newAppName ||
       this.currentApp.contextPath !== this.newAppContextPath ||
       (this.currentApp.applicationBuilder && this.currentApp.applicationBuilder.icon !== this.newAppIcon)) {

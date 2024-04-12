@@ -103,6 +103,33 @@ Follow below steps to upgrade your application:
 
 Congratulations! You have successfully updated your application. You can see the latest version next to your application name.
 
+#### How to create Blueprint Forge application
+
+Blueprint Forge provides various options and flexibility while you create your application. You can configure your device, simulate it or also link device of other dashboard.
+
+1. Go to Extensions -> Click Blueprint Forge.
+2. Click on Deploy application. Edit application name and other details if required.
+3. Click on Open and open the created application.
+4. Click on Start -> Choose the template and click on Continue.
+5. You will be navigated to Details step. Click on continue.
+6. In this step you can choose Welcome template from various templates available.
+7. You can also edit the Application Configuration in this step.
+8. Click on Continue.
+9. In the Connect step, you can configure simulator/device or link your dashboard with another.
+10. In case of simulator, click on Simulator icon and fill the Group name and Number of devices field and select the Dashoard template of your choice. 
+11. In case of Device, click on Device icon and select Device/Group/Type and select the dashboard template of your choice.
+12. In case of Link Dashboard, click on Link icon and select the Dashboard (the dashboard will have same device of link dashboard
+which you choose) and select the Dashboard template of your choice.
+13. You can also proceed with default configuration provided within this step.
+14. Click on Continue. All the necessary plugins/microservices and other dependencies will be installed required for the dashboards.
+15. Click on Save and reload.
+
+Congratulations! You have successfully created an application using Blueprint Forge with template of your choice.
+
+16. You can simulator created in case of simulator selected and also other devices and links configured properly.
+
+
+
 ------------------------------
 
 The Blueprint Forge provided as-is and without warranty or support. They do not constitute part of the Software AG product suite. Users are free to use, fork and modify them, subject to the license agreement. While Software AG welcomes contributions, we cannot guarantee to include every contribution in the master project.
