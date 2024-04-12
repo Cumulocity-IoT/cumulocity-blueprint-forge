@@ -993,7 +993,7 @@ export class TemplateStepFourConnectComponent
     this.templateDetails.dashboards = commonDashboards.concat(functionalDashboards);
     this.templateDetails.dashboards.push(helpAndSupport);
 
-    this.templateDetails.dashboards.forEach((dashboard, index) => {
+    this.templateDetails.dashboards.forEach(async (dashboard, index) => {
       dashboard.enableSimulator = false;
       dashboard.enableDeviceOrGroup = true;
       dashboard.enableLink = false;
@@ -1020,6 +1020,33 @@ export class TemplateStepFourConnectComponent
       dashboard.selectedDashboardName = dashboard.title;
       dashboard.dashboardTemplateSelected = dashboard.title;
       dashboard.defaultLinkedDashboard ="Select Link";
+      let templateDetailsData;
+      let dashboardURL;
+      let pluginDependencies;
+      if (dashboard.selectedDashboardName) {
+        dashboardURL = this.filterTemplates.find(urlObject => urlObject.title === dashboard.selectedDashboardName);
+        templateDetailsData = await (
+          await this.loadTemplateDetails(dashboardURL.dashboard)
+        ).toPromise();
+
+        pluginDependencies = templateDetailsData?.input?.dependencies.filter(
+          (pluginDep) => pluginDep.type === "plugin"
+        );
+        this.templateDetails.plugins =
+          this.templateDetails.plugins.concat(pluginDependencies);
+      }
+      if (dashboard.dashboardTemplateSelected) {
+        dashboardURL = this.filterTemplates.find(urlObject => urlObject.title === dashboard.dashboardTemplateSelected);
+        templateDetailsData = await (
+          await this.loadTemplateDetails(dashboardURL.dashboard)
+        ).toPromise();
+
+        pluginDependencies = templateDetailsData?.input?.dependencies.filter(
+          (pluginDep) => pluginDep.type === "plugin"
+        );
+        this.templateDetails.plugins =
+          this.templateDetails.plugins.concat(pluginDependencies);
+      }
     });
   }
 
