@@ -33,7 +33,7 @@ Blueprint Forge provides a simple, coding-free way to build cumulocity applicati
 * **Link Device from Dashboard:** Map devices from another dashboard by choosing the dashboard to link with.
 * **Select Dashboard Template:** Now you can choose a template for your dashboard, it will include all the details from the selected template.
 * **New Custom Template:** Add a custom template where you can customize which devices to link and also choose the dashboard template.
-* **Generate DTDL:** Generate DTDL files effortlessly based on existing device measurements and simulate real device behavior within the same or different tenants. For more information about DTDL Generator. Refer [DTDL Generation](docs\DTDL_Generator\README.md)
+* **Generate DTDL:** Generate DTDL files effortlessly based on existing device measurements and simulate real device behavior within the same or different tenants. For more information about DTDL Generator. Refer [DTDL Generation](docs/DTDL_Generator\README.md)
 * **Enhanced Dashboard Catalog:** Effortlessly find various dashboard templates tailored to your needs.
 With intuitive search functionality, selecting the perfect dashboard template has never been easier.
 * **Share Dashboards:** Effortlessly share and reuse your customized Dashboards within your own tenant or across different tenants.

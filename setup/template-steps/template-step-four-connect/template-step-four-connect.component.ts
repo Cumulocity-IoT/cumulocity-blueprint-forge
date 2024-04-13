@@ -157,9 +157,13 @@ export class TemplateStepFourConnectComponent
     });
 
     this.setup.data$.subscribe(async data => {
+      let anyDashboardDeselected;
       if (data.blueprintForge && data.blueprintForge != '') {
         const templateDetails = JSON.parse(sessionStorage.getItem("blueprintForge_ActiveTemplateDetails"));
-        if (templateDetails && this.templateId !== templateDetails?.templateId) {
+        if (templateDetails && templateDetails?.dashboards) {
+          anyDashboardDeselected = templateDetails.dashboards.find(dashboard => dashboard.selected === false);
+        }
+        if ((templateDetails && this.templateId !== templateDetails?.templateId) || anyDashboardDeselected) {
           this.templateId = templateDetails.templateId;
           this.templateDetails = templateDetails;
           this.prepareDashboardList();
@@ -331,10 +335,17 @@ export class TemplateStepFourConnectComponent
 
   async configureApp(app: any) {
     const currentHost = window.location.host.split(":")[0];
-    if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
-      this.alert.warning("Installation isn't supported when running Application on localhost.");
-      return;
+    // if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
+    //   this.alert.warning("Installation isn't supported when running Application on localhost.");
+    //   return;
+    // }
+    
+    let defaultDashboardNotChanged = this.templateDetails.dashboards.filter(item => item.title !== 'Instruction' && item.title !== 'Help and Support' && item.title !== 'Welcome' && (item.selectedDashboardName === item.title || item.dashboardTemplateSelected === item.title));
+    if (defaultDashboardNotChanged) {
+      for (let [index, dashb] of defaultDashboardNotChanged.entries()) {
+        this.loadTemplateDetailsFromDC(dashb, index);
     }
+  }
 
     this.templateDetails.plugins = this.templateDetails.plugins.reduce(
       (accumulator, current) => {
@@ -1020,33 +1031,6 @@ export class TemplateStepFourConnectComponent
       dashboard.selectedDashboardName = dashboard.title;
       dashboard.dashboardTemplateSelected = dashboard.title;
       dashboard.defaultLinkedDashboard ="Select Link";
-      let templateDetailsData;
-      let dashboardURL;
-      let pluginDependencies;
-      if (dashboard.selectedDashboardName) {
-        dashboardURL = this.filterTemplates.find(urlObject => urlObject.title === dashboard.selectedDashboardName);
-        templateDetailsData = await (
-          await this.loadTemplateDetails(dashboardURL.dashboard)
-        ).toPromise();
-
-        pluginDependencies = templateDetailsData?.input?.dependencies.filter(
-          (pluginDep) => pluginDep.type === "plugin"
-        );
-        this.templateDetails.plugins =
-          this.templateDetails.plugins.concat(pluginDependencies);
-      }
-      if (dashboard.dashboardTemplateSelected) {
-        dashboardURL = this.filterTemplates.find(urlObject => urlObject.title === dashboard.dashboardTemplateSelected);
-        templateDetailsData = await (
-          await this.loadTemplateDetails(dashboardURL.dashboard)
-        ).toPromise();
-
-        pluginDependencies = templateDetailsData?.input?.dependencies.filter(
-          (pluginDep) => pluginDep.type === "plugin"
-        );
-        this.templateDetails.plugins =
-          this.templateDetails.plugins.concat(pluginDependencies);
-      }
     });
   }
 
