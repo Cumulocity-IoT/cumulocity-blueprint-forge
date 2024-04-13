@@ -340,12 +340,12 @@ export class TemplateStepFourConnectComponent
     //   return;
     // }
     
-    let defaultDashboardNotChanged = this.templateDetails.dashboards.filter(item => item.title !== 'Instruction' && item.title !== 'Help and Support' && item.title !== 'Welcome' && (item.selectedDashboardName === item.title || item.dashboardTemplateSelected === item.title));
-    if (defaultDashboardNotChanged) {
-      for (let [index, dashb] of defaultDashboardNotChanged.entries()) {
-        this.loadTemplateDetailsFromDC(dashb, index);
-    }
-  }
+  //   let defaultDashboardNotChanged = this.templateDetails.dashboards.filter(item => item.title !== 'Instruction' && item.title !== 'Help and Support' && item.title !== 'Welcome' && (item.selectedDashboardName === item.title || item.dashboardTemplateSelected === item.title));
+  //   if (defaultDashboardNotChanged) {
+  //     for (let [index, dashb] of defaultDashboardNotChanged.entries()) {
+  //       this.loadTemplateDetailsFromDC(dashb, index);
+  //   }
+  // }
 
     this.templateDetails.plugins = this.templateDetails.plugins.reduce(
       (accumulator, current) => {
