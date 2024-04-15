@@ -1,0 +1,141 @@
+.font-large {
+    font-size: x-large;
+    cursor: pointer;
+}
+.padd-bottom {
+    padding-bottom: 1.3%;
+}
+.title-width {
+    width: 11%;
+    padding-top: 4px;
+}
+.simulator-section {
+    padding-right: 22%;
+}
+.enable-sim {
+    padding-left: 0; 
+    max-width: 100%; 
+    text-align: end;
+}
+.sim-width {
+    width: 13%;
+}
+.set-margin {
+    margin-left: -4%;
+}
+.pad-left {
+    padding-left: 0;
+}
+.wd-100 {
+    width: 100%;
+}
+.heading-align {
+    margin-bottom: 1%;
+    
+}
+.btn-xs-warning {
+    padding: var(--c8y-btn-padding-xs-vertical) var(--c8y-btn-padding-xs-horizontal);
+    font-size: var(--c8y-btn-font-size-xs);
+    line-height: var(--c8y-btn-line-height-xs);
+    border-radius: var(--c8y-btn-border-radius-xs);
+    height: calc(var(--c8y-unit-base)* 2);
+    position: relative;
+}
+.btn-icon:hover {
+    outline: none !important;
+}
+.download-file {
+    width: 36%; 
+    font-size: large;
+    color: var(--brand-primary, var(--c8y-brand-primary));
+}
+.simulator-warning {
+    margin-left: 10px; 
+    color: #DC143C; 
+    border: none; 
+    font-size: 18px !important; 
+    margin-top: -21px;
+}
+.flt-right {
+    float: right;
+}
+.grid-align {
+    text-align:center;
+    padding-top: 10px;
+}
+.align-left {
+    text-align: left;
+}
+.dashboard-div-height {
+    min-height: 300px;
+}
+.title-font {
+    font-weight: 550;
+}
+.padd-0 {
+    padding:0;
+}
+.group-name-inp {
+    margin-right: 3%;
+}
+.count-inp {
+    margin-right: 2%; 
+    width: 50%;
+}
+.device-div {
+    padding-left: 0; 
+    max-width: 100%; 
+    text-align: end;
+}
+.link-list {
+    max-height: 225px; 
+    overflow-y: auto;
+}
+.fl-rgt {
+    float: right;
+}
+.heading-name {
+    width: 24.3%;
+}
+.heading-configure {
+    width: 29%;
+}
+.heading-template {
+    width: 17.4%;
+}
+.warning-mr {
+    margin-top: 11px;
+}
+.download-mr {
+    margin-top: 3px;
+}
+.simulator-ok {
+    margin-left: 10px; 
+    color: green; 
+    border: none; 
+    font-size: 18px; 
+    margin-top: -2px;
+}
+.warning-width {
+    width: 5%;
+}
+.pointer-icon {
+    cursor: pointer;
+}
+.scroll-div {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.scroll-div::-webkit-scrollbar {
+    width: 5px;
+  }
+  .scroll-div::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+  }
+  .scroll-div::-webkit-scrollbar-thumb {
+    background: #888; 
+  }
+  .scroll-div::-webkit-scrollbar-thumb:hover {
+    background: #555; 
+  }
+  

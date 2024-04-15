@@ -10,6 +10,13 @@ Blueprint Forge provides a simple, coding-free way to build cumulocity applicati
 ## What's new?
 
 * **Multiple Welcome Templates:** Now user can select Welcome Dashboard while creating application. Choose from a variety of Welcome Templates tailored to your needs.
+* **Tailor Your Simulation:** Select the Dashboard template to create simulator or use our pre-configured one.
+* **Link Device from Dashboard:** Link Device with a Click to Another Dashboard.
+* **Configure Your Dashboard:** Configure your dashboard by assigning Actual Device or Simulating it.
+* **Add Custom Dashboard:** Now user can select pre-built templates for custom dashboards.
+* **Enhanced Dashboard Catalog:** Users can now select and filter dashboard templates, as well as create simulators directly from the Dashboard Catalog.
+* **Share Dashboards:** Share and Reuse. Add your Custom Dashboards to the Catalog by using "Add to Catalog" button and Share it within Tenant or export and use it in other tenants.
+* **DTDL Generator Plugin:** New DTDL plugin to generate DTDL or simulator configuration files based on existing device and measurements.
 * **Various bug fixes**
 
 ## Features
@@ -22,6 +29,14 @@ Blueprint Forge provides a simple, coding-free way to build cumulocity applicati
 * **Support for Device group and Asset Type:** Link not just devices, user can also link Device Group and Asset type with the dashboard.
 * **Configure while creating:** User can configure the application while creating it.
 * **Custom Branding:** Provides flexibility and control over application’s look and feel. Now user can use color picker to choose millions of colors to customize branding. Header, Action bar and tab bar are also customizable. User can add his own branding by choosing different colors of his choice in the application. 
+* **Configure Simulator:** Configure the simulator as desired, or we can also auto-configure based on the selected dashboard template.
+* **Link Device from Dashboard:** Map devices from another dashboard by choosing the dashboard to link with.
+* **Select Dashboard Template:** Now you can choose a template for your dashboard, it will include all the details from the selected template.
+* **Add Custom Dashboard:** Add a custom dashboard where you can customize which devices to link and also choose the dashboard template.
+* **Generate DTDL:** Generate DTDL file or Simulator configuration file effortlessly based on existing device measurements and simulate real device behaviour within the same or different tenants. For more information about DTDL Generator. Refer [DTDL Generation](docs/DTDL_Generator/README.md)
+* **Enhanced Dashboard Catalog:** Effortlessly find various dashboard templates tailored to your needs. With intuitive search functionality, selecting the perfect dashboard template has never been easier. You can now also create simulator directly from Dashboard Catalog.
+* **Share Dashboards:** Effortlessly share and reuse your customized Dashboards within your own tenant or across different tenants. Now, easily add your personalized Dashboards to the catalog for seamless access using "Add to Catalog". 
+
 ## Installation
 
 ### Install Blueprint Forge
@@ -85,6 +100,37 @@ Follow below steps to upgrade your application:
 4. Pop up appears for confirmation. Click on "Update" to upgrade your application.
 
 Congratulations! You have successfully updated your application. You can see the latest version next to your application name.
+
+#### How to create Blueprint Forge application
+
+Blueprint Forge provides various options and flexibility while you create your application. You can configure your device, simulate it or also link device of another dashboard.
+
+1. Go to Extensions -> Click Blueprint Forge.
+2. Click on Deploy application. Edit application name and other details if required.
+3. Click on Open and open the created application.
+4. Click on Start -> Choose the template and click on Continue.
+5. You will be navigated to Details step. Click on continue.
+6. In this step you can choose Welcome template from various templates available and can edit the Application Configuration.
+7. Click on Continue.
+8. In the Connect step, you can configure Devices/Simulators/link your dashboard with another. You can also proceed with default configuration.
+9. In case of Device:
+   - Click on Device icon and select Device/Group/Type.
+   - Select the dashboard template of your choice.
+10. In case of simulator:
+    - Click on Simulator icon and fill the Group name and Number of devices field.
+    - Select the Dashboard template of your choice.
+11. In case of Link Dashboard:
+    - Click on Link icon.
+    - Select the Dashboard (the dashboard will have same device of link dashboard which you choose) and select the Dashboard template of your choice.
+12. You can also proceed with default configuration provided within this step.
+13. Click on Continue. All the necessary plugins/microservices and other dependencies will be installed required for the dashboards.
+14. Click on Save and reload.
+
+Congratulations! You have successfully created an application using Blueprint Forge with template of your choice.
+
+For more details, please visit our [Step-by-Step How-To Video Guide](https://open-source.softwareag.com/cumulocity-blueprint-forge/).
+
+
 
 ------------------------------
 

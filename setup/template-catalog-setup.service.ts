@@ -18,11 +18,12 @@
 import { HttpClient, HttpHeaders, HttpResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
-import { catchError, map } from "rxjs/operators";
+import { catchError,  map } from "rxjs/operators";
+import * as delay from "delay";
 import { has, get } from "lodash-es";
 import { ApplicationService, InventoryBinaryService, InventoryService } from "@c8y/ngx-components/api";
-import { CumulocityDashboard } from "builder/template-catalog/template-catalog.model";
-import { TemplateBlueprintDetails, TemplateBlueprintEntry, WelcomeTemplate } from "./template-setup.model";
+import { CumulocityDashboard, TemplateCatalogEntry } from "./../builder/template-catalog/template-catalog.model";
+import { TemplateBlueprintDetails, TemplateBlueprintEntry } from "./template-setup.model";
 import { AppBuilderExternalAssetsService } from "app-builder-external-assets";
 
 const packageJson = require('./../package.json');
@@ -38,11 +39,29 @@ export class TemplateCatalogSetupService {
     private preprodBranchPath = "?ref=preprod";
     pkgVersion: any;
     private isFallBackActive = false;
-    public templateData = new BehaviorSubject<TemplateBlueprintDetails>(undefined);
-    templateData$ = this.templateData.asObservable();
 
-    public welcomeTemplateData = new BehaviorSubject<WelcomeTemplate>(undefined);
-    welcomeTemplateData$ = this.welcomeTemplateData.asObservable();
+    public welcomeTemplateData: any = [];
+
+    public blankTemplate = new BehaviorSubject(false);
+    blankTemplate$ = this.blankTemplate.asObservable();
+
+
+    public dynamicDashboardTemplate = new BehaviorSubject<any>(undefined);
+    dynamicDashboardTemplate$ = this.dynamicDashboardTemplate.asObservable();
+
+    public dynamicDashboardTemplateDetails =  new BehaviorSubject<any>([]);
+    dynamicDashboardTemplateDetails$ = this.dynamicDashboardTemplateDetails.asObservable();
+
+/*     public dynamicPlugins =  new BehaviorSubject<any>([]);
+    dynamicPlugins$ = this.dynamicPlugins.asObservable();
+ */
+    public indexOfDashboardToUpdateTemplate = new BehaviorSubject<any>(null); 
+    indexOfDashboardToUpdateTemplate$ = this.indexOfDashboardToUpdateTemplate.asObservable();
+
+    public searchDashboardTemplate$ = new BehaviorSubject<string>('');
+
+    private appList: any = [];
+    private isAppServiceCalled = false;
 
     constructor(private http: HttpClient, private inventoryService: InventoryService,
         private appService: ApplicationService,
@@ -111,10 +130,10 @@ export class TemplateCatalogSetupService {
             
             welcomeTemplate.map(entry => {
                 return {
-                    dashboardName: get(entry, 'dashboardName'),
+                title: get(entry, 'dashboardName'),
                 dashboard: get(entry, 'dashboard'),
                 description: get(entry, 'description')
-                } as WelcomeTemplate;
+                } as TemplateCatalogEntry;
             });
             template.map(entry => {
                 return {
@@ -143,6 +162,7 @@ export class TemplateCatalogSetupService {
                 microservices: get(catalog, 'microservices'),
                 dashboards: get(catalog, 'dashboards'),
                 description: get(catalog, 'description'),
+                dashboardLinks: get(catalog, 'dashboardLinks'),
                 input: get(catalog, 'input')
             } as TemplateBlueprintDetails;
 
@@ -214,5 +234,20 @@ export class TemplateCatalogSetupService {
 
     private generateRandomInteger(min, max): number {
         return Math.floor(Math.random() * Math.floor(max) + min);
+    }
+
+    async getAppList() {
+        if((!this.appList || this.appList.length === 0)) {
+            if(!this.isAppServiceCalled) {
+                this.isAppServiceCalled = true;
+                this.appList = (await this.appService.list({ pageSize: 2000 })).data;
+                return this.appList;
+            } else {
+                await delay(1000);
+                return await this.getAppList();
+            }
+        } else {
+            return this.appList;
+        }
     }
 }

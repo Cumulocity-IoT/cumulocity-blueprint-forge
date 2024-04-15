@@ -125,7 +125,7 @@ export function standardTheme(branding: any) {
         --dropdown-active-color:${_active_Hex};
         --tooltip-background: ${_active_Hex};/*0b385b*/
         --tooltip-color: ${_text_active_Hex};
-
+        --c8y-popover-background-default:${_lighter_primary_Hex};
         }
 
         .header-bar {

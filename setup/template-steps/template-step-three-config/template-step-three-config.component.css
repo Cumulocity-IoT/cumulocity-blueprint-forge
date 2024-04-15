@@ -8,3 +8,32 @@
 .title-width {
     width: 26%;
 }
+.btn-group > .btn:active {
+    background-color: powderblue !important;
+}
+.spinner-dashboard {
+    top: 2%;
+    position: absolute;
+    padding-left: 5%;
+}
+.disable-dashboard-templates {
+    background-color: #d3d3d3; 
+    pointer-events: none; 
+    cursor: default; 
+    color: gray;
+}
+.mr-left {
+    margin-left: 10px;
+}
+.align-left {
+    text-align: left;
+}
+.grid-align {
+    text-align:center;
+    padding-top: 10px;
+}
+.welcome-list {
+    max-height: 225px; 
+    overflow-y: auto;
+}
+

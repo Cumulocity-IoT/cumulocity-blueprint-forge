@@ -20,7 +20,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NavigationError, Router, RouterModule as NgRouterModule } from '@angular/router';
 import { UpgradeModule as NgUpgradeModule } from '@angular/upgrade/static';
 import { AppStateService, CoreModule, RouterModule, hookStepper} from '@c8y/ngx-components';
-import { DashboardUpgradeModule, UpgradeModule, HybridAppModule } from '@c8y/ngx-components/upgrade';
+import { DashboardUpgradeModule, UpgradeModule, HybridAppModule, WidgetComponent } from '@c8y/ngx-components/upgrade';
 import { BuilderModule } from "./builder/builder.module";
 import { filter, first, map, startWith, tap, withLatestFrom } from "rxjs/operators";
 import { IUser } from '@c8y/client';
@@ -31,7 +31,8 @@ import { SettingsService } from './builder/settings/settings.service';
 import { cockpitWidgets } from '@c8y/ngx-components/widgets/cockpit';
 import { SetupStep } from '@c8y/ngx-components';
 import { HOOK_STEPPER, Steppers,gettext } from '@c8y/ngx-components';
-
+import {DtdlSimulationStrategyFactory} from "./simulation-strategies/dtdl/dtdl.simulation-strategy";
+import { HOOK_SIMULATION_STRATEGY_FACTORY } from './builder/simulator/device-simulator';
 import { TemplateStepOneComponent } from './setup/template-steps/template-step-one/template-step-one.component';
 import { TemplateSetupStepperButtonsComponent } from './setup/template-setup-stepper-buttons.component';
 import { TemplateStepTwoDetailsComponent } from './setup/template-steps/template-step-two-details/template-step-two-details.component';
@@ -44,13 +45,20 @@ import { IconSelectorModule } from './icon-selector/icon-selector.module';
 import { SetupConfigService } from './setup/setup-config.service';
 import { SetupWidgetConfigModalComponent } from './setup/setup-widget-config-modal/setup-widget-config-modal.component';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
+import { TemplateStepFourConnectComponent } from './setup/template-steps/template-step-four-connect/template-step-four-connect.component';
+import { WizardModule } from './wizard/wizard.module';
+import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
+import { ConfigureCustomDashboardModalComponent } from './setup/template-steps/template-step-four-connect/configure-custom-dashboard-modal.component';
+import { AlertMessageModalModule } from './builder/utils/alert-message-modal/alert-message-modal.module';
 @NgModule({
   declarations: [
     TemplateStepOneComponent, 
     TemplateStepTwoDetailsComponent,
     TemplateStepThreeConfigComponent,
+    TemplateStepFourConnectComponent,
     TemplateSetupStepperButtonsComponent,
-    SetupWidgetConfigModalComponent
+    SetupWidgetConfigModalComponent,
+    ConfigureCustomDashboardModalComponent
   ],
   imports: [
     // Upgrade module must be the first
@@ -71,11 +79,22 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
         thumb: false
       }),
     LightboxModule.withConfig({}),
-    BsDropdownModule.forRoot()
+    BsDropdownModule.forRoot(),
+    WizardModule,
+    TypeaheadModule.forRoot(),
+    AlertMessageModalModule
   ],
   providers: [
     TemplateCatalogSetupService,SetupConfigService,
     hookStepper([    {
+        stepperId: Steppers.SETUP,
+        component: TemplateStepFourConnectComponent,
+        label: gettext('Connect'),
+        setupId: 'blueprintForgeConfig',
+        priority: 15,
+        required: true
+    },
+        {
           stepperId: Steppers.SETUP,
           component: TemplateStepThreeConfigComponent,
           label: gettext('Configuration'),
@@ -100,9 +119,8 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
           setupId: 'blueprintForgeApplcationTemplate',
           priority: 30
         }
-      ] as SetupStep[]),
-     
-  ]
+      ] as SetupStep[])
+  ],
 })
 export class AppModule extends HybridAppModule {
     constructor(protected upgrade: NgUpgradeModule, appStateService: AppStateService, private router: Router, 

@@ -13,14 +13,15 @@
     <div class="container-fluid fit-w">
       <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 ">
-      <div class="card-group interact-grid" style="text-align:center;padding-top: 10px;">
+      <div class="card-group interact-grid grid-align">
         <div class="col-xs-12 col-sm-8 col-md-9">
            <div class="card">
           <div class="card-header">
-              <div class="col-xs-12 col-sm-12 col-md-12" style="text-align: left;">
+              <div class="col-xs-11 col-sm-11 col-md-11 align-left">
                   <h4 class="card-title">Ensuring a Seamless Setup: Unveiling the Components Ready to Empower Your Experience!</h4>
               </div>
           </div>
+          
           <div class="card-block" id="dashboardDiv">
               <div class="list-group">
                   <div class="list-group-item d-flex" *ngFor="let dashboard of templateDetails?.dashboards; let i = index">
@@ -35,7 +36,7 @@
                     <div class="list-item-icon">
                       <i title="Dashboard" c8yIcon="dashboard"></i>
                     </div>
-                
+                    
                     <div class="list-item-body text-left">
                       <div class="d-flex row">
                         <span class="col-sm-3 col-xs-12 title-width">{{dashboard.title}}</span>
@@ -43,36 +44,7 @@
                           <span translate>{{dashboard.description}}</span>
                         </div>
                         <div class="col-sm-6 col-xs-12 text-muted">
-                        <div *ngIf="dashboard.isDeviceRequired" class="col-md-7 col-sm-7 pad-left">
-                         
-                          <form class="form-inline" name="deviceForm" #deviceForm="ngForm">
-                            <div class="form-group" class="col-sm-12 col-md-12 col-xs-12" style="padding:0">
-                              <div class="form-group col-sm-6 col-md-6 col-xs-12" style="padding:0; margin: 0">
-                                  <label class="sr-only" for="selected-device">Select Device/asset for dashboard</label>
-                                  
-                                  <input *ngIf="dashboard.isDeviceRequired" name="selectedItem" class="form-control"
-                                  [(ngModel)]="dashboard.name" required readonly style="width: 100%"
-                                      id="selected-device" placeholder="Select Device/Asset" type="text"
-                                     >
-                              </div>
-
-
-                              <div class="col-sm-4 col-md-4 col-xs-12 input-group-btn dropdown" style="padding-left: 0; max-width: 100%; text-align: end" dropdown>
-                                <button type="button" dropdownToggle class="btn btn-primary dropdown-toggle c8y-dropdown">
-                                  <span >{{assetButtonText}}</span>
-                                  <span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-right" *dropdownMenu>
-                                  <li><button *ngIf="dashboard.isSelectAsset" type="button" (click)="openDeviceSelectorDialog(dashboard, 0, i)">Device/Asset <i class="dlt-c8y-icon-question" title="Selected device/asset will be configured with one or more widgets in this dashboard" placement="right"></i></button></li>
-                                  <li><button *ngIf="dashboard.isSelectGroup" type="button"(click)="openDeviceSelectorDialog(dashboard, 1)">Device Group <i class="dlt-c8y-icon-question" title="Selected device group or devices/assets of selected device group will be configured with one or more widgets in this dashboard" placement="right"></i></button></li>
-                                  <li><button *ngIf="!dashboard.isGroupDashboard && dashboard.isSelectType" type="button"(click)="openDeviceSelectorDialog(dashboard, 2)">Device/Asset Type<i class="dlt-c8y-icon-question" title="All devices/assets of selected device/asset type will be configured with one or more widgets in this dashboard" placement="right"></i></button></li>
-                                </ul>
-                              </div>
-                              <div class="col-md-3"></div>
-                                </div>
-                               
-                          </form>
-                        </div>
+                          
                         <div *ngIf="dashboard.welcomeTemplates" class="col-sm-5 col-md-5 col-xs-12 pad-left">
                         <div class="dropdown" dropdown  container="body">
                           <button
@@ -83,7 +55,7 @@
                         >
                           <span>{{templateSelected}}</span> <span class="caret"></span>
                         </button>
-                        <ul style="max-height: 225px; overflow-y: auto" class="dropdown-menu" *dropdownMenu>
+                        <ul class="dropdown-menu welcome-list" *dropdownMenu>
                           <li *ngFor="let selectedWelcomeTemplate of welcomeTemplateData; let st = index">
                             <button type="button" title="{{selectedWelcomeTemplate.description}}" (click)="assignDashboardName(selectedWelcomeTemplate)">
                               {{selectedWelcomeTemplate.dashboardName}}
@@ -92,6 +64,9 @@
                         </ul>
                         </div>
                         </div>
+
+                        <div *ngIf="isPreviewLoading"><c8y-loading></c8y-loading></div>
+                        
                       </div>
                         <div *ngIf="dashboard.title !== 'Instruction' && dashboard.title !== 'Welcome' && dashboard.title !== 'Help and Support' && dashboard.isConfigRequred" class="list-item-icon">
                           <i class="dlt-c8y-icon-cogs space-top" (click)="configureBasicInput(dashboard, i)"></i>
@@ -100,61 +75,13 @@
                     </div>
                     
                   </div>
-                  <div class="list-group-item d-flex" *ngFor="let plugin of templateDetails?.plugins; let p =index">
-                    <div class="list-item-checkbox">
-                      <label id="plugin{{p}}" title="select" class="c8y-checkbox" >
-                        <input type="checkbox" [checked]="plugin.selected"  (change)="syncPluginFlag($event, p)"
-                        [disabled]="plugin.isMandatory"/>
-                        <span></span>
-                      </label>
-                    </div>
-                    <div class="list-item-icon">
-                      <i title="Plugin" c8yIcon="big-parcel"></i>
-                    </div>
-                    <div class="list-item-body text-left">
-                      <div class="d-flex row">
-                        <span class="col-sm-3 col-xs-12 title-width">{{plugin.title}}</span>
-                        <div class="col-sm-3 col-xs-12 text-muted">
-                          <span translate>{{plugin.description}}</span>
-                        </div>
-                        <div class="col-sm-6 col-xs-12 text-muted"></div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="list-group-item d-flex" [ngStyle]="{'opacity': !isMSEnabled ? '0.65 ': ''}" *ngFor="let microservice of templateDetails?.microservices; let m =index">
-                    <div class="list-item-checkbox">
-                      <label id="microservice{{m}}" title="select" class="c8y-checkbox" >
-                        <input type="checkbox" [checked]="microservice.selected"  (change)="syncMicroserviceFlag($event, m)"
-                        [disabled]="microservice.isMandatory"/>
-                        <span></span>
-                      </label>
-                    </div>
-                    <div class="list-item-icon">
-                      <i title="Microservice" c8yIcon="microchip"></i>
-                    </div>
-                    <div class="list-item-body text-left">
-                      <div class="d-flex row">
-                        <span class="col-sm-3 col-xs-12 title-width">{{microservice.title}}
-                          <button *ngIf="!isMSEnabled" disabled type="button" style="margin-left: 10px"
-                                class="btn btn-xs btn-icon">
-                                <i class="fa fa-warning"></i>
-                                Not supported!</button>
-                        </span>
-                        
-                        <div class="col-sm-3 col-xs-12 text-muted">
-                          <span translate>{{microservice.description}}</span>
-                        </div>
-                        <div class="col-sm-6 col-xs-12 text-muted"></div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
             </div>
           </div>
         </div>
         
         <div  class="col-xs-12 col-sm-4 col-md-3">
-          <div class="card" style="text-align: left;">
+          <div class="card align-left">
             <div class="card-header">
                 <div class="col-xs-12 col-sm-12 col-md-12" >
                     <h4 class="card-title">Application Configuration</h4>
@@ -209,9 +136,9 @@
 
 
   <c8y-template-setup-stepper-buttons
-    [formValid]="(deviceFormValid && appConfigForm?.form.valid) ? true : false"
+    [formValid]="(appConfigForm?.form.valid) ? true : false"
     [index]="stepper.selectedIndex"
-    (onNext)="saveandInstall(currentApp)"
+    (onNext)="updateAppConfiguration(currentApp)"
     (onBack)="back()"
   >
   </c8y-template-setup-stepper-buttons>
