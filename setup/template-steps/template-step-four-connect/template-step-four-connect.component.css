@@ -122,3 +122,20 @@
 .pointer-icon {
     cursor: pointer;
 }
+.scroll-div {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.scroll-div::-webkit-scrollbar {
+    width: 5px;
+  }
+  .scroll-div::-webkit-scrollbar-track {
+    background: #f1f1f1; 
+  }
+  .scroll-div::-webkit-scrollbar-thumb {
+    background: #888; 
+  }
+  .scroll-div::-webkit-scrollbar-thumb:hover {
+    background: #555; 
+  }
+  
