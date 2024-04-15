@@ -13,9 +13,6 @@ The Device DTDL Generator Plugin generates DTDL for a device and it also creates
 *  **Save to File Repository:** The dtdl generated or simulator configuration can be saved to tenant's File Repository.
 
 *  **Download:** The dtdl generated or simulator configuration can be downloaded as a json file.
-
-## Prerequisite
-   Cumulocity c8ycli >=1018.x.x
    
 ## Installation
 
