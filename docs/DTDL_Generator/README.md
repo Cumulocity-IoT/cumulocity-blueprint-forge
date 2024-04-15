@@ -3,8 +3,8 @@
 The Device DTDL Generator Plugin is the Cumulocity module federation plugin provided as part of Blueprint Forge. This plugin can be used in any blueprint Forge application.
 The Device DTDL Generator Plugin generates DTDL for a device and it also creates a Simulator Configuration based on the device selected.
 
-<kbd>![DTDL plugin Image](assets/dtdlWidget.png)</kbd>
-<kbd>![DTDL plugin Simulator Image](assets/simulatorConfiguration.png)</kbd>
+<kbd>![DTDL plugin Image](../../assets/dtdlWidget.png)</kbd>
+<kbd>![DTDL plugin Simulator Image](../../assets/simulatorConfiguration.png)</kbd>
 
 ## Features
 
@@ -43,11 +43,11 @@ Congratulations! Enjoy generating DTDL for your device.
 
 -   **Device:** Start typing device name and select the device from typeahead list.
 
-<kbd>![Select Device Image](assets/selectDevice.png)</kbd>
+<kbd>![Select Device Image](../../assets/selectDevice.png)</kbd>
 
 -   Click on 'Generate DTDL' button to generate dtdl for the selected device.
 
-<kbd>![DTDL plugin Image](assets/dtdlWidget.png)</kbd>
+<kbd>![DTDL plugin Image](../../assets/dtdlWidget.png)</kbd>
 
 -   **Copy to clipboard:** This button will copy the dtdl generated to your clipboard.
 
@@ -59,14 +59,14 @@ Congratulations! Enjoy generating DTDL for your device.
 
 -   **Device:** Start typing device name and select the device from typeahead list.
 
-<kbd>![Select Device Image](assets/selectDevice.png)</kbd>
+<kbd>![Select Device Image](../../assets/selectDevice.png)</kbd>
 
 -   Click on 'Simulator Configurator' button to generate Simulator Configuration based on the selected device. You can check and
 edit the measurements.
 
-<kbd>![Simulator measurements Image](assets/simulatorView.png)</kbd>
+<kbd>![Simulator measurements Image](../../assets/simulatorView.png)</kbd>
 
-<kbd>![Simulator configuration Image](assets/simulatorConfiguration.png)</kbd>
+<kbd>![Simulator configuration Image](../../assets/simulatorConfiguration.png)</kbd>
 
 -   **Copy to clipboard:** This button will copy the generated simulator configuration to your clipboard.
 
