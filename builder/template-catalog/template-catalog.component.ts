@@ -336,18 +336,7 @@ export class TemplateCatalogModalComponent implements OnInit {
         if (this.simulatorChecked) {
             let content = await this.simulatorConfigService.generateSimulatorFromConfiguration(this.simGrpAssetName, this.simNoOfDevices, this.simulatorFileContent, this.groupTemplate, '');
             if (content && content.status == 0) {
-                // this.app.applicationBuilder.simulators = content.simulators;
                 this.app=content.app;
-                // this.templateDetails.input.devices = [
-                //     {
-                //         type: "Temperature Sensor",
-                //         placeholder: "DeviceTarget0",
-                //         reprensentation: {
-                //             id: content?.deviceId,
-                //             name: content?.deviceName,
-                //         },
-                //     },
-                // ];
                 for(let device of this.templateDetails.input.devices){
                     device.reprensentation={
                         id: content?.deviceId,
@@ -404,10 +393,10 @@ export class TemplateCatalogModalComponent implements OnInit {
 
     async installDependency(dependency: DependencyDescription): Promise<void> {
         const currentHost = window.location.host.split(':')[0];
-       /*  if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
+        if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
             this.alertService.warning("Installation isn't supported when running Application Builder on localhost.");
             return;
-        } */
+        }
         if (dependency.type === "microservice") { // installing plugin
             this.showProgressModalDialog(`Downloading ${dependency.title}`);
             this.progressIndicatorService.setProgress(10);

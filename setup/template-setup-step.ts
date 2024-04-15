@@ -44,10 +44,6 @@ export abstract class TemplateSetupStep {
     this.stepper.linear = true;
   }
 
-  verifyStepCompleted() {
-    /*  this.blueprintForge = this.setupConfigService.stepCompleted(this.stepper, this.step, this.setup);
-     if(!this.blueprintForge) { this.blueprintForge = DEFAULT_CONFIG;} */
-  }
   async next(stepIndex?) {
     this.pending = true;
     try {

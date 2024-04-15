@@ -64,7 +64,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep{
   deviceFormValid: boolean;
   dashboardName: any;
   templateSelected: string;
- // isMSEnabled: boolean = false;
   blankTemplateDashboard: boolean;
   welcomeTemplateData: TemplateCatalogEntry;
   isPreviewLoading: boolean;
@@ -124,13 +123,6 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep{
     this.templateDetails.dashboards[index].selected = event.target.checked;
   }
   
- /*  syncPluginFlag(event, index) {
-    this.templateDetails.plugins[index].selected = event.target.checked;
-  } */
- /*  syncMicroserviceFlag(event, index) {
-    this.templateDetails.microservices[index].selected = event.target.checked;
-  } */
-
    async updateAppConfiguration(app: any) {
     sessionStorage.setItem("blueprintForge_ActiveTemplateDetails", JSON.stringify(this.templateDetails));
     if (this.currentApp.name !== this.newAppName ||
