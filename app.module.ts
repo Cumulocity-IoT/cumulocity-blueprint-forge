@@ -47,6 +47,9 @@ import { SetupWidgetConfigModalComponent } from './setup/setup-widget-config-mod
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { TemplateStepFourConnectComponent } from './setup/template-steps/template-step-four-connect/template-step-four-connect.component';
 import { WizardModule } from './wizard/wizard.module';
+import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
+import { ConfigureCustomDashboardModalComponent } from './setup/template-steps/template-step-four-connect/configure-custom-dashboard-modal.component';
+import { AlertMessageModalModule } from './builder/utils/alert-message-modal/alert-message-modal.module';
 @NgModule({
   declarations: [
     TemplateStepOneComponent, 
@@ -55,6 +58,7 @@ import { WizardModule } from './wizard/wizard.module';
     TemplateStepFourConnectComponent,
     TemplateSetupStepperButtonsComponent,
     SetupWidgetConfigModalComponent,
+    ConfigureCustomDashboardModalComponent
   ],
   imports: [
     // Upgrade module must be the first
@@ -76,7 +80,9 @@ import { WizardModule } from './wizard/wizard.module';
       }),
     LightboxModule.withConfig({}),
     BsDropdownModule.forRoot(),
-    WizardModule
+    WizardModule,
+    TypeaheadModule.forRoot(),
+    AlertMessageModalModule
   ],
   providers: [
     TemplateCatalogSetupService,SetupConfigService,
@@ -113,8 +119,7 @@ import { WizardModule } from './wizard/wizard.module';
           setupId: 'blueprintForgeApplcationTemplate',
           priority: 30
         }
-      ] as SetupStep[]),
-    //   { provide: HOOK_SIMULATION_STRATEGY_FACTORY, useClass: DtdlSimulationStrategyFactory, multi: true },
+      ] as SetupStep[])
   ],
 })
 export class AppModule extends HybridAppModule {

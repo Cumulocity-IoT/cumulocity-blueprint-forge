@@ -24,7 +24,7 @@ import { DeviceSelectorModalComponent } from "../utils/device-selector-modal/dev
 import { BsModalRef, BsModalService } from "ngx-bootstrap/modal";
 import { DependencyDescription, TemplateCatalogEntry, TemplateDetails } from "./template-catalog.model";
 import { TemplateCatalogService } from "./template-catalog.service";
-import { AlertService, DynamicComponentDefinition, DynamicComponentService } from "@c8y/ngx-components";
+import { AlertService, DynamicComponentDefinition, DynamicComponentService, PluginsService } from "@c8y/ngx-components";
 import { Observable, Subject, Subscription, interval } from "rxjs";
 import { ProgressIndicatorModalComponent } from "../utils/progress-indicator-modal/progress-indicator-modal.component";
 
@@ -35,7 +35,7 @@ import { AccessRightsService } from "../../builder/access-rights.service";
 import { ProgressIndicatorService } from "../../builder/utils/progress-indicator-modal/progress-indicator.service";
 import { ApplicationBinaryService } from "../../builder/application-binary.service";
 import { AlertMessageModalComponent } from "../utils/alert-message-modal/alert-message-modal.component";
-
+import { SimulatorConfigService } from "../../builder/simulator-config/simulator-config.service";
 
 enum TemplateCatalogStep {
     CATALOG,
@@ -74,9 +74,16 @@ export class TemplateCatalogModalComponent implements OnInit {
 
     public assetButtonText = "Device/Asset";
 
-    private groupTemplate = false;
+    groupTemplate = false;
+
+    simulatorChecked = false;
+    simGrpAssetName='';
+    simNoOfDevices;
+    simulatorFileContent;
 
     private appList = [];
+
+    private listOfPackages = [];
 
     private sharedTemplates:any = [];
 
@@ -118,7 +125,9 @@ export class TemplateCatalogModalComponent implements OnInit {
         private catalogService: TemplateCatalogService, private componentService: DynamicComponentService,
         private alertService: AlertService, private widgetCatalogService: WidgetCatalogService,
         private applicationBinaryService: ApplicationBinaryService, private sanitizer: DomSanitizer,
-        private accessRightsService: AccessRightsService, private progressIndicatorService: ProgressIndicatorService,private invService: InventoryService) {
+        private accessRightsService: AccessRightsService, private progressIndicatorService: ProgressIndicatorService, 
+        private invService: InventoryService, private pluginsService: PluginsService,
+        private simulatorConfigService: SimulatorConfigService) {
         this.onSave = new Subject();
         this.onCancel = new Subject();
     }
@@ -135,6 +144,7 @@ export class TemplateCatalogModalComponent implements OnInit {
             this.loadTemplateCatalog();
         }
         this.appList = (await this.appService.list({ pageSize: 2000 })).data;
+        this.listOfPackages = await this.pluginsService.listPackages();
         this.isMSEnabled =  this.applicationBinaryService.isMicroserviceEnabled(this.appList);
     }
 
@@ -264,15 +274,15 @@ export class TemplateCatalogModalComponent implements OnInit {
         switch (templateType) {
             case 1:
                 device.assetButtonText = "Device Group";
-                this.groupTemplate = true;
+                // this.groupTemplate = true;
                 break;
             case 2:
                 device.assetButtonText = "Device/Asset Type";
-                this.groupTemplate = true;
+                // this.groupTemplate = true;
                 break;
             default:
                 device.assetButtonText = "Device/Asset";
-                this.groupTemplate = false;
+                // this.groupTemplate = false;
                 break;
         }
         this.dashboardConfiguration.templateType = templateType;
@@ -323,6 +333,23 @@ export class TemplateCatalogModalComponent implements OnInit {
         if(this.templateDetails.input.devices && this.templateDetails.input.devices.length > 1){
             this.groupTemplate = false;
         }
+        if (this.simulatorChecked) {
+            let content = await this.simulatorConfigService.generateSimulatorFromConfiguration(this.simGrpAssetName, this.simNoOfDevices, this.simulatorFileContent, this.groupTemplate, '');
+            if (content && content.status == 0) {
+                this.app=content.app;
+                for(let device of this.templateDetails.input.devices){
+                    device.reprensentation={
+                        id: content?.deviceId,
+                        name: content?.deviceName,
+                    };
+                }
+            }
+            else {
+                if (content && content.status) {
+                    this.alertService.danger(content.message);
+                }
+            }
+        }
         await this.catalogService.createDashboard(this.app, this.dashboardConfiguration, this.selectedTemplate, this.templateDetails, this.groupTemplate);
 
         this.hideProgressModalDialog();
@@ -366,10 +393,10 @@ export class TemplateCatalogModalComponent implements OnInit {
 
     async installDependency(dependency: DependencyDescription): Promise<void> {
         const currentHost = window.location.host.split(':')[0];
-       /*  if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
+        if (currentHost === 'localhost' || currentHost === '127.0.0.1') {
             this.alertService.warning("Installation isn't supported when running Application Builder on localhost.");
             return;
-        } */
+        }
         if (dependency.type === "microservice") { // installing plugin
             this.showProgressModalDialog(`Downloading ${dependency.title}`);
             this.progressIndicatorService.setProgress(10);
@@ -418,8 +445,8 @@ export class TemplateCatalogModalComponent implements OnInit {
                 });
             
         } else { // installing plugin
-            const widgetBinaryFound = this.appList.find(app => app.manifest?.isPackage && (app.name.toLowerCase() === dependency.title?.toLowerCase() ||
-                (app.contextPath && app.contextPath?.toLowerCase() === dependency?.contextPath?.toLowerCase())));
+            const widgetBinaryFound = this.listOfPackages.find(app => (app.name.toLowerCase() === dependency.title?.toLowerCase() ||
+            (app.contextPath && app.contextPath?.toLowerCase() === dependency?.contextPath?.toLowerCase())));
             this.showProgressModalDialog(`Installing ${dependency.title}`);
             this.progressIndicatorService.setProgress(10);
             if (widgetBinaryFound) {
@@ -461,13 +488,28 @@ export class TemplateCatalogModalComponent implements OnInit {
         if (!this.templateDetails.input.devices || this.templateDetails.input.devices.length === 0) {
             return true;
         }
-
-        for (let device of this.templateDetails.input.devices) {
-            if (!device.reprensentation) {
-                return false;
+        if (!this.simulatorChecked) {
+            for (let device of this.templateDetails.input.devices) {
+                if (!device.reprensentation) {
+                    return false;
+                }
             }
         }
-
+        else if(this.simulatorChecked){
+            if(!this.simulatorFileContent) {
+                return false;
+            }
+            if(!this.groupTemplate){
+                if(!this.simGrpAssetName){
+                    return false;
+                }
+            }
+            else if(this.groupTemplate){
+                if(!this.simGrpAssetName || !this.simNoOfDevices){
+                    return false;
+                }
+            }
+        }
         return true;
     }
 
@@ -554,6 +596,11 @@ export class TemplateCatalogModalComponent implements OnInit {
         this.fileJson = JSON.parse(await( this.readFileContents(this.fileSelected)));
     }
 
+    async onSimulatorFileSelected(files: FileList){
+        let file=files.item(0);
+        this.simulatorFileContent=JSON.parse(await(this.readFileContents(file)));
+    }
+
     readFileContents(file: File): Promise<string> {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -602,10 +649,7 @@ export class TemplateCatalogModalComponent implements OnInit {
                     this.filterTemplates = this.templates.filter(template => template?.manufactur == '');
                     break;
                 case '4':
-                    this.filterTemplates = this.templates.filter(template => template.availability && template.availability == 'EXPORT');
-                    break;
-                case '5':
-                    this.filterTemplates = this.templates.filter(template => template.availability && template.availability == 'SHARED');
+                    this.filterTemplates = this.templates.filter(template => template.availability);
                     break;
             }
         }

@@ -18,7 +18,8 @@
 import { HttpClient, HttpHeaders, HttpResponse } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { BehaviorSubject, Observable } from "rxjs";
-import { catchError, map } from "rxjs/operators";
+import { catchError,  map } from "rxjs/operators";
+import * as delay from "delay";
 import { has, get } from "lodash-es";
 import { ApplicationService, InventoryBinaryService, InventoryService } from "@c8y/ngx-components/api";
 import { CumulocityDashboard, TemplateCatalogEntry } from "./../builder/template-catalog/template-catalog.model";
@@ -38,27 +39,29 @@ export class TemplateCatalogSetupService {
     private preprodBranchPath = "?ref=preprod";
     pkgVersion: any;
     private isFallBackActive = false;
-    public templateData = new BehaviorSubject<TemplateBlueprintDetails>(undefined);
-    templateData$ = this.templateData.asObservable();
 
-    public welcomeTemplateData = new BehaviorSubject<TemplateCatalogEntry>(undefined);
-    welcomeTemplateData$ = this.welcomeTemplateData.asObservable();
+    public welcomeTemplateData: any = [];
 
     public blankTemplate = new BehaviorSubject(false);
     blankTemplate$ = this.blankTemplate.asObservable();
 
-    public welcomeTemplateSelected = new BehaviorSubject("Default Template");
-    welcomeTemplateSelected$ = this.welcomeTemplateSelected.asObservable();
 
     public dynamicDashboardTemplate = new BehaviorSubject<any>(undefined);
     dynamicDashboardTemplate$ = this.dynamicDashboardTemplate.asObservable();
 
-    public dynamicDashboardTemplateDetails =  new BehaviorSubject<any>(undefined);
+    public dynamicDashboardTemplateDetails =  new BehaviorSubject<any>([]);
     dynamicDashboardTemplateDetails$ = this.dynamicDashboardTemplateDetails.asObservable();
 
+/*     public dynamicPlugins =  new BehaviorSubject<any>([]);
+    dynamicPlugins$ = this.dynamicPlugins.asObservable();
+ */
     public indexOfDashboardToUpdateTemplate = new BehaviorSubject<any>(null); 
     indexOfDashboardToUpdateTemplate$ = this.indexOfDashboardToUpdateTemplate.asObservable();
 
+    public searchDashboardTemplate$ = new BehaviorSubject<string>('');
+
+    private appList: any = [];
+    private isAppServiceCalled = false;
 
     constructor(private http: HttpClient, private inventoryService: InventoryService,
         private appService: ApplicationService,
@@ -231,5 +234,20 @@ export class TemplateCatalogSetupService {
 
     private generateRandomInteger(min, max): number {
         return Math.floor(Math.random() * Math.floor(max) + min);
+    }
+
+    async getAppList() {
+        if((!this.appList || this.appList.length === 0)) {
+            if(!this.isAppServiceCalled) {
+                this.isAppServiceCalled = true;
+                this.appList = (await this.appService.list({ pageSize: 2000 })).data;
+                return this.appList;
+            } else {
+                await delay(1000);
+                return await this.getAppList();
+            }
+        } else {
+            return this.appList;
+        }
     }
 }

@@ -35,15 +35,14 @@
                     <select class="form-control" [(ngModel)]="filter" style="border-radius:20px;"
                         id="dashboardView" (change)="onFilterChange()">
                         <option value="1">All</option>
-                        <option value="2">Devices</option>
+                        <option value="2">Device/Asset</option>
                         <option value="3">General</option>
-                        <option value="4">Custom</option>
-                        <option value="5">Tenant Only</option>
+                        <option value="4">Tenant Only</option>
                     </select>
                 </div>
             </div>
             <div class="col-xs-1 col-sm-1 col-md-1 col-lg-1 dflex-center">
-                <button class="btn btn-dot" title="Import Dashboard Template" [popover]="importPopover" popoverTitle="Import Dashboard Template"
+                <button class="btn btn-dot btn-default" title="Import Dashboard Template" [popover]="importPopover" popoverTitle="Import Dashboard Template"
                     placement="right" type="button"><i class="c8y-icon dlt-c8y-icon-upload"></i></button>
             </div>
             </div>
@@ -82,7 +81,7 @@
                             {{template?.description?template?.description:'No description available'}}
                         </div>
                         <div *ngIf="template.comingSoon==false" class="button-grp">
-                            <button type="button" class="btn btn-default btn-sm" style="width: 100%;"
+                            <button type="button" class="btn btn-default btn-sm btn-default-dark-theme" style="width: 100%;"
                                 (click)="onTemplateClicked(template)">Details</button>
                         </div>
                     </div>
@@ -129,22 +128,51 @@
                 </div>
 
                 <div *ngIf="templateDetails.input?.devices?.length > 0">
+                    <div class="form-group">
+                        <label class="c8y-switch m-t-8" *ngIf="templateDetails.input?.devices?.length == 1">
+                            <input type="checkbox" name="simulate" [(ngModel)]="simulatorChecked" />
+                            <span></span>Simulator
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label class="c8y-switch m-t-8" *ngIf="templateDetails.input?.devices?.length == 1">
+                            <input type="checkbox" name="groupTemplate" [(ngModel)]="groupTemplate" />
+                            <span></span>Group Template
+                        </label>
+                    </div>
                     <div class="form-group" *ngFor="let device of templateDetails.input.devices; let i = index">
-                        <label for="device"><span>Device/Sensor/Asset - Type: {{device.type}}</span></label>
-                        <div class="input-group">
-                            <input type="text" [readonly]="true" name="selected-device-{{i}}" class="form-control" id="selected-device-{{i}}" 
-                            placeholder="Device/Group/Asset/Type" [ngModel]="templateDetails.input.devices[i].reprensentation?.name"/>
-                            <div class="input-group-btn dropdown" dropdown>
-                              <button type="button" id="asset-button-{{i}}" dropdownToggle class="btn btn-primary dropdown-toggle c8y-dropdown">
-                                <span *ngIf="device.assetButtonText">{{device.assetButtonText}}</span>
-                                <span *ngIf="!device.assetButtonText">Device/Asset</span>
-                                <span class="caret"></span>
-                              </button>
-                              <ul class="dropdown-menu dropdown-menu-right" *dropdownMenu>
-                                <li><button type="button" (click)="openDeviceSelectorDialog(device,i, 0)">Device/Asset</button></li>
-                                <li><button type="button"(click)="openDeviceSelectorDialog(device,i, 1)">Device Group</button></li>
-                                <li><button type="button"(click)="openDeviceSelectorDialog(device,i, 2)">Device/Asset Type</button></li>
-                              </ul>
+                        <div *ngIf="!simulatorChecked">
+                            <label for="device"><span>Device/Sensor/Asset - Type: {{device.type}}</span></label>
+                            <div class="input-group">
+                                <input type="text" [readonly]="true" name="selected-device-{{i}}" class="form-control"
+                                    id="selected-device-{{i}}" placeholder="Device/Group/Asset/Type"
+                                    [ngModel]="templateDetails.input.devices[i].reprensentation?.name" />
+                                <div class="input-group-btn dropdown" dropdown>
+                                    <button type="button" id="asset-button-{{i}}" dropdownToggle
+                                        class="btn btn-primary dropdown-toggle c8y-dropdown">
+                                        <span *ngIf="device.assetButtonText">{{device.assetButtonText}}</span>
+                                        <span *ngIf="!device.assetButtonText">Device/Asset</span>
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu dropdown-menu-right" *dropdownMenu>
+                                        <li><button type="button" (click)="openDeviceSelectorDialog(device,i, 0)">Device/Asset</button></li>
+                                        <li><button type="button" (click)="openDeviceSelectorDialog(device,i, 1)">Device Group</button></li>
+                                        <li *ngIf="groupTemplate"><button type="button"
+                                                (click)="openDeviceSelectorDialog(device,i, 2)">Device/Asset Type</button></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div *ngIf="simulatorChecked">
+                            <label for="device"><span>Simulate - Type: {{device.type}}</span></label>
+                            <div class="form-group d-flex">
+                                <input type="text" name="simGrpAssetName" class="form-control" [placeholder]="groupTemplate?'Group/Type Name':'Device/Asset Name'" [(ngModel)]="simGrpAssetName"/>
+                                <input *ngIf="groupTemplate" type="number" name="simNoOfDevices" class="form-control" placeholder="# of devices" min="1" max="5" [(ngModel)]="simNoOfDevices"/>
+                            </div>
+                            <div>
+                                <label for="device"><span>Simulator Config File</span></label>
+                                <input type="file" name="simFileList" accept=".json" id="simulatorFile" aria-describedby="simulatorinput" class="form-control"
+                                    (change)="onSimulatorFileSelected($event.target.files)" />
                             </div>
                         </div>
                     </div>
@@ -256,10 +284,7 @@
 </ng-template>
 
 <ng-template #templateLabel let-template>
-    <ng-container *ngIf="template.manufactur && template.manufactur !==''">Device</ng-container>
+    <ng-container *ngIf="template.manufactur && template.manufactur !==''">Device/Asset</ng-container>
     <ng-container *ngIf="template?.manufactur ===''">General</ng-container>
-    <ng-container *ngIf="template.availability">
-        <ng-container *ngIf="template.availability==='EXPORT'">Custom</ng-container>
-        <ng-container *ngIf="template.availability==='SHARED'">Tenant Only</ng-container>
-    </ng-container>
+    <ng-container *ngIf="template.availability">Tenant Only</ng-container>
 </ng-template>

@@ -25,6 +25,7 @@ export interface BlueprintForge {
     plugins?: PluginDetails[];
     microservices?: MicroserviceDetails[];
     dashboards: Dashboards[];
+    selectedWelcomeTemplate?: string;
 }
 export interface TemplateBlueprintEntry {
     templateId: string;
@@ -74,6 +75,27 @@ export interface MicroserviceDetails {
 }
 
 export interface Dashboards {
+    dtdlURL: any;
+    name: string;
+    simulatorNoOfDevices: number;
+    simulatorGroupName: string;
+    isSpin: boolean;
+    dynamicDashboardTemplate?: any;
+    dynamicDashboardArray?: any;
+    input: any;
+    previewBinaryId: any;
+    preview: any;
+    dynamicDashboardAssigned?: boolean;
+    simulatorFileExists?: boolean;
+    dtdlFileExists?: boolean;
+    defaultLinkedDashboard?: string;
+    findMatchedLink?: Dashboards;
+    selectedDashboardName?: string;
+    id: string;
+    dashboardTemplateSelected: any;
+    enableLink?: boolean;
+    enableDeviceOrGroup?: boolean;
+    enableSimulator?: boolean;
     welcomeTemplates: any;
     title: string;
     icon: string;
@@ -97,6 +119,7 @@ export interface Dashboards {
     templateType?: number;
     basicConfig?: WidgetDetail[];
     isConfigRequred?: boolean;
+    linkDashboards?: any;
 }
 export interface DashboardWidgets {
     id?: string;

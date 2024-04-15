@@ -109,6 +109,7 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
     forceUpdate = false;
     expandEventSubject: Subject<void> = new Subject<void>();
     isFilterActive: boolean = false;
+    simulators: [];
 
     constructor(
         private appIdService: AppIdService, private appService: ApplicationService, private appStateService: AppStateService,
@@ -132,6 +133,7 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
                 this.newAppName = app.name;
                 this.newAppContextPath = app.contextPath;
                 this.newAppIcon = app.applicationBuilder.icon;
+                this.simulators = app.applicationBuilder.simulators;
             })
         );
 
@@ -141,6 +143,7 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
                 if (this.forceUpdate) {
                     this.appDataService.forceUpdate = true;
                 }
+                app.applicationBuilder.simulators = [...this.simulators]
                 await this.appService.update(app);
                 this.appDataService.refreshAppForDashboard.next();
                 this.navigation.refresh();
@@ -263,7 +266,6 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
                     dashboards.splice(i, 1);
                     application.applicationBuilder.dashboards = [...dashboards];
                 }
-                await this.inventoryService.delete(dashboardIDToDelete);
                 this.filteredDashboardList = application.applicationBuilder.dashboards;
                 this.prepareDashboardHierarchy(application);
                 this.delayedAppUpdateSubject.next({
@@ -274,6 +276,7 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
                 if (application.applicationBuilder.dashboards.length === 0) {
                     this.autoLockDashboard = false;
                 }
+                await this.inventoryService.delete(dashboardIDToDelete);
                 this.cd.detectChanges();
                 // TODO?
                 // this.tabs.refresh();
@@ -552,6 +555,7 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
                 }
             });
         }
+        //await this.deleteAllDashboards(app);
 
     }
 
@@ -669,11 +673,12 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
                     id: this.appBuilderObject.id,
                     applicationBuilder: this.appBuilderObject.applicationBuilder
                 } as any);
-                await this.inventoryService.delete(dashboard.id);
                 if (this.appBuilderObject.applicationBuilder.dashboards.length === 0) {
                     this.autoLockDashboard = false;
                 }
                 this.cd.detectChanges();
+                await this.inventoryService.delete(dashboard.id);
+               
                 // TODO?
                 // this.tabs.refresh();
             }
@@ -750,6 +755,17 @@ export class DashboardConfigComponent implements OnInit, OnDestroy {
         }
     }
 
+    // This method for internal testing only
+    private async deleteAllDashboards(app: any) {
+        for(let element of app.applicationBuilder.dashboards) {
+           await this.inventoryService.delete(element.id);
+        };
+        app.applicationBuilder.dashboards = [];
+        this.delayedAppUpdateSubject.next({
+            id: app.id,
+            applicationBuilder:  app.applicationBuilder
+        } as any);
+    }
     // TODO: we need to see how can we use product icons instead of device selector
     /* async openIconModal() {
         const icon = await this.iconSelector.selectIcon();

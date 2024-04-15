@@ -166,10 +166,10 @@ export class SimulatorManagerService {
         this.clearSimulators();
 
         let turnOn = false;
-        for (let simulatorConfig of Array.from(this.simulatorConfigById.values())) {
+        for (let simulatorConfig of Array.from(this.simulatorConfigById?.values())) {
             this.createInstance(simulatorConfig);
             if( simulatorConfig.type == "DTDL"){
-                for (let dtdlConfig of Array.from(simulatorConfig.config.dtdlModelConfig)) {
+                for (let dtdlConfig of Array.from(simulatorConfig?.config?.dtdlModelConfig)) {
                     if( dtdlConfig.alternateConfigs && dtdlConfig.alternateConfigs.hasOwnProperty("opEnabled") && dtdlConfig.alternateConfigs.opEnabled) {
                         turnOn = true;
                     }        

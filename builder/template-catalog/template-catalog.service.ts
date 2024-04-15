@@ -111,7 +111,6 @@ export class TemplateCatalogService {
         } else if (this.pkgVersion.includes('rc')) {
             url = url + this.preprodBranchPath;
         }
-        console.log('url sent', url);
         return this.http.get(`${url}`).pipe(map((dashboard: TemplateDetails) => {
             return dashboard;
         }));

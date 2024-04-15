@@ -16,7 +16,7 @@
 * limitations under the License.
  */
 import { CdkStep } from '@angular/cdk/stepper';
-import { AfterViewInit, Component, ViewEncapsulation } from '@angular/core';
+import { AfterContentInit, AfterViewInit, Component, ViewEncapsulation } from '@angular/core';
 import { AlertService, AppStateService, C8yStepper, SetupComponent } from '@c8y/ngx-components';
 import { TemplateSetupStep } from './../../template-setup-step';
 import { TemplateCatalogSetupService } from '../../template-catalog-setup.service';
@@ -32,13 +32,12 @@ import { SetupConfigService } from './../../setup-config.service';
   encapsulation: ViewEncapsulation.None,
   host: { class: 'd-contents' }
 })
-export class TemplateStepTwoDetailsComponent extends TemplateSetupStep implements AfterViewInit {
+export class TemplateStepTwoDetailsComponent extends TemplateSetupStep {
   public templateDetails: TemplateBlueprintDetails;
   configDetails: any;
   images: GalleryItem[];
   blueprintForgeTemplateURL: any;
-  dataBlueprintForgeURL: any;
-  load: number;
+  dataBlueprintForgeURL: string = "";
 
   constructor(
     public stepper: C8yStepper,
@@ -51,35 +50,16 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep implement
     protected setupConfigService: SetupConfigService
   ) {
     super(stepper, step, setup, appState, alert, setupConfigService);
-    this.load = 0;
-    
-      this.setup.data$.subscribe(data => {
-        if (data.blueprintForge && data.blueprintForge != '') {
-          if (this.load == 0) {
+    this.setup.data$.subscribe(data => {
+      if (data.blueprintForge && data.blueprintForge != '') {
+        const templateDetails = JSON.parse(sessionStorage.getItem("blueprintForge_ActiveTemplateDetails"));
+        if (this.dataBlueprintForgeURL !== data.blueprintForge.templateURL || !templateDetails) {
           this.templateDetails = null;
-          const templateURL = data.blueprintForge.templateURL;
-          this.loadTemplateDetailsCatalog(templateURL);
-          this.load = this.load + 1;
-          } 
-        }
-      });
-    
-  }
-
-  ngOnInit() {
-      this.setup.data$.subscribe(data => {
-      if (this.load > 0 && this.dataBlueprintForgeURL !== data.blueprintForge.templateURL) {
-        this.templateCatalogSetupService.dynamicDashboardTemplateDetails.next([]);
           this.dataBlueprintForgeURL = data.blueprintForge.templateURL;
-            this.loadTemplateDetailsCatalog(data.blueprintForge.templateURL);
+          this.loadTemplateDetailsCatalog(this.dataBlueprintForgeURL);
+        }
       }
-        });
-      
-     
-  }
-
-  ngAfterViewInit() {
-    this.verifyStepCompleted();
+    });
   }
 
   loadTemplateDetailsCatalog(dashboardURL) {
@@ -107,11 +87,9 @@ export class TemplateStepTwoDetailsComponent extends TemplateSetupStep implement
         } else {
           this.images = [];
         }
-        this.templateCatalogSetupService.templateData.next(this.templateDetails);
+        sessionStorage.setItem("blueprintForge_ActiveTemplateDetails", JSON.stringify(this.templateDetails));
       }, error => {
         this.alertService.danger("There is some technical error! Please try after sometime.");
       });
   }
-
- 
 }
