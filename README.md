@@ -13,7 +13,7 @@ Blueprint Forge provides a simple, coding-free way to build cumulocity applicati
 * **Tailor Your Simulation:** Select the Dashboard template to create simulator or use our pre-configured one.
 * **Link Device from Dashboard:** Link Device with a Click to Another Dashboard.
 * **Configure Your Dashboard:** Configure your dashboard by assigning Actual Device or Simulating it.
-* **New Custom Template:** Now user can select pre-built templates for custom dashboards.
+* **Add Custom Dashboard:** Now user can select pre-built templates for custom dashboards.
 * **Enhanced Dashboard Catalog:** Users can now select and filter dashboard templates, as well as create simulators directly from the Dashboard Catalog.
 * **Share Dashboards:** Share and Reuse. Add your Custom Dashboards to the Catalog by using "Add to Catalog" button and Share it within Tenant or export and use it in other tenants.
 * **DTDL Generator Plugin:** New DTDL plugin to generate DTDL or simulator configuration files based on existing device and measurements.
@@ -32,7 +32,7 @@ Blueprint Forge provides a simple, coding-free way to build cumulocity applicati
 * **Configure Simulator:** Configure the simulator as desired, or we can also auto-configure based on the selected dashboard template.
 * **Link Device from Dashboard:** Map devices from another dashboard by choosing the dashboard to link with.
 * **Select Dashboard Template:** Now you can choose a template for your dashboard, it will include all the details from the selected template.
-* **New Custom Template:** Add a custom template where you can customize which devices to link and also choose the dashboard template.
+* **Add Custom Dashboard:** Add a custom dashboard where you can customize which devices to link and also choose the dashboard template.
 * **Generate DTDL:** Generate DTDL file or Simulator configuration file effortlessly based on existing device measurements and simulate real device behaviour within the same or different tenants. For more information about DTDL Generator. Refer [DTDL Generation](docs/DTDL_Generator/README.md)
 * **Enhanced Dashboard Catalog:** Effortlessly find various dashboard templates tailored to your needs. With intuitive search functionality, selecting the perfect dashboard template has never been easier. You can now also create simulator directly from Dashboard Catalog.
 * **Share Dashboards:** Effortlessly share and reuse your customized Dashboards within your own tenant or across different tenants. Now, easily add your personalized Dashboards to the catalog for seamless access using "Add to Catalog". 
