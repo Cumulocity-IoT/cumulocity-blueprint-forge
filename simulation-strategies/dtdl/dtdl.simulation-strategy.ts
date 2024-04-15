@@ -54,12 +54,10 @@ export class DtdlSimulationStrategy extends DeviceIntervalSimulator {
     public async onOperation(param: any): Promise<boolean> {
         for (let index = 0; index < this.config.dtdlModelConfig.length; index++) {
             const model = this.config.dtdlModelConfig[index];
-            //console.log("DTDL operation = ", param, "model", model);
             if (model.alternateConfigs.opEnabled && model.alternateConfigs.operations.length > 1) {
                 if (_.has(param, "deviceId") && _.get(param, "deviceId") == model.alternateConfigs.opSource) {
                     model.alternateConfigs.operations.forEach((cfg: DtdlSimulationModel, i: number) => {
                         if (_.has(param, model.alternateConfigs.payloadFragment) && _.get(param, model.alternateConfigs.payloadFragment) == cfg.matchingValue) {
-                            //console.log(`Matched ${cfg.matchingValue} setting cfg = `, cfg);
                             model.alternateConfigs.configIndex = i; //used in create measurement below.
                             if (model.alternateConfigs.opReply == true) {
                                 const partialUpdateObject: Partial<IOperation> = {
@@ -102,7 +100,6 @@ export class DtdlSimulationStrategy extends DeviceIntervalSimulator {
                                     break;
 
                                 default:
-                                    //console.log("index",cfgIndex, "cfg" , modelConfig.alternateConfigs.operations[cfgIndex]);
                                     this.createMeasurements(deviceId, modelConfig.alternateConfigs.operations[cfgIndex]);
                                     break;
                             }
@@ -117,7 +114,6 @@ export class DtdlSimulationStrategy extends DeviceIntervalSimulator {
                                     break;
 
                                 default:
-                                    //console.log("index",cfgIndex, "cfg" , modelConfig.alternateConfigs.operations[cfgIndex]);
                                     this.createMeasurements(deviceId, modelConfig);
                                     break;
                             }                            
@@ -241,7 +237,6 @@ export class DtdlSimulationStrategy extends DeviceIntervalSimulator {
             default:
                 break;
         }
-        //console.log("GetMeasurementValue: ", modelConfig, mValue)
         return mValue;
     }
 
