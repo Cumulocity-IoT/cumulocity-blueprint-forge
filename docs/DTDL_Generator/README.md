@@ -18,9 +18,8 @@ The Device DTDL Generator Plugin generates DTDL for a device and it also creates
 
 ### Runtime plugin Deployment?
 
-* This plugin support runtime deployment. Download [Runtime Binary](https://github.com/SoftwareAG/cumulocity-smart-echart-widget-plugin/releases/download/1.0.2/sag-ps-pkg-smart-echart-1.0.2.zip) and install via Administrations --> Ecosystems --> Extensions.
-
-* Look for `Device DTDL Generator` and install it in your choice of application.
+* This plugin is provided as part of Blueprint Forge. Download [Runtime Binary](https://github.com/SoftwareAG/cumulocity-smart-echart-widget-plugin/releases/download/1.0.2/sag-ps-pkg-smart-echart-1.0.2.zip). 
+* Go to Administration -> Ecosystem -> Extension -> Blueprint forge and from plugins section, Install plugin.
 
 ## QuickStart
 
