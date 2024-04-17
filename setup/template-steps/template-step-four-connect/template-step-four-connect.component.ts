@@ -400,6 +400,7 @@ export class TemplateStepFourConnectComponent
     for (let plugin of configDataPlugins) {
       await this.installPlugin(plugin, listOfPackages);
       overallProgress = overallProgress + eachRemoteProgress;
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       this.progressIndicatorService.setOverallProgress(overallProgress);
     }
     await new Promise((resolve) => setTimeout(resolve, 1000));

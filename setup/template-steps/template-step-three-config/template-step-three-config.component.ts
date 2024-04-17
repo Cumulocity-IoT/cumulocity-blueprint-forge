@@ -68,6 +68,7 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep{
   welcomeTemplateData: TemplateCatalogEntry;
   isPreviewLoading: boolean;
   private templateId = "";
+  private isThemeChanged = false;
 
   constructor(
     public stepper: C8yStepper,
@@ -127,7 +128,8 @@ export class TemplateStepThreeConfigComponent extends TemplateSetupStep{
     sessionStorage.setItem("blueprintForge_ActiveTemplateDetails", JSON.stringify(this.templateDetails));
     if (this.currentApp.name !== this.newAppName ||
       this.currentApp.contextPath !== this.newAppContextPath ||
-      (this.currentApp.applicationBuilder && this.currentApp.applicationBuilder.icon !== this.newAppIcon)) {
+      (this.currentApp.applicationBuilder && this.currentApp.applicationBuilder.icon !== this.newAppIcon) || 
+      this.isThemeChanged) {
       await this.saveAppChanges(app);
     } 
     this.blankTemplateDashboard = true;
@@ -228,6 +230,7 @@ async saveAppChanges(app) {
   }
 
   setTheme(app, primary, active, text, textOnPrimary, textOnActive, hover, headerBar, tabBar, toolBar, selectedTheme) {
+    this.isThemeChanged = true;
     app.applicationBuilder.branding.enabled = true;
     app.applicationBuilder.branding.colors.primary = primary;
     app.applicationBuilder.branding.colors.active = active;
