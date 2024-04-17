@@ -195,6 +195,7 @@ export class TemplateStepFourConnectComponent
   }
 
   async simulatorCreateForDashboard(event, dashboard, index) {
+    this.clearDeviceandLinksOnToggleSwitch(dashboard, index);
     if(!dashboard.simulatorConfigFiles || dashboard.simulatorConfigFiles.length  === 0) {
       this.checkForSimulatorConfig(dashboard, index);
     }
@@ -283,10 +284,21 @@ export class TemplateStepFourConnectComponent
           this.templateDetails.dashboards[index].dynamicDashboardArray =
             cloneDeep(currentDashboardTemplate);
           this.loadSimulatorConfigFiles(this.templateDetails.dashboards[index]);
-            let pluginsForDynamic =  this.templateDetails.dashboards[index].dynamicDashboardArray.input.dependencies;
+
+          // Add dependencies in case of dynamic dashboards
+            let pluginsForDynamic =  this.templateDetails.dashboards[index].dynamicDashboardArray?.input?.dependencies
+            .filter(dependency => dependency.type === 'plugin');
          
-          this.templateDetails.plugins = this.templateDetails.plugins.concat(pluginsForDynamic);
-        
+            if (pluginsForDynamic) {
+              this.templateDetails.plugins = this.templateDetails.plugins.concat(pluginsForDynamic);
+            }
+
+          let microservicesForDynamic =  this.templateDetails.dashboards[index].dynamicDashboardArray?.input?.dependencies
+            .filter(dependency => dependency.type === 'microservice');
+         
+            if (microservicesForDynamic) {
+              this.templateDetails.microservices = this.templateDetails.microservices.concat(microservicesForDynamic);
+            }
         });
     }
   }
@@ -780,8 +792,6 @@ export class TemplateStepFourConnectComponent
 
   //TODO Refactor
   openDeviceSelectorDialog(dashboard, templateType: number, index) {
-    dashboard.simulatorGroupName = "";
-    dashboard.simulatorNoOfDevices = "";
     switch (templateType) {
       case 1:
         this.assetButtonText = "Device Group";
@@ -817,8 +827,6 @@ export class TemplateStepFourConnectComponent
             },
           ];
           
-
-       
             for (
               let dd = 0;
               dd < this.templateDetails.dashboards.length;
@@ -829,12 +837,9 @@ export class TemplateStepFourConnectComponent
                 this.templateDetails.dashboards[dd].linkWithDashboard ===
                   dashboard.id
               ) {
-                this.templateDetails.dashboards[dd].devices = !this
-                  .templateDetails.dashboards[dd].devices
-                  ? dashboard.devices
-                  : this.templateDetails.dashboards[dd].devices;
-                this.templateDetails.dashboards[dd].defaultLinkedDashboard =
-                  dashboard.title;
+                this.templateDetails.dashboards[dd].devices = null;
+                this.templateDetails.dashboards[dd].linkDashboards = [];
+                this.templateDetails.dashboards[dd].defaultLinkedDashboard = 'Select Link';
               } 
             }
             this.formValidation('onload', dashboard);
@@ -952,6 +957,7 @@ export class TemplateStepFourConnectComponent
               findMatchedIdObject = this.templateDetails.dashboards.find(
                 (match) => match.id === item.linkWithDashboard
               );
+              console.log('findMatchedIdObject', findMatchedIdObject);
               if (
                 findMatchedIdObject &&
                 findMatchedIdObject.devices &&
@@ -1077,9 +1083,10 @@ export class TemplateStepFourConnectComponent
     this.formValidation('onload', dashboard);
   }
 
-  connectActualDeviceOrGroup(dashboard) {
+  connectActualDeviceOrGroup(dashboard, index) {
     dashboard.enableDeviceOrGroup = true;
     dashboard.enableSimulator = dashboard.enableLink = false;
+    this.clearDeviceandLinksOnToggleSwitch(dashboard, index);
     this.formValidation('onload', dashboard);
   }
 
@@ -1123,13 +1130,15 @@ export class TemplateStepFourConnectComponent
 
   generateLinkingDashboards() {
     let linkDashboards: any = cloneDeep(this.templateDetails.dashboards);
+
     linkDashboards = linkDashboards.filter(
       (item) =>
         item.title != "Welcome" &&
         item.title !== "Help and Support" &&
         item.title !== "Instruction" &&
-        ((item.devices && item.devices[0]?.reprensentation.id !== null) ||
-          (item.simulatorGroupName && item.simulatorNoOfDevices))
+        ((item.devices && item.devices[0]?.reprensentation.id !== null && item.devices?.length > 0) ||
+          (item.simulatorGroupName && item.simulatorNoOfDevices)) &&
+          JSON.stringify(item.templateType) !== '2'
     );
     this.templateDetails.dashboards.forEach((dashboardItem) => {
       if (
@@ -1256,6 +1265,7 @@ export class TemplateStepFourConnectComponent
   checkAndGenerateLinks(dashboard) {
     this.formValidation('onload', dashboard);
     if (dashboard.simulatorGroupName && dashboard.simulatorNoOfDevices) {
+      dashboard.templateType = 1;
       // Assign some data to take care of link, only for UI purpose at this stage
       dashboard.devices = [
         {
@@ -1423,4 +1433,26 @@ private alertModalDialog(message: any): BsModalRef {
   return this.modalService.show(AlertMessageModalComponent, { class: 'c8y-wizard', initialState: { message } });
 }
   
+clearDeviceandLinksOnToggleSwitch(dashboard, dashboardIndex) {
+    this.templateDetails.dashboards[dashboardIndex].devices = null;
+    dashboard.name = null;
+    dashboard.simulatorGroupName = "";
+    dashboard.simulatorNoOfDevices = "";
+    for (
+      let dd = 0;
+      dd < this.templateDetails.dashboards.length;
+      dd++
+    ) {
+      if (
+        this.templateDetails.dashboards[dd].isDeviceRequired === true &&
+        this.templateDetails.dashboards[dd].linkWithDashboard ===
+          dashboard.id
+      ) {
+        this.templateDetails.dashboards[dd].devices = null;
+        this.templateDetails.dashboards[dd].linkDashboards = [];
+        this.templateDetails.dashboards[dd].defaultLinkedDashboard = 'Select Link';
+      } 
+    }
+  
+}
 }

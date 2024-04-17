@@ -123,6 +123,7 @@
     cursor: pointer;
 }
 .scroll-div {
+    min-height: 315px;
     overflow-y: auto;
     overflow-x: hidden;
 }
