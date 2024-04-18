@@ -286,7 +286,7 @@ export class TemplateStepFourConnectComponent
           this.loadSimulatorConfigFiles(this.templateDetails.dashboards[index]);
 
           // Add dependencies in case of dynamic dashboards
-            let pluginsForDynamic =  this.templateDetails.dashboards[index].dynamicDashboardArray?.input?.dependencies
+          /*   let pluginsForDynamic =  this.templateDetails.dashboards[index].dynamicDashboardArray?.input?.dependencies
             .filter(dependency => dependency.type === 'plugin');
          
             if (pluginsForDynamic) {
@@ -298,7 +298,8 @@ export class TemplateStepFourConnectComponent
          
             if (microservicesForDynamic) {
               this.templateDetails.microservices = this.templateDetails.microservices.concat(microservicesForDynamic);
-            }
+            } */
+            this.pluginDetailsArray = cloneDeep(this.templateDetails.plugins );
         });
     }
   }
