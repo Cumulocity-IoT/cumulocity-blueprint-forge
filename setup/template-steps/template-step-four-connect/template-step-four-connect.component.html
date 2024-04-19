@@ -168,12 +168,18 @@
                                 <div *ngIf="!dashboard.isHidden" class="dropdown wd-100" dropdown container="body">
                                   <input [(ngModel)]="dashboard.dashboardTemplateSelected"
                                     [typeahead]="filterTemplates" id="dashboardTemplates-{{i}}"
-                                    typeaheadOptionField="title" class="form-control" placeholder="Select Template"
+                                    typeaheadOptionField="title" class="form-control fl-left" placeholder="Select Template"
                                     [typeaheadMinLength]="2"
                                     (typeaheadOnSelect)="assignSelectedDashboard(i, $event)"
                                     (typeaheadNoResults)="formValidation('onload', dashboard)"
                                     [ngModelOptions]="{standalone: true}"
                                     required>
+                                    <button type="button" class="btn btn-info fl-rgt pointer-icon"
+                                    title="Click to see the list of dashboard templates and its preview"
+                                    (click)="showDashboardTemplatesListAndPreview(filterTemplates)">
+                                    <i c8yIcon="info"
+                                      ></i>
+                                      </button>
                                 </div>
                               </div>
 
@@ -181,12 +187,18 @@
                                 <div class="dropdown wd-100"
                                   dropdown container="body">
                                   <input [(ngModel)]="dashboard.selectedDashboardName" [typeahead]="filterTemplates"
-                                    typeaheadOptionField="title" class="form-control" placeholder="Select Template"
+                                    typeaheadOptionField="title" class="form-control fl-left" placeholder="Select Template"
                                     [typeaheadMinLength]="2"
                                     (typeaheadOnSelect)="assignSelectedDashboard(i, $event)"
                                     (typeaheadNoResults)="formValidation('onload', dashboard)"
                                     [ngModelOptions]="{standalone: true}"
                                     required>
+                                    <button type="button" class="btn btn-info fl-rgt pointer-icon"
+                                    title="Click to see the list of dashboard templates and its preview"
+                                    (click)="showDashboardTemplatesListAndPreview(filterTemplates)">
+                                      <i c8yIcon="info"
+                                        ></i>
+                                        </button>
                                 </div>
                               </div>
                               <div class="col-md-1 col-sm-1 warning-width" >

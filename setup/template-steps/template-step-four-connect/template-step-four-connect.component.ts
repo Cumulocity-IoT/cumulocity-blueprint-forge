@@ -61,6 +61,7 @@ import { DomSanitizer } from "@angular/platform-browser";
 import { ConfigureCustomDashboardModalComponent } from "./configure-custom-dashboard-modal.component";
 import { SimulatorConfigService } from "../../../builder/simulator-config/simulator-config.service";
 import { AlertMessageModalComponent } from "../../../builder/utils/alert-message-modal/alert-message-modal.component";
+import { DashboardListModalComponent } from "../../utils/dashboard-list-modal/dashboard-list.component";
 @Component({
   selector: "c8y-template-step-four-connect",
   templateUrl: "./template-step-four-connect.component.html",
@@ -286,7 +287,7 @@ export class TemplateStepFourConnectComponent
           this.loadSimulatorConfigFiles(this.templateDetails.dashboards[index]);
 
           // Add dependencies in case of dynamic dashboards
-          /*   let pluginsForDynamic =  this.templateDetails.dashboards[index].dynamicDashboardArray?.input?.dependencies
+           let pluginsForDynamic =  this.templateDetails.dashboards[index].dynamicDashboardArray?.input?.dependencies
             .filter(dependency => dependency.type === 'plugin');
          
             if (pluginsForDynamic) {
@@ -298,8 +299,8 @@ export class TemplateStepFourConnectComponent
          
             if (microservicesForDynamic) {
               this.templateDetails.microservices = this.templateDetails.microservices.concat(microservicesForDynamic);
-            } */
-            this.pluginDetailsArray = cloneDeep(this.templateDetails.plugins );
+            } 
+            this.pluginDetailsArray = cloneDeep(this.templateDetails.plugins);
         });
     }
   }
@@ -959,7 +960,6 @@ export class TemplateStepFourConnectComponent
               findMatchedIdObject = this.templateDetails.dashboards.find(
                 (match) => match.id === item.linkWithDashboard
               );
-              console.log('findMatchedIdObject', findMatchedIdObject);
               if (
                 findMatchedIdObject &&
                 findMatchedIdObject.devices &&
@@ -1456,5 +1456,26 @@ clearDeviceandLinksOnToggleSwitch(dashboard, dashboardIndex) {
       } 
     }
   
+}
+
+showDashboardTemplatesListAndPreview(dashboardTemplatesList) {
+  let dashboardTemplateData;
+  dashboardTemplatesList = this.sortDashboardsByTitle(dashboardTemplatesList);
+dashboardTemplatesList.forEach(async (item, index) => {
+  if (item.dashboard) {
+    dashboardTemplateData = await (
+      await this.loadTemplateDetails(item.dashboard)
+    ).toPromise();
+    
+
+    dashboardTemplatesList[index].dashboardPreview = this.catalogService.getGithubURL(dashboardTemplateData.preview);
+  }
+  
+})
+console.log('dashboardTemplatesList', dashboardTemplatesList);
+  this.deviceSelectorModalRef = this.modalService.show(
+    DashboardListModalComponent,
+      { class: "c8y-wizard", initialState: { dashboardTemplatesList } }
+    );
 }
 }
