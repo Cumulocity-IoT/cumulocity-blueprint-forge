@@ -374,6 +374,20 @@ export class TemplateStepFourConnectComponent
       []
     );
 
+
+    // this.templateDetails.dashboards.forEach(async dashboardItem => {
+    //   if (dashboardItem.title != "Instruction" &&
+    //   dashboardItem.title != "Help and Support" &&
+    //   dashboardItem.title != "Welcome") {
+
+      
+
+
+    //     if (dashboardItem.enableSimulator && dashboardItem.simulatorFileExists) {
+    //       await this.simulatorFileGeneration(dashboardItem);
+    //     }
+    //   }
+    // })
     // Filter dashboards which are selected
 
     let configDataDashboards = this.templateDetails.dashboards.filter(
@@ -531,7 +545,23 @@ export class TemplateStepFourConnectComponent
         this.groupTemplate = false;
       }
 
-      if (db.enableSimulator && db.simulatorFileExists) {
+
+      
+      let findMatchedSimulator;
+      if (db.devices && db.devices[0]?.reprensentation?.id === 'dummy_id') {
+        findMatchedSimulator = this.templateDetails.dashboards.find(matchedSim => db.defaultLinkedDashboard === matchedSim.title);
+        if (findMatchedSimulator) {
+          if (findMatchedSimulator.enableSimulator && findMatchedSimulator.simulatorFileExists && !findMatchedSimulator?.simulatorGeneratedAlready) {
+            await this.simulatorFileGeneration(findMatchedSimulator);
+            
+          }
+          if(findMatchedSimulator?.simulatorGeneratedAlready) {
+            db.devices = findMatchedSimulator.devices;
+          }
+        }
+      }
+
+      if (db.enableSimulator && db.simulatorFileExists && !db?.simulatorGeneratedAlready) {
         await this.simulatorFileGeneration(db);
       }
 
@@ -837,8 +867,9 @@ export class TemplateStepFourConnectComponent
             ) {
               if (
                 this.templateDetails.dashboards[dd].isDeviceRequired === true &&
-                this.templateDetails.dashboards[dd].linkWithDashboard ===
-                  dashboard.id
+                (this.templateDetails.dashboards[dd].linkWithDashboard && dashboard.id && 
+                  this.templateDetails.dashboards[dd].linkWithDashboard ===
+                  dashboard.id)
               ) {
                 this.templateDetails.dashboards[dd].devices = null;
                 this.templateDetails.dashboards[dd].linkDashboards = [];
@@ -875,8 +906,9 @@ export class TemplateStepFourConnectComponent
             ) {
               if (
                 this.templateDetails.dashboards[dd].isDeviceRequired === true &&
+                (this.templateDetails.dashboards[dd].linkWithDashboard && dashboard.id &&
                 this.templateDetails.dashboards[dd].linkWithDashboard ===
-                  dashboard.id
+                  dashboard.id)
               ) {
                 this.templateDetails.dashboards[dd].devices = !this
                   .templateDetails.dashboards[dd].devices
@@ -1231,6 +1263,7 @@ export class TemplateStepFourConnectComponent
     }
   }
   async simulatorFileGeneration(dashboard) {
+    dashboard.templateType = 1;
       let isGroup = true;
       let content =  await this.simulatorConfigService.generateSimulatorFromConfiguration(
         dashboard.simulatorGroupName,
@@ -1241,10 +1274,10 @@ export class TemplateStepFourConnectComponent
       );
       if(content && content.status == 0)
       {
+        console.log('template details dashboards', this.templateDetails.dashboards);
           // this.currentApp.applicationBuilder.simulators = content.simulators;
           this.currentApp=content.app;
           dashboard.name = content?.deviceId;
-          dashboard.templateType = 1;
           dashboard.devices = [
             {
               type: "Temperature Sensor",
@@ -1255,6 +1288,13 @@ export class TemplateStepFourConnectComponent
               },
             },
           ];
+
+          this.templateDetails?.dashboards.forEach(dashboardItem => {
+            if (dashboardItem.defaultLinkedDashboard === dashboard.title) {
+              dashboardItem.devices = dashboard.devices;
+            }
+          })
+          dashboard.simulatorGeneratedAlready = true;
         }
       else {
         if(content && content.status) {
@@ -1283,7 +1323,7 @@ export class TemplateStepFourConnectComponent
       for (let dd = 0; dd < this.templateDetails.dashboards.length; dd++) {
         if (
           this.templateDetails.dashboards[dd].isDeviceRequired === true &&
-          this.templateDetails.dashboards[dd].linkWithDashboard === dashboard.id
+          (this.templateDetails.dashboards[dd].linkWithDashboard && dashboard.id && this.templateDetails.dashboards[dd].linkWithDashboard === dashboard.id)
         ) {
           this.templateDetails.dashboards[dd].devices = !this.templateDetails
             .dashboards[dd].devices
@@ -1447,8 +1487,9 @@ clearDeviceandLinksOnToggleSwitch(dashboard, dashboardIndex) {
     ) {
       if (
         this.templateDetails.dashboards[dd].isDeviceRequired === true &&
-        this.templateDetails.dashboards[dd].linkWithDashboard ===
-          dashboard.id
+        (this.templateDetails.dashboards[dd].linkWithDashboard && dashboard.id && 
+          this.templateDetails.dashboards[dd].linkWithDashboard ===
+          dashboard.id)
       ) {
         this.templateDetails.dashboards[dd].devices = null;
         this.templateDetails.dashboards[dd].linkDashboards = [];
@@ -1472,7 +1513,6 @@ dashboardTemplatesList.forEach(async (item, index) => {
   }
   
 })
-console.log('dashboardTemplatesList', dashboardTemplatesList);
   this.deviceSelectorModalRef = this.modalService.show(
     DashboardListModalComponent,
       { class: "c8y-wizard", initialState: { dashboardTemplatesList } }
