@@ -1,8 +1,16 @@
 .img-dashboard{
-    width: 500px; 
-    height: 300px;
+    width: 100%; 
+    height: 500px;
 } 
 .dashboard-list {
-    width:500px; 
-    max-width: 500px;
+    width: 100%; 
+    max-width: 100%;
+    height: 500px !important;
+    max-height: 500px !important;
 }
+.eye-preview {
+    font-size: 20px;
+    float: right;
+    padding-right: 15%;
+    color: #058192;
+  }

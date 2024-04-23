@@ -18,6 +18,7 @@
 import { Component, OnInit } from "@angular/core";
 import { BsModalRef } from "ngx-bootstrap/modal";
 import { cloneDeep } from "lodash-es";
+import { Subject } from "rxjs";
 
 @Component({
     selector: 'dashboard-list-modal',
@@ -30,11 +31,13 @@ export class DashboardListModalComponent implements OnInit{
     showImage: boolean = false;
     imageIndex: any;
     dashboardTemplatesListCopy: any;
-    
+    public onTemplateSelected: Subject<string>;
+    templateSelected: any;
+	  
     constructor(private modalRef: BsModalRef) { }
     ngOnInit() {
         this.dashboardTemplatesListCopy = cloneDeep(this.dashboardTemplatesList);
-        console.log('dashboard templates list in popup', this.dashboardTemplatesList);
+        this.onTemplateSelected = new Subject();
     }
 
     searchForDashboard() {
@@ -60,9 +63,15 @@ export class DashboardListModalComponent implements OnInit{
     showImageCanvas(dashboard, index) {
         this.showImage = !this.showImage;  
         this.imageIndex = index;
+        this.templateSelected = dashboard?.title?.trim();
     }
 
     backToList() {
         this.showImage = false;
+    }
+
+    selectDashboardTemplate() {
+        this.onTemplateSelected.next(this.templateSelected);
+        this.closeDialog();
     }
 }

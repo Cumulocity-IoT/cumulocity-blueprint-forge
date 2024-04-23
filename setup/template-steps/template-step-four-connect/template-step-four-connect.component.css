@@ -140,12 +140,22 @@
     background: #555; 
   }
   .btn-info {
-    position: absolute;
-    top: -5px;
+    /* position: absolute;
+    top: -5px; */
     color: #058192;
-    padding-left: 0;
+    padding: 1% 0 0 4%;
   }
   .fl-left {
     float: left;
+  }
+
+  .font-search {
+    font-size: 20px;
+  }
+  .wd-div {
+    width: 19%;
+  }
+  .wd-input {
+    width: 85%;
   }
   

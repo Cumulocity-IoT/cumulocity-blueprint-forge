@@ -216,7 +216,7 @@ export class TemplateStepFourConnectComponent
 
   private async loadTemplateDetailsFromDC(template: any, index?): Promise<void> {
     this.templateDetails.dashboards[index].isSpin = true;
-    if (template.availability && template.availability === "SHARED") {
+    if (template?.availability && template?.availability === "SHARED") {
       let currentDashboardTemplate = cloneDeep(template.templateDetails);;
       this.templateDetails.dashboards[index].dynamicDashboardArray =
             cloneDeep(currentDashboardTemplate);
@@ -287,7 +287,7 @@ export class TemplateStepFourConnectComponent
           this.loadSimulatorConfigFiles(this.templateDetails.dashboards[index]);
 
           // Add dependencies in case of dynamic dashboards
-           let pluginsForDynamic =  this.templateDetails.dashboards[index].dynamicDashboardArray?.input?.dependencies
+          /* let pluginsForDynamic =  this.templateDetails.dashboards[index].dynamicDashboardArray?.input?.dependencies
             .filter(dependency => dependency.type === 'plugin');
          
             if (pluginsForDynamic) {
@@ -299,7 +299,7 @@ export class TemplateStepFourConnectComponent
          
             if (microservicesForDynamic) {
               this.templateDetails.microservices = this.templateDetails.microservices.concat(microservicesForDynamic);
-            } 
+            } */
             this.pluginDetailsArray = cloneDeep(this.templateDetails.plugins);
         });
     }
@@ -938,12 +938,20 @@ export class TemplateStepFourConnectComponent
     );
   }
 
-  assignSelectedDashboard(index, event) {
+  assignSelectedDashboard(index, event, sentFrom) {
     this.templateDetails.dashboards[index].dynamicDashboardAssigned = true;
-    this.checkForSimulatorConfig(event.item, index);
-    this.templateDetails.dashboards[index].dynamicDashboardTemplate =
+    if (sentFrom === 'fromTemplate') {
+      this.checkForSimulatorConfig(event.item, index);
+      this.templateDetails.dashboards[index].dynamicDashboardTemplate =
       event.item;
-    this.loadTemplateDetailsFromDC(event.item, index);
+      this.loadTemplateDetailsFromDC(event.item, index);
+    } else if (sentFrom === 'fromPopup') {
+      this.checkForSimulatorConfig(event, index);
+      this.templateDetails.dashboards[index].dynamicDashboardTemplate =
+      event;
+      this.loadTemplateDetailsFromDC(event, index);
+    }
+    
   }
 
   async checkForSimulatorConfig(event, index) {
@@ -1274,7 +1282,6 @@ export class TemplateStepFourConnectComponent
       );
       if(content && content.status == 0)
       {
-        console.log('template details dashboards', this.templateDetails.dashboards);
           // this.currentApp.applicationBuilder.simulators = content.simulators;
           this.currentApp=content.app;
           dashboard.name = content?.deviceId;
@@ -1499,7 +1506,7 @@ clearDeviceandLinksOnToggleSwitch(dashboard, dashboardIndex) {
   
 }
 
-showDashboardTemplatesListAndPreview(dashboardTemplatesList) {
+showDashboardTemplatesListAndPreview(dashboardTemplatesList, dashboard, index, fromTypeahead, event) {
   let dashboardTemplateData;
   dashboardTemplatesList = this.sortDashboardsByTitle(dashboardTemplatesList);
 dashboardTemplatesList.forEach(async (item, index) => {
@@ -1515,7 +1522,17 @@ dashboardTemplatesList.forEach(async (item, index) => {
 })
   this.deviceSelectorModalRef = this.modalService.show(
     DashboardListModalComponent,
-      { class: "c8y-wizard", initialState: { dashboardTemplatesList } }
+      { class: "modal-lg", initialState: { dashboardTemplatesList } }
     );
+
+    this.deviceSelectorModalRef.content.onTemplateSelected.subscribe(templateSelected => {
+      if (fromTypeahead === 'fromSelectedDashboardTypeahead') {
+        dashboard.selectedDashboardName = templateSelected;
+      } else if (fromTypeahead === 'fromDashboardTemplateTypeahead') {
+        dashboard.dashboardTemplateSelected = templateSelected;
+      }
+      let filterSelectedDashboardData = this.filterTemplates.find(item => item.title === templateSelected);
+      this.assignSelectedDashboard(index, filterSelectedDashboardData, 'fromPopup');
+});
 }
 }
