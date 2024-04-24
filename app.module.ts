@@ -51,7 +51,6 @@ import { TypeaheadModule } from 'ngx-bootstrap/typeahead';
 import { ConfigureCustomDashboardModalComponent } from './setup/template-steps/template-step-four-connect/configure-custom-dashboard-modal.component';
 import { AlertMessageModalModule } from './builder/utils/alert-message-modal/alert-message-modal.module';
 import { DashboardListModalComponent } from './setup/utils/dashboard-list-modal/dashboard-list.component';
-import { PopoverModule } from "ngx-bootstrap/popover";
 @NgModule({
   declarations: [
     TemplateStepOneComponent, 
@@ -86,7 +85,6 @@ import { PopoverModule } from "ngx-bootstrap/popover";
     WizardModule,
     TypeaheadModule.forRoot(),
     AlertMessageModalModule,
-    PopoverModule.forRoot()
   ],
   providers: [
     TemplateCatalogSetupService,SetupConfigService,
