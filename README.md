@@ -17,6 +17,7 @@ Blueprint Forge provides a simple, coding-free way to build cumulocity applicati
 * **Enhanced Dashboard Catalog:** Users can now select and filter dashboard templates, as well as create simulators directly from the Dashboard Catalog.
 * **Share Dashboards:** Share and Reuse. Add your Custom Dashboards to the Catalog by using "Add to Catalog" button and Share it within Tenant or export and use it in other tenants.
 * **DTDL Generator Plugin:** New DTDL plugin to generate DTDL or simulator configuration files based on existing device and measurements.
+* **Dashboard Template Preview:** Now user can see the preview of various Dashboard Templates while creating the application.
 * **Various bug fixes**
 
 ## Features
