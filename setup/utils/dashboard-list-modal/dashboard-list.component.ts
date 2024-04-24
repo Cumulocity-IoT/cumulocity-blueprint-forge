@@ -74,4 +74,8 @@ export class DashboardListModalComponent implements OnInit{
         this.onTemplateSelected.next(this.templateSelected);
         this.closeDialog();
     }
+
+    selectTemplateChosen(dashboard) {
+        this.templateSelected = dashboard?.title?.trim();
+    }
 }

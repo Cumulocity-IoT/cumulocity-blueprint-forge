@@ -23,6 +23,7 @@
 
         <button *ngFor="let dashboard of dashboardTemplatesList; let d = index" type="button"
             class="list-group-item"
+            (click)="selectTemplateChosen(dashboard)"
             >{{dashboard.title.trim()}} 
             
         <i c8yIcon="eye" class="eye-preview" (click)="showImageCanvas(dashboard, d)"></i>
@@ -40,8 +41,8 @@
 
 
 <div class="c8y-wizard-footer">
-    <button *ngIf="!showImage" class="btn btn-default" (click)="closeDialog()">Cancel</button>
+    <button class="btn btn-default" (click)="closeDialog()">Cancel</button>
     <button *ngIf="showImage" class="btn btn-default" (click)="backToList()">Back</button>
-    <button *ngIf="showImage" class="btn btn-default" (click)="selectDashboardTemplate()">Select</button>
+    <button class="btn btn-primary" (click)="selectDashboardTemplate()" [disabled]="!templateSelected">Select</button>
 </div>
 
