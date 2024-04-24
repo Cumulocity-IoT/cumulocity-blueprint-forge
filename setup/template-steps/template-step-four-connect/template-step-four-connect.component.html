@@ -42,7 +42,7 @@
                               <div class="col-sm-2 col-xs-12 text-muted sim-width">
                                 <div class="btn-group" role="group">
                                   <button type="button" class="btn btn-default"
-                                    (click)="connectActualDeviceOrGroup(dashboard)"
+                                    (click)="connectActualDeviceOrGroup(dashboard, i)"
                                     [ngStyle]="{'background-color': dashboard.enableDeviceOrGroup ? '#C5EDEA': none}">
                                     <i c8yIcon="multiple-devices"
                                       title="Connect your dashboard with Device/Group or Type"></i></button>
@@ -164,29 +164,41 @@
                               </div>
 
 
-                              <div *ngIf="dashboard.enableLink" class="col-md-2 col-sm-3 set-margin">
+                              <div *ngIf="dashboard.enableLink" class="col-md-2 col-sm-3 set-margin wd-div">
                                 <div *ngIf="!dashboard.isHidden" class="dropdown wd-100" dropdown container="body">
                                   <input [(ngModel)]="dashboard.dashboardTemplateSelected"
                                     [typeahead]="filterTemplates" id="dashboardTemplates-{{i}}"
-                                    typeaheadOptionField="title" class="form-control" placeholder="Select Template"
+                                    typeaheadOptionField="title" class="form-control fl-left wd-input" placeholder="Select Template"
                                     [typeaheadMinLength]="2"
-                                    (typeaheadOnSelect)="assignSelectedDashboard(i, $event)"
+                                    (typeaheadOnSelect)="assignSelectedDashboard(i, $event, 'fromTemplate')"
                                     (typeaheadNoResults)="formValidation('onload', dashboard)"
                                     [ngModelOptions]="{standalone: true}"
                                     required>
+                                    <button type="button" class="btn btn-info fl-rgt pointer-icon search-icon-padding"
+                                    title="Click to see the list of dashboard templates and its preview"
+                                    (click)="showDashboardTemplatesListAndPreview(filterTemplates, dashboard, i, 'fromDashboardTemplateTypeahead', $event)">
+                                    <i c8yIcon="search" class="font-search"
+                                      ></i>
+                                      </button>
                                 </div>
                               </div>
 
-                              <div *ngIf="dashboard.isGroupDashboard || !dashboard.enableLink" class="col-md-2 col-sm-3 set-margin">
+                              <div *ngIf="dashboard.isGroupDashboard || !dashboard.enableLink" class="col-md-2 col-sm-3 set-margin wd-div">
                                 <div class="dropdown wd-100"
                                   dropdown container="body">
                                   <input [(ngModel)]="dashboard.selectedDashboardName" [typeahead]="filterTemplates"
-                                    typeaheadOptionField="title" class="form-control" placeholder="Select Template"
+                                    typeaheadOptionField="title" class="form-control fl-left wd-input" placeholder="Select Template"
                                     [typeaheadMinLength]="2"
-                                    (typeaheadOnSelect)="assignSelectedDashboard(i, $event)"
+                                    (typeaheadOnSelect)="assignSelectedDashboard(i, $event, 'fromTemplate')"
                                     (typeaheadNoResults)="formValidation('onload', dashboard)"
                                     [ngModelOptions]="{standalone: true}"
                                     required>
+                                    <button type="button" class="btn btn-info fl-rgt pointer-icon search-icon-padding"
+                                    title="Click to see the list of dashboard templates and its preview"
+                                    (click)="showDashboardTemplatesListAndPreview(filterTemplates, dashboard, i, 'fromSelectedDashboardTypeahead', $event)">
+                                      <i c8yIcon="search" class="font-search"
+                                        ></i>
+                                        </button>
                                 </div>
                               </div>
                               <div class="col-md-1 col-sm-1 warning-width" >
@@ -216,7 +228,7 @@
                             
                           </div>
                           <div class="col-xs-1 col-sm-1 col-md-1 flt-right">
-                            <button type="button" class="btn btn-dot" (click)="configureCustomDashboard()" title="Add Dashboard">
+                            <button type="button" class="btn btn-default btn-dot" (click)="configureCustomDashboard()" title="Add Dashboard">
                               <i c8yIcon="add-circle-outline" class="icon-24"></i>
                             </button>
                           </div>
