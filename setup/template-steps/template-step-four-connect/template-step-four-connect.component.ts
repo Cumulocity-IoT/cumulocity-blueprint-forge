@@ -57,7 +57,6 @@ import { SettingsService } from "../../../builder/settings/settings.service";
 import { DOCUMENT } from "@angular/common";
 import * as _ from "lodash";
 import { cloneDeep } from "lodash-es";
-import { DomSanitizer } from "@angular/platform-browser";
 import { ConfigureCustomDashboardModalComponent } from "./configure-custom-dashboard-modal.component";
 import { SimulatorConfigService } from "../../../builder/simulator-config/simulator-config.service";
 import { AlertMessageModalComponent } from "../../../builder/utils/alert-message-modal/alert-message-modal.component";
@@ -89,7 +88,6 @@ export class TemplateStepFourConnectComponent
   currentApp: IApplication;
   templateDetailsData: any;
   isFormValid = false;
- // deviceFormValid: boolean;
   assetButtonText: String = "Select Device";
   groupTemplateInDashboard: boolean;
   dashboardName: any;
@@ -109,8 +107,6 @@ export class TemplateStepFourConnectComponent
   dynamicDashboardValueToUpdate: any;
   filterTemplates: any;
   dashboardTemplateSelected: any;
-  //linkDashboards: any;
-  // linkDashboardsCopy: any;
   storeDefaultDashboardName: string;
   simulatorConfigFiles: any[];
   isPreviewLoading: boolean;
@@ -145,7 +141,6 @@ export class TemplateStepFourConnectComponent
     private pluginsService: PluginsService,
     private alertService: AlertService,
     private templateCatalogFromDCService: TemplateCatalogService,
-    private sanitizer: DomSanitizer,
     private componentService: DynamicComponentService,
     private simulatorConfigService: SimulatorConfigService
   ) {
@@ -285,21 +280,6 @@ export class TemplateStepFourConnectComponent
           this.templateDetails.dashboards[index].dynamicDashboardArray =
             cloneDeep(currentDashboardTemplate);
           this.loadSimulatorConfigFiles(this.templateDetails.dashboards[index]);
-
-          // Add dependencies in case of dynamic dashboards
-          /* let pluginsForDynamic =  this.templateDetails.dashboards[index].dynamicDashboardArray?.input?.dependencies
-            .filter(dependency => dependency.type === 'plugin');
-         
-            if (pluginsForDynamic) {
-              this.templateDetails.plugins = this.templateDetails.plugins.concat(pluginsForDynamic);
-            }
-
-          let microservicesForDynamic =  this.templateDetails.dashboards[index].dynamicDashboardArray?.input?.dependencies
-            .filter(dependency => dependency.type === 'microservice');
-         
-            if (microservicesForDynamic) {
-              this.templateDetails.microservices = this.templateDetails.microservices.concat(microservicesForDynamic);
-            } */
             this.pluginDetailsArray = cloneDeep(this.templateDetails.plugins);
         });
     }
@@ -374,20 +354,6 @@ export class TemplateStepFourConnectComponent
       []
     );
 
-
-    // this.templateDetails.dashboards.forEach(async dashboardItem => {
-    //   if (dashboardItem.title != "Instruction" &&
-    //   dashboardItem.title != "Help and Support" &&
-    //   dashboardItem.title != "Welcome") {
-
-      
-
-
-    //     if (dashboardItem.enableSimulator && dashboardItem.simulatorFileExists) {
-    //       await this.simulatorFileGeneration(dashboardItem);
-    //     }
-    //   }
-    // })
     // Filter dashboards which are selected
 
     let configDataDashboards = this.templateDetails.dashboards.filter(
@@ -449,9 +415,6 @@ export class TemplateStepFourConnectComponent
       this.progressIndicatorService.setProgress(20);
       this.progressIndicatorService.setMessage(`Installing ${db.title}`);
       await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      
-
       // in case of multiple templates
 
       let templateDetailsData;
@@ -544,8 +507,6 @@ export class TemplateStepFourConnectComponent
       } else {
         this.groupTemplate = false;
       }
-
-
       
       let findMatchedSimulator;
       if (db.devices && db.devices[0]?.reprensentation?.id === 'dummy_id') {
@@ -566,32 +527,12 @@ export class TemplateStepFourConnectComponent
       }
 
         templateDetailsData.input.devices = db.devices;
-      
-     /*  if (
-        db.dynamicDashboardArray &&
-        db.dynamicDashboardArray.input &&  db.dynamicDashboardAssigned
-      )
-      {
-        templateDetailsData.dashboard = db.dashboard;
-        templateDetailsData.title = db.title;
-        templateDetailsData.input.devices = db.devices;
-        templateDetailsData.input.dependencies =
-          db.dynamicDashboardArray.input.dependencies;
-        templateDetailsData.input.images =
-          db.dynamicDashboardArray.input.images;
-        templateDetailsData.widgets =
-          db.dynamicDashboardArray.widgets;
-        templateDetailsData.simulatorDTDL =
-          db.dynamicDashboardArray.simulatorDTDL;
-      } */
      
       if (
         db.title !== "Instruction" &&
         db.title !== "Welcome" &&
         db.title !== "Help and Support"
       ) {
-        
-
         // Newly added code for different way of linking dashboards
           let findDashbordsWithMatchedLink =
             this.templateDetails.dashboards.filter(
@@ -988,8 +929,6 @@ export class TemplateStepFourConnectComponent
       )
       .subscribe(
         (catalog: any) => {
-        //  this.templatesFromDC = catalog;
-        
           this.filterTemplates = catalog
             ? catalog
             : [];
@@ -1308,7 +1247,6 @@ export class TemplateStepFourConnectComponent
           this.alertService.danger(content.message);
         }
       }
-    
   }
 
   checkAndGenerateLinks(dashboard) {
@@ -1396,11 +1334,8 @@ export class TemplateStepFourConnectComponent
             id: app.id,
             applicationBuilder: app.applicationBuilder
         } as any);
-
     }
   }
-
-
 
   private loadTemplatesForCustomDashboard() {
     this.templateCatalogFromDCService
@@ -1439,7 +1374,6 @@ export class TemplateStepFourConnectComponent
         formValid = true;
       }
     }
-    
 
     if (type === 'onload') {
       if (this.templateDetails && this.templateDetails.dashboards) {
@@ -1465,7 +1399,6 @@ export class TemplateStepFourConnectComponent
         }
         
       }
-      
     }
     this.formValid = formValid;
   }
@@ -1531,7 +1464,7 @@ dashboardTemplatesList.forEach(async (item, index) => {
       } else if (fromTypeahead === 'fromDashboardTemplateTypeahead') {
         dashboard.dashboardTemplateSelected = templateSelected;
       }
-      let filterSelectedDashboardData = this.filterTemplates.find(item => item.title === templateSelected);
+      let filterSelectedDashboardData = this.filterTemplates.find(item => item.title?.trim() === templateSelected?.trim());
       this.assignSelectedDashboard(index, filterSelectedDashboardData, 'fromPopup');
 });
 }

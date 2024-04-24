@@ -200,7 +200,6 @@ async saveAppChanges(app) {
     throw e;
   }
   this.appStateService.currentUser.next(this.appStateService.currentUser.value);
-  
 }
 
   showSetupConfigModal(dashboardBasicConfig): BsModalRef {
