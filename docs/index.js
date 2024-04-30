@@ -9,6 +9,18 @@ var jsonData = {
         "https://labcase.softwareag.com/storage/d/aab636eafea97add7ba211446dc9193c.mp4",
     },
     {
+      title: "Blueprint Forge 2.1.0",
+      description: "Seamlessly Link Devices and Dashboards: Blueprint Forge Simplifies Application Creation",
+      videoUrl:
+        "https://www.youtube.com/watch?v=ciEtvjHiOXs",
+    },
+    {
+      title: "DTDL Generator Plugin",
+      description: "​​​​​​DTDL Generator plugin to generate Digital Twin Definitions out of Cumulocity to simulate devices with ease.",
+      videoUrl:
+        "https://www.youtube.com/watch?v=fYhyUJT2WmY",
+    },
+    {
       title: "Predictive Maintenance with Boon Logic",
       description:
         "​​​​​​​Boon Logic is an AI software company focused on delivering the fastest anomaly detection solutions available in the market today.",
@@ -19,7 +31,7 @@ var jsonData = {
       description: "​​​​​​​Integrate Cumulocity with Field Services platform to effectively manage device malfunctions and alerts.",
       videoUrl:
         "https://labcase.softwareag.com/storage/d/62366d9ac93bcaec9558aa3c34f695e3.mp4",
-    },
+    }
   ],
 };
 const title = document.getElementById("title");
