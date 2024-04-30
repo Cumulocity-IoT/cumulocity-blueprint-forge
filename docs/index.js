@@ -12,13 +12,13 @@ var jsonData = {
       title: "Blueprint Forge 2.1.0",
       description: "Seamlessly Link Devices and Dashboards: Blueprint Forge Simplifies Application Creation",
       videoUrl:
-        "https://www.youtube.com/watch?v=ciEtvjHiOXs",
+        "https://www.youtube.com/embed/ciEtvjHiOXs?si=fNwpyPPt8_UzeVKf",
     },
     {
       title: "DTDL Generator Plugin",
       description: "​​​​​​DTDL Generator plugin to generate Digital Twin Definitions out of Cumulocity to simulate devices with ease.",
       videoUrl:
-        "https://www.youtube.com/watch?v=fYhyUJT2WmY",
+        "https://www.youtube.com/embed/fYhyUJT2WmY?si=0OF52ncKJKp3nZX9",
     },
     {
       title: "Predictive Maintenance with Boon Logic",
