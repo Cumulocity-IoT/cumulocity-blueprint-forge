@@ -2,15 +2,8 @@ var jsonData = {
   HeadingName: "Blueprint Forge",
   videoList: [
     {
-      title: "Blueprint Forge: A Step-by-Step How-To Video Guide",
-      description:
-        "Unlock innovation in minutes: Discover the swift and effortless path to crafting applications with Blueprint. Follow this <a href='https://www.youtube.com/watch?v=TpUcVjMlBxg' target='_blank' >step-by-step guide </a> to register a device with cumulocity.",
-      videoUrl:
-        "https://labcase.softwareag.com/storage/d/aab636eafea97add7ba211446dc9193c.mp4",
-    },
-    {
       title: "Blueprint Forge 2.1.0",
-      description: "Seamlessly Link Devices and Dashboards: Blueprint Forge Simplifies Application Creation",
+      description: "Unlock innovation in minutes: Discover the swift and effortless path to crafting applications with Blueprint. Follow this <a href='https://www.youtube.com/watch?v=TpUcVjMlBxg' target='_blank' >step-by-step guide </a> to register a device with cumulocity.",
       videoUrl:
         "https://www.youtube.com/embed/ciEtvjHiOXs?si=fNwpyPPt8_UzeVKf",
     },
@@ -31,6 +24,13 @@ var jsonData = {
       description: "​​​​​​​Integrate Cumulocity with Field Services platform to effectively manage device malfunctions and alerts.",
       videoUrl:
         "https://labcase.softwareag.com/storage/d/62366d9ac93bcaec9558aa3c34f695e3.mp4",
+    },
+    {
+      title: "Blueprint Forge 1.0: A Step-by-Step How-To Video Guide (Deprecated)",
+      description:
+        "Unlock innovation in minutes: Discover the swift and effortless path to crafting applications with Blueprint. Follow this <a href='https://www.youtube.com/watch?v=TpUcVjMlBxg' target='_blank' >step-by-step guide </a> to register a device with cumulocity.",
+      videoUrl:
+        "https://labcase.softwareag.com/storage/d/aab636eafea97add7ba211446dc9193c.mp4",
     }
   ],
 };
