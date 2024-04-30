@@ -15,6 +15,9 @@
 * See the License for the specific language governing permissions and
 * limitations under the License.
  */
+
+import { TemplateCatalogEntry } from "./../builder/template-catalog/template-catalog.model";
+
 // This is for storing configuration
 export interface BlueprintForge {
     templateURL?: string;
@@ -22,6 +25,7 @@ export interface BlueprintForge {
     plugins?: PluginDetails[];
     microservices?: MicroserviceDetails[];
     dashboards: Dashboards[];
+    selectedWelcomeTemplate?: string;
 }
 export interface TemplateBlueprintEntry {
     templateId: string;
@@ -30,12 +34,6 @@ export interface TemplateBlueprintEntry {
     thumbnail: string;
     config: string;
     comingSoon: boolean;
-}
-
-export interface WelcomeTemplate {
-    dashboardName: string;
-    dashboard: string;
-    description: string;
 }
 
 export interface TemplateBlueprintDetails {
@@ -47,6 +45,7 @@ export interface TemplateBlueprintDetails {
     plugins?: PluginDetails[];
     microservices?: MicroserviceDetails[];
     dashboards: Dashboards[];
+    dashboardLinks?:DashboardLink [];
     input : {
         devices?: DeviceDetails[];
     }
@@ -76,6 +75,29 @@ export interface MicroserviceDetails {
 }
 
 export interface Dashboards {
+    simulatorGeneratedAlready: any;
+    dtdlURL: any;
+    name: string;
+    simulatorNoOfDevices: number;
+    simulatorGroupName: string;
+    isSpin: boolean;
+    dynamicDashboardTemplate?: any;
+    dynamicDashboardArray?: any;
+    input: any;
+    previewBinaryId: any;
+    preview: any;
+    dynamicDashboardAssigned?: boolean;
+    simulatorFileExists?: boolean;
+    dtdlFileExists?: boolean;
+    defaultLinkedDashboard?: string;
+    findMatchedLink?: Dashboards;
+    selectedDashboardName?: string;
+    id: string;
+    dashboardTemplateSelected: any;
+    enableLink?: boolean;
+    enableDeviceOrGroup?: boolean;
+    enableSimulator?: boolean;
+    welcomeTemplates: any;
     title: string;
     icon: string;
     isDeviceRequired: boolean;
@@ -84,7 +106,6 @@ export interface Dashboards {
     selected?: boolean;
     configured?: boolean;
     deviceId?: string;
-    isChecked?: boolean;
     dashboardWidgets: DashboardWidgets[];
     isSelectAsset: boolean;
     isSelectType: boolean;
@@ -92,6 +113,14 @@ export interface Dashboards {
     isGroupDashboard: boolean;
     visibility: boolean;
     isMandatory: boolean;
+    dashboardTemplate?: TemplateCatalogEntry[];
+    linkWithDashboard?: string;
+    devices?: DeviceDetails[];
+    isSimulatorConfigExist?: boolean;
+    templateType?: number;
+    basicConfig?: WidgetDetail[];
+    isConfigRequred?: boolean;
+    linkDashboards?: any;
 }
 export interface DashboardWidgets {
     id?: string;
@@ -122,6 +151,26 @@ export interface DashboardWidgets {
         name: string;
     };
 } 
+
+export interface DashboardLink {
+    dashboardName: string;
+    updatableProperty?: string;
+    targetDashboardName: string;
+    targetProperty?: string;
+    widgetComponentId?: string;
+}
+
+export interface WidgetDetail {
+    componentId?: string;
+    title?: string;
+    config?: WidgetConfig[];
+}
+
+export interface WidgetConfig {
+    type?: string;
+    fieldName?: string;
+    name?: string;
+}
 
 
 

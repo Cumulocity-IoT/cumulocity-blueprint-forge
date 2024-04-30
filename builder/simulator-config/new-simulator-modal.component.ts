@@ -22,9 +22,10 @@ import {
     ComponentFactoryResolver, ComponentRef,
     Injector,
     ViewChild,
-    ViewContainerRef
+    ViewContainerRef,
+    OnInit
 } from '@angular/core';
-import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { BsModalRef, BsModalService, ModalOptions } from 'ngx-bootstrap/modal';
 import { WizardComponent } from "../../wizard/wizard.component";
 import { InventoryService, ApplicationService, IManagedObject, FetchClient } from '@c8y/client';
 import { AppIdService } from "../app-id.service";
@@ -40,15 +41,21 @@ import { SimulatorWorkerAPI } from '../simulator/mainthread/simulator-worker-api
 import { SimulatorConfigService } from './simulator-config.service';
 import { AlertMessageModalComponent } from '../../builder/utils/alert-message-modal/alert-message-modal.component';
 import { SimulatorManagerService } from '../../builder/simulator/mainthread/simulator-manager.service';
-
+import { switchMap} from "rxjs/operators";
+import { AppDataService } from '../app-data.service';
+import { from, of, Subscription, Subject } from "rxjs";
 @Component({
     templateUrl: './new-simulator-modal.component.html'
 })
-export class NewSimulatorModalComponent {
+export class NewSimulatorModalComponent implements OnInit{
     busy: boolean = false;
     isConfigFileUploading: boolean = false;
     isConfigFileError: boolean = false;
-
+    appId:string;
+    simulatorList:any[];
+    simulatorsNameList:string[]=[];
+    appSubscription:Subscription;
+    isduplicateSmulatorName:boolean=false;
     @ViewChild(WizardComponent, { static: true }) wizard: WizardComponent;
 
     @ViewChild("configWrapper", { read: ViewContainerRef, static: true }) configWrapper: ViewContainerRef;
@@ -60,6 +67,7 @@ export class NewSimulatorModalComponent {
     deviceName: string | undefined;
     groupName: string | undefined;
     numberOfDevice: number | 0;
+    deviceType: string| undefined;
     isGroup: boolean = false;
     configFromFile: any;
     runOnServer: boolean = false;
@@ -75,9 +83,38 @@ export class NewSimulatorModalComponent {
         private appService: ApplicationService, private appIdService: AppIdService, private fetchClient: FetchClient,
         private simulatorNotificationService: SimulatorNotificationService, private fileSimulatorNotificationService: FileSimulatorNotificationService,
         private simulatorConfigService: SimulatorConfigService,private modalService: BsModalService,
-        private simulatorManagerService: SimulatorManagerService
+        private simulatorManagerService: SimulatorManagerService,public appDataService: AppDataService,
+        private modalOptions: ModalOptions
     ) { }
-
+    async ngOnInit(): Promise<void> {
+        this.appDataService.forceUpdate = true;
+        await this.getAppDetails(this.appId);            
+    }
+    //Getting application details
+    async getAppDetails(appId:string){
+        const app = this.appIdService.appIdDelayedUntilAfterLogin$.pipe(
+            switchMap(appId =>  {
+                if (appId) {
+                return from(this.appDataService.getAppDetails(appId));
+                } else {
+                return of(null);
+                }
+            })
+        );
+        this.appSubscription = app.subscribe((app) => {
+        if(app  &&  app.applicationBuilder && app.applicationBuilder?.simulators){
+            this.simulatorList=app.applicationBuilder?.simulators
+        }
+        this.getSimulatorsNameList(this.simulatorList);
+    });
+    
+    }
+    //Getting a list of all existing simulator names
+    async getSimulatorsNameList(simulatorList:any[]){
+        simulatorList.forEach(simulator=>{
+            this.simulatorsNameList.push(simulator.name);
+        });
+    }
     async openSimulatorConfig() {
         this.wizard.selectStep('config');
 
@@ -119,7 +156,15 @@ export class NewSimulatorModalComponent {
 
         }
     }
-
+    //validating if simulator name already exists
+    validateSimulatorName(){
+        if(this.simulatorsNameList.includes(this.simulatorName)){
+            this.isduplicateSmulatorName=true;
+        }
+        else{
+            this.isduplicateSmulatorName=false;
+        }
+    }
     resetDialogSize() {
         this.bsModalRef.setClass('modal-sm');
     }
@@ -169,7 +214,10 @@ export class NewSimulatorModalComponent {
                     name: this.simulatorName,
                     c8y_RequiredAvailability: {
                         responseInterval: 5
-                    }
+                    },
+                    c8y_SupportedOperations: [
+                        "c8y_Connection_status"
+                    ]
                 })).data;
                 this.deviceName = this.simulatorName;
                 this.deviceId = device.id;
@@ -210,7 +258,8 @@ export class NewSimulatorModalComponent {
             type: metadata.name,
             config: this.newConfig,
             lastUpdated: new Date().toISOString(),
-            serverSide: (runOnServer ? true : false)
+            serverSide: (runOnServer ? true : false),
+            started : null
         };
         simulators.push(newSimulatorObject);
         appServiceData.applicationBuilder.simulators = simulators;
@@ -239,6 +288,7 @@ export class NewSimulatorModalComponent {
 
         if(isFirstSimulator) {
             this.simulatorManagerService.initialize();
+            this.simSvc.startOperationListener();
         }
         // We could just wait for them to refresh, but it's nicer to instantly refresh
         await this.simSvc.checkForSimulatorConfigChanges();
@@ -260,10 +310,14 @@ export class NewSimulatorModalComponent {
         for (let index = 0; index < this.numberOfDevice; index++) {
             const childManageObject: Partial<IManagedObject> = {
                 c8y_IsDevice: {},
+                type: (this.deviceType ? this.deviceType: null),
                 name: this.simulatorName + '-' + (index + 1),
                 c8y_RequiredAvailability: {
                     responseInterval: 5
-                }
+                },
+                c8y_SupportedOperations: [
+                    "c8y_Connection_status"
+                ]
             };
             await this.inventoryService.childAssetsCreate(childManageObject, group.id);
         }
@@ -280,14 +334,7 @@ export class NewSimulatorModalComponent {
             input = event.target.result;
             const validJson = this.isValidJson(input);
             if (validJson) {
-                this.selectedStrategyFactory = this.simulationStrategiesService.strategiesByName.get(validJson.type);
-                if (this.selectedStrategyFactory === undefined) {
-                    this.isConfigFileError = true;
-                } else {
-                    this.configFromFile = validJson.config;
-                    this.simulatorName = validJson.name;
-                    this.wizard.selectStep('device');
-                }
+                this.processFileInput(validJson);
             } else {
                 this.isConfigFileError = true;
                 events.srcElement.value = "";
@@ -370,5 +417,15 @@ export class NewSimulatorModalComponent {
                 this.newConfig.intervalInvalid = false;
             }
         });
+    }
+
+    processFileInput(validJson) {
+        this.selectedStrategyFactory = this.simulationStrategiesService.strategiesByName.get(validJson.type);
+                if (this.selectedStrategyFactory === undefined) {
+                    this.isConfigFileError = true;
+                } else {
+                    this.configFromFile = validJson.config;
+                    this.simulatorName = validJson.name;
+                }
     }
 }

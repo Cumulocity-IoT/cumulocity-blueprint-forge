@@ -21,8 +21,9 @@ import { AlertService, AppStateService, C8yStepper, SetupComponent } from '@c8y/
 import { TemplateSetupStep } from './../../template-setup-step';
 import { TemplateCatalogSetupService } from '../../template-catalog-setup.service';
 import { catchError } from "rxjs/operators";
-import { TemplateBlueprintDetails, TemplateBlueprintEntry, WelcomeTemplate } from './../../template-setup.model';
+import { TemplateBlueprintDetails, TemplateBlueprintEntry } from './../../template-setup.model';
 import { SetupConfigService } from './../../setup-config.service';
+import { TemplateCatalogEntry } from './../../../builder/template-catalog/template-catalog.model';
 
 @Component({
   selector: 'c8y-template-step-one',
@@ -30,11 +31,11 @@ import { SetupConfigService } from './../../setup-config.service';
   styleUrls: ['./template-step-one.component.css'],
   host: { class: 'd-contents' }
 })
-export class TemplateStepOneComponent extends TemplateSetupStep implements OnInit, AfterViewInit {
+export class TemplateStepOneComponent extends TemplateSetupStep implements OnInit {
 
 
   public templates: Array<TemplateBlueprintEntry> = [];
-  public welcomeTemplate: Array<WelcomeTemplate> = [];
+  public welcomeTemplate: Array<TemplateCatalogEntry> = [];
 
   public filterTemplates: Array<TemplateBlueprintEntry> = [];
   templateDetails: TemplateBlueprintDetails;
@@ -55,10 +56,6 @@ export class TemplateStepOneComponent extends TemplateSetupStep implements OnIni
     this.loadTemplateCatalog();
   }
 
-  ngAfterViewInit() {
-    this.verifyStepCompleted();
-
-  }
   loadTemplateCatalog() {
     this.templateCatalogSetupService.getTemplateCatalog()
       .pipe(catchError(err => {
@@ -67,7 +64,7 @@ export class TemplateStepOneComponent extends TemplateSetupStep implements OnIni
       }))
       .subscribe((catalog: any) => {
         this.templates = this.templates.concat(catalog[0]);
-        this.templateCatalogSetupService.welcomeTemplateData.next(catalog[1]);
+        this.templateCatalogSetupService.welcomeTemplateData = catalog[1];
         this.filterTemplates = (this.templates ? this.templates : []);
         this.filterTemplates.forEach(template => {
           if (template.thumbnail && template?.thumbnail != '') {

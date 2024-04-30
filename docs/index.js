@@ -2,11 +2,16 @@ var jsonData = {
   HeadingName: "Blueprint Forge",
   videoList: [
     {
-      title: "Blueprint Forge: A Step-by-Step How-To Video Guide",
-      description:
-        "Unlock innovation in minutes: Discover the swift and effortless path to crafting applications with Blueprint. Follow this <a href='https://www.youtube.com/watch?v=TpUcVjMlBxg' target='_blank' >step-by-step guide </a> to register a device with cumulocity.",
+      title: "Blueprint Forge 2.1.0",
+      description: "Unlock innovation in minutes: Discover the swift and effortless path to crafting applications with Blueprint. Follow this <a href='https://www.youtube.com/watch?v=TpUcVjMlBxg' target='_blank' >step-by-step guide </a> to register a device with cumulocity.",
       videoUrl:
-        "https://labcase.softwareag.com/storage/d/aab636eafea97add7ba211446dc9193c.mp4",
+        "https://www.youtube.com/embed/ciEtvjHiOXs?si=fNwpyPPt8_UzeVKf",
+    },
+    {
+      title: "DTDL Generator Plugin",
+      description: "​​​​​​DTDL Generator plugin to generate Digital Twin Definitions out of Cumulocity to simulate devices with ease.",
+      videoUrl:
+        "https://www.youtube.com/embed/fYhyUJT2WmY?si=0OF52ncKJKp3nZX9",
     },
     {
       title: "Predictive Maintenance with Boon Logic",
@@ -20,6 +25,13 @@ var jsonData = {
       videoUrl:
         "https://labcase.softwareag.com/storage/d/62366d9ac93bcaec9558aa3c34f695e3.mp4",
     },
+    {
+      title: "Blueprint Forge 1.0: A Step-by-Step How-To Video Guide (Deprecated)",
+      description:
+        "Unlock innovation in minutes: Discover the swift and effortless path to crafting applications with Blueprint. Follow this <a href='https://www.youtube.com/watch?v=TpUcVjMlBxg' target='_blank' >step-by-step guide </a> to register a device with cumulocity.",
+      videoUrl:
+        "https://labcase.softwareag.com/storage/d/aab636eafea97add7ba211446dc9193c.mp4",
+    }
   ],
 };
 const title = document.getElementById("title");
