@@ -16,7 +16,9 @@
     "postbuild-dev": " gulp bundle"
   },
   "repository": "git+https://github.com/SoftwareAG/cumulocity-blueprint-forge.git",
-  "keywords": ["Blueprint"],
+  "keywords": [
+    "Blueprint"
+  ],
   "author": "Software AG, Global Presales",
   "license": "Apache-2.0",
   "homepage": "https://github.com/SoftwareAG/cumulocity-blueprint-forge#readme",
@@ -94,34 +96,46 @@
         "required": true,
         "functional": "These cookies are used to support you during your first steps in the product, to deliver content tailored to your needs, and to collect usage statistics."
       },
-      "exports": [{
-        "name": "Device DTDL Generator plugin",
-        "module": "DtdlGeneratorPluginModule",
-        "path": "./custom-plugins/dtdl-generator/gp-dtdl-generator-plugin.module.ts",
-        "description": "Adds a navigation plugin to generate DTDL file for a device."
-      }],
+      "exports": [
+        {
+          "name": "Device DTDL Generator plugin",
+          "module": "DtdlGeneratorPluginModule",
+          "path": "./custom-plugins/dtdl-generator/gp-dtdl-generator-plugin.module.ts",
+          "description": "Adds a navigation plugin to generate DTDL file for a device."
+        }
+      ],
       "remotes": {
-        "widget-plugin": ["DtdlGeneratorPluginModule"]
+        "widget-plugin": [
+          "DtdlGeneratorPluginModule"
+        ]
       },
-      "copy": [{
-        "from": "./ui-assets/fonts",
-        "to": "./fonts/"
-      }, {
-        "from": "./ui-assets/img",
-        "to": "./img/"
-      }, {
-        "from": "assets/blueprint-forge.png",
-        "to": "assets/blueprint-forge.png"
-      }, {
-        "from": "LICENSE",
-        "to": "LICENSE.txt"
-      }, {
-        "from": "README.md",
-        "to": "README.md"
-      }],
+      "copy": [
+        {
+          "from": "./ui-assets/fonts",
+          "to": "./fonts/"
+        },
+        {
+          "from": "./ui-assets/img",
+          "to": "./img/"
+        },
+        {
+          "from": "assets/blueprint-forge.png",
+          "to": "assets/blueprint-forge.png"
+        },
+        {
+          "from": "LICENSE",
+          "to": "LICENSE.txt"
+        },
+        {
+          "from": "README.md",
+          "to": "README.md"
+        }
+      ],
       "version": "2.1.2"
     },
     "cli": {}
   },
-  "browserslist": ["last 2 major versions"]
+  "browserslist": [
+    "last 2 major versions"
+  ]
 }
