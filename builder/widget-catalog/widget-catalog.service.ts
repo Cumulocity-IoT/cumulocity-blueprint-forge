@@ -36,7 +36,7 @@ const packageJson = require('./../../package.json');
 @Injectable()
 export class WidgetCatalogService {
 
-  C8Y_VERSION = '1016.X.X';
+  C8Y_VERSION = '1018.X.X';
   pkgVersion: any;
   private WidgetCatalogPath = '/widgetCatalog/widget-catalog.json';
   private DemoCatalogWidgetsPath = '/demoCatalogWidgets/demo-catalog-widgets.json';

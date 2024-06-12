@@ -1,6 +1,6 @@
 {
   "name": "blueprint-forge",
-  "version": "2.1.2",
+  "version": "2.1.1",
   "description": "Blueprint Forge enables template driven approach of integrating pre-built solution templates with a seemless user experience.",
   "scripts": {
     "start": "c8ycli server",
@@ -38,7 +38,7 @@
     "@ng-select/ng-select": "^9.1.0",
     "@ngx-translate/core": "14.0.0",
     "angular": "1.6.9",
-    "app-builder-external-assets": "file:binary/app-builder-external-assets-3.2.0.tgz",
+    "app-builder-external-assets": "file:binary/app-builder-external-assets-3.3.0.tgz",
     "crypto-js": "^4.2.0",
     "delay": "^5.0.0",
     "font-awesome": "^4.7.0",

@@ -204,7 +204,7 @@ export class TemplateCatalogSetupService {
         };
     }
 
-    getDashboardFields(link) {
+   /*  getDashboardFields(link) {
 
         return this.http.get(`${this.GATEWAY_URL_GitHubAsset}${link}`).pipe(map(response => {
             let dashboardFields = response as Array<object>;
@@ -215,7 +215,7 @@ export class TemplateCatalogSetupService {
             })
         }));
 
-    }
+    } */
 
     private getWidgetsAsChildren(widgets): object {
         let children = {};
