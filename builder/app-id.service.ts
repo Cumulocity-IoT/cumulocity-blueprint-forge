@@ -19,7 +19,8 @@
 import {distinctUntilChanged, filter, first, map, mapTo, switchMap, tap} from "rxjs/operators";
 import {BehaviorSubject, Observable, of} from "rxjs";
 import {Injectable} from "@angular/core";
-import {AppStateService} from "@c8y/ngx-components";
+import { FetchClient } from "@c8y/client";
+import { AppStateService} from "@c8y/ngx-components";
 import {ActivationEnd, ParamMap, Router} from "@angular/router";
 import {get} from "lodash-es";
 
@@ -29,8 +30,13 @@ export class AppIdService {
     readonly appId$ = new BehaviorSubject<string|undefined>(undefined);
     /** same as the appId$ but the value is pended until after the user logs in */
     readonly appIdDelayedUntilAfterLogin$: Observable<string|undefined>;
+    private readonly CUMULOCITY_COMMUNITY_MS_HEALTH_URL = '/service/c8y-community-utils/health';
+    isCommunityMSExist = false;
 
-    constructor(private router: Router, private appStateService: AppStateService) {
+    constructor(private router: Router, private appStateService: AppStateService,
+        private client: FetchClient
+    ) {
+        
         router.events.pipe(
                 filter(event => event instanceof ActivationEnd),
                 switchMap(() => get(router.routerState.root, 'firstChild.paramMap') as Observable<ParamMap> | undefined || of(undefined)),
@@ -46,6 +52,18 @@ export class AppIdService {
                 mapTo(url)
             )
         ));
+
+        this.getCumulocityCommunityMSHealth().then(response => {
+            if(response && response.status === "UP") {
+                this.isCommunityMSExist = true;
+            } else  {
+                this.isCommunityMSExist = false;
+            }
+          }).catch(err => {
+                this.isCommunityMSExist = false;
+          })
+        
+    
     }
 
     // Required for navigator plugin
@@ -58,5 +76,9 @@ export class AppIdService {
     /** Gets the current appId (from the url eg: '/application/123/dashboard/xyz' => '123') */
     getCurrentAppId(): string | undefined {
         return this.appId$.getValue();
+    }
+
+    async getCumulocityCommunityMSHealth() {
+        return (await (await this.client.fetch(`${this.CUMULOCITY_COMMUNITY_MS_HEALTH_URL}`)).json());
     }
 }

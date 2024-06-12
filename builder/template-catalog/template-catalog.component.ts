@@ -409,15 +409,13 @@ export class TemplateCatalogModalComponent implements OnInit {
                 }
             });
             this.catalogService.downloadBinary(dependency.link)
-                .subscribe(async data => {
+                .then(async blob => {
                     let createdApp = null;
                     this.microserviceDownloadProgress$.unsubscribe();
                     try {
                         this.progressIndicatorService.setProgress(40);
                         this.progressIndicatorService.setMessage(`Installing ${dependency.title}`);
-                        const blob = new Blob([data], {
-                            type: 'application/zip'
-                        });
+                        
                         const fileName = dependency.link.replace(/^.*[\\\/]/, '');
                         const fileOfBlob = new File([blob], fileName);
 
@@ -442,10 +440,14 @@ export class TemplateCatalogModalComponent implements OnInit {
                         this.alertService.danger("There is some technical error! Please try after sometime.");
                         console.error(ex.message);
                     }
+                }).catch(err => {
+                    this.hideProgressModalDialog();
+                    this.loadErrorMessageDialog();
                 });
             
         } else { // installing plugin
-            const widgetBinaryFound = this.listOfPackages.find(app => (app.name.toLowerCase() === dependency.title?.toLowerCase() ||
+            const packageList = await this.pluginsService.listPackages(); 
+            const widgetBinaryFound = packageList.find(app => (app.name.toLowerCase() === dependency.title?.toLowerCase() ||
             (app.contextPath && app.contextPath?.toLowerCase() === dependency?.contextPath?.toLowerCase())));
             this.showProgressModalDialog(`Installing ${dependency.title}`);
             this.progressIndicatorService.setProgress(10);
@@ -464,11 +466,8 @@ export class TemplateCatalogModalComponent implements OnInit {
             } else {
                 this.progressIndicatorService.setProgress(10);
                     this.catalogService.downloadBinary(dependency.link?dependency.link : dependency.binaryLink)
-                    .subscribe(data => {
+                    .then(blob => {
                         this.progressIndicatorService.setProgress(20);
-                        const blob = new Blob([data], {
-                            type: 'application/zip'
-                        });
                         const fileName =dependency.link? dependency.link.replace(/^.*[\\\/]/, '') : dependency.binaryLink.replace(/^.*[\\\/]/, '');
                         const fileOfBlob = new File([blob], fileName);
                         this.widgetCatalogService.installPackage(fileOfBlob).then(async () => {
@@ -655,4 +654,16 @@ export class TemplateCatalogModalComponent implements OnInit {
         }
         this.searchFilterTemplates= this.filterTemplates ? this.filterTemplates : [];
     }
+
+    private loadErrorMessageDialog() {
+        const alertMessage = {
+          title: 'Microservice needed!',
+          description: `'Cumulocity Community Utils' microservice is not installed or subscribed. Please download the microservice, then install and subscribe to it by navigating to Administration -> Ecosystems -> Microservices. `,
+          type: 'danger',
+          externalLink: "https://labcase.softwareag.com/storage/d/a02221e54739758ccb1ab839ce09e2cc",
+          externalLinkLabel: "Download the microservice now.",
+          alertType: 'info' //info|confirm
+        }
+        this.alertModalDialog(alertMessage);
+      }
 }
