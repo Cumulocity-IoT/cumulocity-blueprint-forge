@@ -612,8 +612,7 @@ export class TemplateStepFourConnectComponent
       });
 
     const data = await this.templateCatalogSetupService
-      .downloadBinary(microService.link)
-      .toPromise();
+      .downloadBinary(microService.link);
     let createdApp = null;
     this.microserviceDownloadProgress$.unsubscribe();
     try {
@@ -688,8 +687,7 @@ export class TemplateStepFourConnectComponent
     } else {
       this.progressIndicatorService.setProgress(10);
       const data = await this.templateCatalogSetupService
-        .downloadBinary(plugin.link)
-        .toPromise();
+        .downloadBinary(plugin.link);
 
       this.progressIndicatorService.setProgress(20);
       const blob = new Blob([data], {
