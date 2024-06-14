@@ -479,7 +479,11 @@ export class TemplateCatalogModalComponent implements OnInit {
                             this.alertService.danger("There is some technical error! Please try after sometime.");
                             console.error(error);
                         });
-                    });
+                    })
+                    .catch(err => {
+                        this.hideProgressModalDialog();
+                        this.loadErrorMessageDialog();
+                    });;
             }
         }
     }

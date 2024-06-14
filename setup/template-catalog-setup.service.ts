@@ -186,7 +186,8 @@ export class TemplateCatalogSetupService {
                 this.alertService.danger("Unable to download binary! Please try after sometime. If problem persists, please contact the administrator.");
             }
         } else {
-            throw Error("Unable to download binary!");     
+            console.log("Unable to download binary!");
+            return null;
         }
 
     }
