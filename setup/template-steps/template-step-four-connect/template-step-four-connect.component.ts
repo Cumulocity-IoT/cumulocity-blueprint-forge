@@ -117,6 +117,8 @@ export class TemplateStepFourConnectComponent
   private templateId: string ="";
   blankDashboardURL: any;
   formValid: boolean = false;
+  installationFailed: boolean = false;
+  isRetry: boolean = false;
 
   constructor(
     public stepper: C8yStepper,
@@ -333,13 +335,10 @@ export class TemplateStepFourConnectComponent
       this.alert.warning("Installation isn't supported when running Application on localhost.");
       return;
     }
-    
-  //   let defaultDashboardNotChanged = this.templateDetails.dashboards.filter(item => item.title !== 'Instruction' && item.title !== 'Help and Support' && item.title !== 'Welcome' && (item.selectedDashboardName === item.title || item.dashboardTemplateSelected === item.title));
-  //   if (defaultDashboardNotChanged) {
-  //     for (let [index, dashb] of defaultDashboardNotChanged.entries()) {
-  //       this.loadTemplateDetailsFromDC(dashb, index);
-  //   }
-  // }
+    if (this.isRetry) {
+      this.next();
+      return;
+    } 
 
     this.templateDetails.plugins = this.templateDetails.plugins.reduce(
       (accumulator, current) => {
@@ -386,7 +385,6 @@ export class TemplateStepFourConnectComponent
       this.progressIndicatorService.setOverallProgress(overallProgress);
     }
     await new Promise((resolve) => setTimeout(resolve, 1000));
-
     if (this.isMSEnabled) {
       for (let ms of configDataMicroservices) {
         this.progressIndicatorService.setMessage(`Installing ${ms.title}`);
@@ -596,8 +594,10 @@ export class TemplateStepFourConnectComponent
       this.next();
       await new Promise((resolve) => setTimeout(resolve, 5000));
       this.hideProgressModalDialog();
-    } else {
+    } else if((!this.installationFailed) || (this.isRetry)) {
       this.next();
+    } else {
+      this.isRetry = true;
     }
   }
 
@@ -614,6 +614,10 @@ export class TemplateStepFourConnectComponent
     const data = await this.templateCatalogSetupService
       .downloadBinary(microService.link);
       if (!data) {
+
+        // Flag to show the alert service of missing microservice/plugin for the first time
+        this.installationFailed = true;
+        
         this.alertService.danger(
           "Unable to install "+fileName+". Please install it manually.",
           "Unable to install the "+fileName+ " because the 'Cumulocity Community Utils' microservice is not installed or subscribed."
@@ -697,6 +701,9 @@ export class TemplateStepFourConnectComponent
       const data = await this.templateCatalogSetupService
         .downloadBinary(plugin.link);
       if (!data) {
+         // Flag to show the alert service of missing microservice/plugin for the first time
+         this.installationFailed = true;
+         
         this.alertService.danger(
           "Unable to install "+fileName+". Please install it manually.",
           "Unable to install the "+fileName+ " because the 'Cumulocity Community Utils' microservice is not installed or subscribed."
@@ -877,8 +884,6 @@ export class TemplateStepFourConnectComponent
         }
       );
     }
-
-
   }
 
   hideProgressModalDialog() {
