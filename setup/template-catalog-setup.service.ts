@@ -215,19 +215,6 @@ export class TemplateCatalogSetupService {
         };
     }
 
-   /*  getDashboardFields(link) {
-
-        return this.http.get(`${this.GATEWAY_URL_GitHubAsset}${link}`).pipe(map(response => {
-            let dashboardFields = response as Array<object>;
-        })).pipe(catchError(err => {
-            console.log('Template Catalog: Download Binary: Error in primary endpoint! using fallback...');
-            return this.http.get(`${this.GATEWAY_URL_GitHubAsset_FallBack}${link}`, {
-                responseType: 'json'
-            })
-        }));
-
-    } */
-
     private getWidgetsAsChildren(widgets): object {
         let children = {};
         widgets.forEach(widget => {
