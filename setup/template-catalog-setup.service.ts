@@ -21,10 +21,12 @@ import { BehaviorSubject, Observable } from "rxjs";
 import { catchError,  map } from "rxjs/operators";
 import * as delay from "delay";
 import { has, get } from "lodash-es";
-import { ApplicationService, InventoryBinaryService, InventoryService } from "@c8y/ngx-components/api";
+import { ApplicationService, FetchClient, InventoryBinaryService, InventoryService } from "@c8y/ngx-components/api";
 import { CumulocityDashboard, TemplateCatalogEntry } from "./../builder/template-catalog/template-catalog.model";
 import { TemplateBlueprintDetails, TemplateBlueprintEntry } from "./template-setup.model";
 import { AppBuilderExternalAssetsService } from "app-builder-external-assets";
+import { AppIdService } from "../builder/app-id.service";
+import { AlertService } from "@c8y/ngx-components";
 
 const packageJson = require('./../package.json');
 @Injectable()
@@ -66,13 +68,17 @@ export class TemplateCatalogSetupService {
     constructor(private http: HttpClient, private inventoryService: InventoryService,
         private appService: ApplicationService,
         private binaryService: InventoryBinaryService,
-        private externalService: AppBuilderExternalAssetsService
+        private externalService: AppBuilderExternalAssetsService,
+        private client: FetchClient,
+        private appIdService: AppIdService,
+        private alertService: AlertService
+        
     ) {
 
         this.GATEWAY_URL_GitHubAPI = this.externalService.getURL('GITHUB', 'gatewayURL_Github');
-        this.GATEWAY_URL_GitHubAsset = this.externalService.getURL('GITHUB', 'gatewayURL_GitHubAsset');
+        this.GATEWAY_URL_GitHubAsset = 'service/c8y-community-utils/githubAsset?path=';
         this.GATEWAY_URL_GitHubAPI_FallBack = this.externalService.getURL('GITHUB', 'gatewayURL_Github_Fallback');
-        this.GATEWAY_URL_GitHubAsset_FallBack = this.externalService.getURL('GITHUB', 'gatewayURL_GitHubAsset_Fallback');
+        this.GATEWAY_URL_GitHubAsset_FallBack = 'service/c8y-community-utils/githubAsset?path=';
         this.pkgVersion = packageJson.version;
 
     }
@@ -169,16 +175,21 @@ export class TemplateCatalogSetupService {
         }));
     }
 
-    downloadBinary(binaryId: string): Observable<ArrayBuffer> {
-        return this.http.get(`${this.GATEWAY_URL_GitHubAsset}${binaryId}`, {
-            responseType: 'arraybuffer'
-        })
-            .pipe(catchError(err => {
-                console.log('Template Catalog: Download Binary: Error in primary endpoint! using fallback...');
-                return this.http.get(`${this.GATEWAY_URL_GitHubAsset_FallBack}${binaryId}`, {
-                    responseType: 'arraybuffer'
-                })
-            }));
+
+    async downloadBinary(binaryId: string): Promise<any> {
+
+        if(this.appIdService.isCommunityMSExist) {
+            const response = await this.client.fetch(`${this.GATEWAY_URL_GitHubAsset}${binaryId}`);
+            if(response && response.ok) {
+                return (await response.blob());
+            } else  {
+                this.alertService.danger("Unable to download binary! Please try after sometime. If problem persists, please contact the administrator.");
+            }
+        } else {
+            console.log("Unable to download binary!");
+            return null;
+        }
+
     }
 
     getGithubURL(relativePath: string) {
@@ -202,19 +213,6 @@ export class TemplateCatalogSetupService {
             global: true,
             isFrozen: true,
         };
-    }
-
-    getDashboardFields(link) {
-
-        return this.http.get(`${this.GATEWAY_URL_GitHubAsset}${link}`).pipe(map(response => {
-            let dashboardFields = response as Array<object>;
-        })).pipe(catchError(err => {
-            console.log('Template Catalog: Download Binary: Error in primary endpoint! using fallback...');
-            return this.http.get(`${this.GATEWAY_URL_GitHubAsset_FallBack}${link}`, {
-                responseType: 'json'
-            })
-        }));
-
     }
 
     private getWidgetsAsChildren(widgets): object {

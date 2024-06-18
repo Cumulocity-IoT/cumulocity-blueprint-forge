@@ -21,7 +21,7 @@ import { Injectable } from "@angular/core";
 import { Observable } from "rxjs";
 import { catchError, map } from "rxjs/operators";
 import { has, get } from "lodash-es";
-import { IManagedObject, IManagedObjectBinary, IResult } from '@c8y/client';
+import { FetchClient, IManagedObjectBinary, IResult } from '@c8y/client';
 import { BinaryDescription, CumulocityDashboard, DependencyDescription, DeviceDescription, TemplateCatalogEntry, TemplateDashboardWidget, TemplateDetails } from "./template-catalog.model";
 import { ApplicationService, InventoryBinaryService, InventoryService } from "@c8y/ngx-components/api";
 import { AppBuilderNavigationService } from "../navigation/app-builder-navigation.service";
@@ -31,6 +31,7 @@ import { DashboardConfig } from "builder/application-config/dashboard-config.com
 import { SettingsService } from "../settings/settings.service";
 import { AppDataService } from "../app-data.service";
 import * as _ from "lodash";
+import { AppIdService } from "../app-id.service";
 
 const packageJson = require('./../../package.json');
 @Injectable()
@@ -38,6 +39,7 @@ export class TemplateCatalogService {
 
     private GATEWAY_URL_GitHubAsset = '';
     private GATEWAY_URL_GitHubAPI = '';
+    private GATEWAY_URL_Labcase = '';
     private GATEWAY_URL_GitHubAsset_FallBack = '';
     private GATEWAY_URL_GitHubAPI_FallBack = '';
     private dashboardCatalogPath = '/dashboardCatalog/catalog.json';
@@ -51,11 +53,16 @@ export class TemplateCatalogService {
     constructor(private http: HttpClient, private inventoryService: InventoryService,
         private appService: ApplicationService, private navigation: AppBuilderNavigationService,
         private binaryService: InventoryBinaryService, private alertService: AlertService, private appDataService: AppDataService,
-        private externalService: AppBuilderExternalAssetsService, private settingsService: SettingsService) {
+        private externalService: AppBuilderExternalAssetsService, private settingsService: SettingsService,
+        private client: FetchClient, private appIdService: AppIdService) {
         this.GATEWAY_URL_GitHubAPI = this.externalService.getURL('GITHUB','gatewayURL_Github');
-        this.GATEWAY_URL_GitHubAsset =  this.externalService.getURL('GITHUB','gatewayURL_GitHubAsset');
+        this.GATEWAY_URL_GitHubAsset =  'service/c8y-community-utils/githubAsset?path=';
         this.GATEWAY_URL_GitHubAPI_FallBack = this.externalService.getURL('GITHUB','gatewayURL_Github_Fallback');
-        this.GATEWAY_URL_GitHubAsset_FallBack =  this.externalService.getURL('GITHUB','gatewayURL_GitHubAsset_Fallback');
+        this.GATEWAY_URL_GitHubAsset_FallBack =  'service/c8y-community-utils/githubAsset?path=';
+        this.GATEWAY_URL_GitHubAsset = 'service/c8y-community-utils/githubAsset?path=';
+        this.GATEWAY_URL_GitHubAsset_FallBack = 'service/c8y-community-utils/githubAsset?path=';
+        this.GATEWAY_URL_Labcase = 'service/c8y-community-utils/labcaseAsset?id=';
+
         this.pkgVersion = packageJson.version;
         
     }
@@ -129,16 +136,18 @@ export class TemplateCatalogService {
         }));
     }
 
-    downloadBinary(binaryId: string): Observable<ArrayBuffer> {
-        return this.http.get(`${this.GATEWAY_URL_GitHubAsset}${binaryId}`, {
-            responseType: 'arraybuffer'
-        })
-        .pipe(catchError(err => {
-            console.log('Template Catalog: Download Binary: Error in primary endpoint! using fallback...');
-            return this.http.get(`${this.GATEWAY_URL_GitHubAsset_FallBack}${binaryId}`, {
-              responseType: 'arraybuffer'
-            })
-        }));
+    async downloadBinary(binaryId: string): Promise<any> {
+
+        if(this.appIdService.isCommunityMSExist) {
+            const response = await this.client.fetch(`${this.GATEWAY_URL_GitHubAsset}${binaryId}`);
+            if(response && response.ok) {
+                return (await response.blob());
+            } else  {
+                this.alertService.danger("Unable to download binary! Please try after sometime. If problem persists, please contact the administrator.");
+            }
+        } else {
+            throw Error("Unable to download binary!");     
+        }
     }
 
     downloadLargeBinary(binaryId: string){
@@ -324,24 +333,25 @@ export class TemplateCatalogService {
     }
 
     private async uploadBinaryToC8Y(binaryDescription: BinaryDescription): Promise<string> {
-        const response: HttpResponse<Blob> = await this.downloadBinaryFromRepository(binaryDescription.link).toPromise();
-        const fileName = this.getFileNameFromContentDispositionHeader(response.headers.get('content-disposition'));
-        const binaryFile = new File([response.body], fileName, { type: response.body.type });
-
-        return await this.createBinaryInC8Y(binaryFile);
+        const response = await this.downloadBinaryFromRepository(binaryDescription.link);
+        if(response && response.ok) {
+            const fileName = this.getFileNameFromContentDispositionHeader(response.headers.get('content-disposition'));
+            const blob = await response.blob()
+            const binaryFile = new File([blob], fileName, { type: blob.type });
+            return await this.createBinaryInC8Y(binaryFile);
+        } else  {
+            this.alertService.danger("Unable to download binary! Please try after sometime. If problem persists, please contact the administrator.");
+        }
     }
 
-    private downloadBinaryFromRepository(binaryId: string): Observable<HttpResponse<Blob>> {
-        if(this.isFallBackActive) {
-            return this.http.get(`${this.GATEWAY_URL_GitHubAsset_FallBack}${binaryId}`, {
-                responseType: 'blob',
-                observe: 'response'
-            });
+    private async downloadBinaryFromRepository(binaryId: string): Promise<any> {
+
+        if(this.appIdService.isCommunityMSExist) {
+            return (await this.client.fetch(`${this.GATEWAY_URL_Labcase}${binaryId}`));
+        } else {
+            console.error("Unable to download Binary file from Repository!");
+            throw Error("Unable to download binary!");     
         }
-        return this.http.get(`${this.GATEWAY_URL_GitHubAsset}${binaryId}`, {
-            responseType: 'blob',
-            observe: 'response'
-        });
     }
 
     private async createBinaryInC8Y(binary: File): Promise<string> {
