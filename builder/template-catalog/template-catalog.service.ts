@@ -479,4 +479,8 @@ export class TemplateCatalogService {
             return null;
         });
     }
+
+    downloadDTDL(path: string) {
+        return this.http.get(`${path}`);
+    }
 }

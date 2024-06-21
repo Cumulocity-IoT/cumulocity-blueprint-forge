@@ -551,11 +551,19 @@ export class TemplateCatalogModalComponent implements OnInit {
     }
 
     downloadDTDL(uri: string) {
-        const dtdlLink = document.createElement("a");
-        dtdlLink.href = this.catalogService.getGithubURL(uri);;
-        document.body.appendChild(dtdlLink);
-        dtdlLink.click();
-        document.body.removeChild(dtdlLink);
+        const fileName = uri.replace(/^.*[\\\/]/, '');
+        this.catalogService.downloadDTDL(this.catalogService.getGithubURL(uri))
+        .subscribe((response: any) => {
+            const fileData = JSON.stringify(response, null, 2);
+            var blob = new Blob([fileData], {type: 'application/json'});
+            const dtdlLink = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            dtdlLink.href = url;
+            dtdlLink.download = fileName;
+            dtdlLink.click();
+            URL.revokeObjectURL(url);
+            dtdlLink.remove();
+        });
     }
 
     applyFilter() {
