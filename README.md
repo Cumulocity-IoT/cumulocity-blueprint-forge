@@ -1,3 +1,7 @@
+#  Deprecation notice
+This tool is not further developed and it might break with upcoming Cumulocity releases. Use it at your own risk.
+The repository is archived but feel free to fork & adapt it to your needs in a new repo.
+
 # Blueprint Forge for Cumulocity
 
 Blueprint Forge provides a simple, coding-free way to build cumulocity application using pre-built solution templates. Blueprint Forge is an open-source Cumulocity Blueprint that empowers you to initially build an application from a template and later enhance it with additional plugins, dashboards, branding and much more. It's being managed by Cumulocity's open-source community but not officially supported by Cumulocity GmbH. You can log any issues at GitHub or ask any question on the Cumulocity AG Tech Community. Support will be provided on best endeavours.
