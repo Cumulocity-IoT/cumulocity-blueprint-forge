@@ -1,8 +1,8 @@
 # Blueprint Forge for Cumulocity
 
-Blueprint Forge provides a simple, coding-free way to build cumulocity application using pre-built solution templates. Blueprint Forge is an open-source Cumulocity Blueprint that empowers you to initially build an application from a template and later enhance it with additional plugins, dashboards, branding and much more. It's being managed by the Software AG's open-source community but not officially supported by Software AG. You can log any issues at GitHub or ask any question on the Software AG Tech Community. Support will be provided on best endeavours.
+Blueprint Forge provides a simple, coding-free way to build cumulocity application using pre-built solution templates. Blueprint Forge is an open-source Cumulocity Blueprint that empowers you to initially build an application from a template and later enhance it with additional plugins, dashboards, branding and much more. It's being managed by Cumulocity's open-source community but not officially supported by Cumulocity GmbH. You can log any issues at GitHub or ask any question on the Cumulocity AG Tech Community. Support will be provided on best endeavours.
 
-[Discover, Learn, Excel: Access How-To Video and Demos at a Glance!](https://open-source.softwareag.com/cumulocity-blueprint-forge)
+[Discover, Learn, Excel: Access How-To Video and Demos at a Glance!](https://cumulocity-iot.github.io/cumulocity-blueprint-forge/)
 
 
 ![BlueprintForge](assets/blueprint-forge.png)
@@ -42,7 +42,7 @@ Blueprint Forge provides a simple, coding-free way to build cumulocity applicati
 
 ### Install Blueprint Forge
 
-1. Grab the **[Latest Release Zip](https://github.com/SoftwareAG/cumulocity-blueprint-forge/releases)**
+1. Grab the **[Latest Release Zip](https://github.com/Cumulocity-IoT/cumulocity-blueprint-forge/releases)**
 2. Go to the **Administration view** in your tenant (/apps/administration)
 3. Open the **Ecosystem** section in the navigator
 4. Go to **Extensions**
@@ -52,7 +52,7 @@ Blueprint Forge provides a simple, coding-free way to build cumulocity applicati
 
 ### Incremental Upgrade
 
-1. Grab the **[Latest Release Zip](https://github.com/SoftwareAG/cumulocity-blueprint-forge/releases)**
+1. Grab the **[Latest Release Zip](https://github.com/Cumulocity-IoT/cumulocity-blueprint-forge/releases)**
 2. Go to the **Administration view** in your tenant (/apps/administration)
 3. Open the **Ecosystem** section in the navigator
 4. Go to **Extensions**
@@ -129,13 +129,13 @@ Blueprint Forge provides various options and flexibility while you create your a
 
 Congratulations! You have successfully created an application using Blueprint Forge with template of your choice.
 
-For more details, please visit our [Step-by-Step How-To Video Guide](https://open-source.softwareag.com/cumulocity-blueprint-forge/).
+For more details, please visit our [Step-by-Step How-To Video Guide](https://cumulocity-iot.github.io/cumulocity-blueprint-forge/).
 
 
 
 ------------------------------
 
-The Blueprint Forge provided as-is and without warranty or support. They do not constitute part of the Software AG product suite. Users are free to use, fork and modify them, subject to the license agreement. While Software AG welcomes contributions, we cannot guarantee to include every contribution in the master project.
+This blueprint forge is provided as-is and without warranty or support. They do not constitute part of the Cumulocity product suite. Users are free to use, fork and modify them, subject to the license agreement. While Cumulocity GmbH welcomes contributions, we cannot guarantee to include every contribution in the master project.
 _____________________
-For more information you can Ask a Question in the [TECH Community Forums](https://tech.forums.softwareag.com/tag/Cumulocity-IoT).
+For more information you can ask a question in the [Tech Community Forums](https://techcommunity.cumulocity.com).
 
